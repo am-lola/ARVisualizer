@@ -1,4 +1,6 @@
 #include "renderer.hpp"
+#include "mesh/vertex.hpp"
+#include "mesh/mesh.hpp"
 
 namespace ar
 {
@@ -85,6 +87,7 @@ void Renderer::init(int windowWidth, int windowHeight)
   // load video shaders
   _videoShader.loadAndLink("shaders/video.vert", "shaders/video.frag");
   _videoShader.addUniform("videotex");
+  _videoMesh.SetShader(&_videoShader);
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();
@@ -127,39 +130,35 @@ void Renderer::init_geometry()
   // prepare video pane
   glGenVertexArrays(1, &_videoVAO);
   glBindVertexArray(_videoVAO);
-  glGenBuffers(1, &_videoVBO);
 
-  GLfloat videoVertices[] = {
-  //  X      Y     U     V
-    -1.0f,  1.0f, 0.0f, 0.0f,
-     1.0f,  1.0f, 1.0f, 0.0f,
-     1.0f, -1.0f, 1.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 1.0f
+  std::vector<VertexP2T2> videoVertices = {
+    //   Position        UV Coords
+     { {-1.0f,  1.0f}, {0.0f, 0.0f} },
+     { { 1.0f,  1.0f}, {1.0f, 0.0f} },
+     { { 1.0f, -1.0f}, {1.0f, 1.0f} },
+     { {-1.0f, -1.0f}, {0.0f, 1.0f} }
   };
 
-  glBindBuffer(GL_ARRAY_BUFFER, _videoVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT)*16, videoVertices, GL_STATIC_DRAW);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(
-    0, // position
-    2,
-    GL_FLOAT,
-    GL_FALSE,
-    4 * sizeof(GL_FLOAT),
-    (void*)0
-  );
+  std::vector<GLuint> videoIndices = {
+      0, 1, 2, // first triangle
+      0, 2, 3  // second triangle
+  };
 
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(
-    1, // texcoord
-    2,
-    GL_FLOAT,
-    GL_FALSE,
-    4 * sizeof(GL_FLOAT),
-    (void*)(2 * sizeof(GL_FLOAT))
-  );
+  _videoMesh.SetVertices(videoVertices);
+  _videoMesh.SetIndices(videoIndices);
+
+  glGenBuffers(1, &_videoVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, _videoVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(VertexP2T2)*videoVertices.size(), &videoVertices[0], GL_STATIC_DRAW);
+
+  glGenBuffers(1, &_videoIBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _videoIBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*videoIndices.size(), &videoIndices[0], GL_STATIC_DRAW);
+
+  VertexP2T2::EnableVertexAttribArray();
 
   // reset GL state
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 }
@@ -173,8 +172,10 @@ void Renderer::init_textures()
       _currentVideoFrame[i] = 50;
     }
 
-    glGenTextures(1, &_videoTexture);
-    bufferTexture(_width, _height, _videoTexture, _currentVideoFrame);
+    GLuint videoTexture;
+    glGenTextures(1, &videoTexture);
+    bufferTexture(_width, _height, videoTexture, _currentVideoFrame);
+    _videoMesh.SetTexture(videoTexture);
 }
 
 void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
@@ -208,7 +209,7 @@ void Renderer::render()
     if (_newVideoFrame)
     {
       std::lock_guard<std::mutex> guard(_mutex);
-      bufferTexture(_width, _height, _videoTexture, _currentVideoFrame);
+      bufferTexture(_width, _height, _videoMesh.GetTexture(), _currentVideoFrame);
       _newVideoFrame = false;
     }
 
@@ -228,13 +229,16 @@ void Renderer::renderOneFrame()
 {
   _videoShader.enable();
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _videoTexture);
+  glBindTexture(GL_TEXTURE_2D, _videoMesh.GetTexture());
   glUniform1i(_videoShader.getUniform("videotex"), 0);
-  glBindVertexArray(_videoVAO);
 
-  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+  glBindVertexArray(_videoVAO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _videoIBO);
+
+  glDrawElementsBaseVertex(GL_TRIANGLES, _videoMesh.IndexCount(), GL_UNSIGNED_INT, (void*)0, _videoMesh.GetOffset());
 
   // cleanup
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
   _videoShader.disable();

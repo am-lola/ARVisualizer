@@ -6,6 +6,7 @@
 #include <thread>
 #include <mutex>
 #include "ShaderProgram.hpp"
+#include "mesh/mesh.hpp"
 
 namespace ar
 {
@@ -44,9 +45,11 @@ private:
   unsigned char* _currentVideoFrame;
   GLuint _videoVAO;
   GLuint _videoVBO;
-  GLuint _videoTexture;
+  GLuint _videoIBO;
   ShaderProgram _videoShader;
   bool _newVideoFrame = false;
+
+  TexturedQuad _videoMesh;
 
   // Sets up the OpenGL context & initializes data needed for rendering
   void init(int windowWidth, int windowHeight);

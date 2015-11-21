@@ -14,7 +14,12 @@ option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
 
 if (ARVIS_BUILD_LIBRARY)
     set(CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++")
-    file(GLOB libarvis_src src/arvisualizer.*pp src/renderer.*pp src/loadShaders.*pp src/ShaderProgram.*pp)
+    file(GLOB libarvis_src
+        src/arvisualizer.*pp
+        src/renderer.*pp
+        src/loadShaders.*pp
+        src/ShaderProgram.*pp
+        src/mesh/mesh.*pp)
     add_library(arvisualizer SHARED ${libarvis_src})
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
