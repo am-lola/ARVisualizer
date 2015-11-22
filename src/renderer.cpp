@@ -84,10 +84,12 @@ void Renderer::init(int windowWidth, int windowHeight)
   // setup OpenGL context and open a window for rendering
   init_GL(windowWidth, windowHeight);
 
+  // init buffers
+  _quadsBuffer = new VertexBuffer<VertexP2T2>();
+
   // load video shaders
   _videoShader.loadAndLink("shaders/video.vert", "shaders/video.frag");
   _videoShader.addUniform("videotex");
-  _videoMesh.SetShader(&_videoShader);
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();
@@ -128,9 +130,6 @@ void Renderer::init_GL(int windowWidth, int windowHeight)
 void Renderer::init_geometry()
 {
   // prepare video pane
-  glGenVertexArrays(1, &_videoVAO);
-  glBindVertexArray(_videoVAO);
-
   std::vector<VertexP2T2> videoVertices = {
     //   Position        UV Coords
      { {-1.0f,  1.0f}, {0.0f, 0.0f} },
@@ -144,23 +143,7 @@ void Renderer::init_geometry()
       0, 2, 3  // second triangle
   };
 
-  _videoMesh.SetVertices(videoVertices);
-  _videoMesh.SetIndices(videoIndices);
-
-  glGenBuffers(1, &_videoVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, _videoVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(VertexP2T2)*videoVertices.size(), &videoVertices[0], GL_STATIC_DRAW);
-
-  glGenBuffers(1, &_videoIBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _videoIBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*videoIndices.size(), &videoIndices[0], GL_STATIC_DRAW);
-
-  VertexP2T2::EnableVertexAttribArray();
-
-  // reset GL state
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  _2DQuads.push_back(TexturedQuad(videoVertices, videoIndices, &_videoShader));
 }
 
 void Renderer::init_textures()
@@ -175,7 +158,8 @@ void Renderer::init_textures()
     GLuint videoTexture;
     glGenTextures(1, &videoTexture);
     bufferTexture(_width, _height, videoTexture, _currentVideoFrame);
-    _videoMesh.SetTexture(videoTexture);
+
+    _2DQuads[0].SetTexture(videoTexture); /// TODO: Don't do this...
 }
 
 void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
@@ -206,14 +190,28 @@ void Renderer::render()
 {
   while (_running)
   {
+    // if we've received a new video frame, send it to the GPU
     if (_newVideoFrame)
     {
       std::lock_guard<std::mutex> guard(_mutex);
-      bufferTexture(_width, _height, _videoMesh.GetTexture(), _currentVideoFrame);
+      bufferTexture(_width, _height, _2DQuads[0].GetTexture(), _currentVideoFrame);
       _newVideoFrame = false;
     }
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // if we have any new mesh data, send it to the GPU
+    for (auto& m : _2DQuads)
+    {
+      if (m.Dirty())
+      {
+        m.SetOffset(_quadsBuffer->AddVertices(m.GetVertices()));
+        _quadsBuffer->AddIndices(m.GetIndices());
+        m.ClearDirty();
+      }
+    }
+    if (_quadsBuffer->Dirty())
+    {
+      _quadsBuffer->BufferData();
+    }
 
     renderOneFrame();
 
@@ -221,27 +219,33 @@ void Renderer::render()
     glfwPollEvents();
   }
 
-  // if we've stopped rendering, close/destroy the window
-  glfwDestroyWindow(_window);
+  // if we've stopped rendering, close/destroy the window & cleanup
+  shutdown();
 }
 
 void Renderer::renderOneFrame()
 {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
   _videoShader.enable();
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _videoMesh.GetTexture());
+  glBindTexture(GL_TEXTURE_2D, _2DQuads[0].GetTexture());
   glUniform1i(_videoShader.getUniform("videotex"), 0);
 
-  glBindVertexArray(_videoVAO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _videoIBO);
-
-  glDrawElementsBaseVertex(GL_TRIANGLES, _videoMesh.IndexCount(), GL_UNSIGNED_INT, (void*)0, _videoMesh.GetOffset());
+  for (auto& m : _2DQuads)
+  {
+    _quadsBuffer->Draw(m.IndexCount(), m.GetOffset());
+  }
 
   // cleanup
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
   _videoShader.disable();
+}
+
+void Renderer::shutdown()
+{
+  delete(_quadsBuffer);
+  glfwDestroyWindow(_window);
 }
 
 } // namespace ar

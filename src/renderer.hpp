@@ -3,10 +3,13 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
+#include <vector>
 #include <thread>
 #include <mutex>
 #include "ShaderProgram.hpp"
+#include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
+
 
 namespace ar
 {
@@ -43,13 +46,11 @@ private:
 
     /// TODO: move this to its own class
   unsigned char* _currentVideoFrame;
-  GLuint _videoVAO;
-  GLuint _videoVBO;
-  GLuint _videoIBO;
   ShaderProgram _videoShader;
   bool _newVideoFrame = false;
 
-  TexturedQuad _videoMesh;
+  std::vector<TexturedQuad> _2DQuads;
+  VertexBuffer<VertexP2T2>* _quadsBuffer;
 
   // Sets up the OpenGL context & initializes data needed for rendering
   void init(int windowWidth, int windowHeight);
@@ -71,6 +72,9 @@ private:
 
   // renders just one frame
   void renderOneFrame();
+
+  // Final cleanup which needs to be done (from the render thread) when we stop rendering
+  void shutdown();
 };
 
 } // namespace ar

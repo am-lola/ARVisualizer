@@ -13,11 +13,14 @@ public:
   Mesh() : _id(0) {};
   Mesh(ShaderProgram* s) : _id(0), _shader(s) {};
   Mesh(std::vector<VertexT> v) : _id(0), _vertices(v), _dirty(true) {};
+  Mesh(std::vector<VertexT> v, std::vector<GLuint> i) : _id(0), _vertices(v), _indices(i), _dirty(true) {};
   Mesh(std::vector<VertexT> v, ShaderProgram* s) : _id(0), _vertices(v), _shader(s), _dirty(true) {};
+  Mesh(std::vector<VertexT> v, std::vector<GLuint> i, ShaderProgram* s) : _id(0), _vertices(v), _indices(i), _shader(s), _dirty(true) {};
 
   int ID() { return _id; };
 
   bool Dirty() { return _dirty; };
+  bool ClearDirty() { _dirty = false; };
 
   unsigned int VertexCount() { return _vertices.size(); };
   std::vector<VertexT> GetVertices() { return _vertices; };
@@ -45,6 +48,8 @@ private:
 class TexturedQuad : public Mesh<VertexP2T2>
 {
 public:
+  using Mesh::Mesh;
+
   GLuint GetTexture() { return _texture; };
   void SetTexture(GLuint tex) { _texture = tex; };
 
