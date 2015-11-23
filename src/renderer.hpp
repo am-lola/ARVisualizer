@@ -3,6 +3,12 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
+
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
 #include <vector>
 #include <thread>
 #include <mutex>
@@ -34,6 +40,26 @@ public:
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
   void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
 
+  // Gets the View matrix
+  glm::mat4 GetViewMatrix()
+  {
+    return glm::lookAt( // should probably cache this and only update it when it changes
+      _camera.position,
+      _camera.forward,
+      _camera.up
+    );
+  }
+
+  glm::mat4 GetProjectionMatrix()
+  {
+    return glm::perspective( // this one, too
+      _camera.fov,
+      (float)_width / (float)_height,
+      _camera.nearClip,
+      _camera.farClip
+    );
+  }
+
 private:
   bool _running = false;
 
@@ -44,13 +70,26 @@ private:
 
   std::thread _renderThread;
 
+  struct camera_parms {
+      glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);  // where the camera is
+      glm::vec3 forward  = glm::vec3(0.0f, 0.0f, 1.0f);  // where the camera is looking
+      glm::vec3 up       = glm::vec3(0.0f, 1.0f, 0.0f);  // "up" from camera's perspective (orthogonal to forward)
+      float fov          = 45.0f;  // field of view, in degrees
+      float nearClip     = 0.1f;   // distance to near clipping plane
+      float farClip      = 100.0f; // distance to far clipping plane
+  } _camera;
+
     /// TODO: move this to its own class
   unsigned char* _currentVideoFrame;
   ShaderProgram _videoShader;
   bool _newVideoFrame = false;
 
-  std::vector<TexturedQuad> _2DQuads;
-  VertexBuffer<VertexP2T2>* _quadsBuffer;
+  ShaderProgram _defaultShader;
+  std::vector<TexturedQuad> _2DMeshes;
+  VertexBuffer<VertexP2T2>* _2DMeshBuffer;
+
+  std::vector<Mesh<VertexP3C3> > _3DMeshes;
+  VertexBuffer<VertexP3C3>* _3DMeshBuffer;
 
   // Sets up the OpenGL context & initializes data needed for rendering
   void init(int windowWidth, int windowHeight);

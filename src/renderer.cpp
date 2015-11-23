@@ -85,11 +85,14 @@ void Renderer::init(int windowWidth, int windowHeight)
   init_GL(windowWidth, windowHeight);
 
   // init buffers
-  _quadsBuffer = new VertexBuffer<VertexP2T2>();
+  _2DMeshBuffer = new VertexBuffer<VertexP2T2>();
+  _3DMeshBuffer = new VertexBuffer<VertexP3C3>();
 
   // load video shaders
-  _videoShader.loadAndLink("shaders/video.vert", "shaders/video.frag");
-  _videoShader.addUniform("videotex");
+  _defaultShader.loadAndLink("shaders/default.vert", "shaders/default.frag");
+  _defaultShader.addUniform("MVP");
+  _videoShader.loadAndLink("shaders/2D_passthru.vert", "shaders/simpleTexture.frag");
+  _videoShader.addUniform("tex");
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();
@@ -124,7 +127,7 @@ void Renderer::init_GL(int windowWidth, int windowHeight)
 
   glfwSwapInterval(1);
   glEnable(GL_DEPTH_TEST);
-  glClearColor(0, 0, 0.5, 1);
+  glClearColor(0, 0, 0.15, 1);
 }
 
 void Renderer::init_geometry()
@@ -143,7 +146,7 @@ void Renderer::init_geometry()
       0, 2, 3  // second triangle
   };
 
-  _2DQuads.push_back(TexturedQuad(videoVertices, videoIndices, &_videoShader));
+  _2DMeshes.push_back(TexturedQuad(videoVertices, videoIndices, &_videoShader));
 }
 
 void Renderer::init_textures()
@@ -159,7 +162,7 @@ void Renderer::init_textures()
     glGenTextures(1, &videoTexture);
     bufferTexture(_width, _height, videoTexture, _currentVideoFrame);
 
-    _2DQuads[0].SetTexture(videoTexture); /// TODO: Don't do this...
+    _2DMeshes[0].SetTexture(videoTexture); /// TODO: Don't do this...
 }
 
 void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
@@ -194,25 +197,39 @@ void Renderer::render()
     if (_newVideoFrame)
     {
       std::lock_guard<std::mutex> guard(_mutex);
-      bufferTexture(_width, _height, _2DQuads[0].GetTexture(), _currentVideoFrame);
+      bufferTexture(_width, _height, _2DMeshes[0].GetTexture(), _currentVideoFrame);
       _newVideoFrame = false;
     }
 
-    // if we have any new mesh data, send it to the GPU
-    for (auto& m : _2DQuads)
+    // if we have any new mesh data, update buffers and send it to the GPU
+    for (auto& m : _2DMeshes)
     {
       if (m.Dirty())
       {
-        m.SetOffset(_quadsBuffer->AddVertices(m.GetVertices()));
-        _quadsBuffer->AddIndices(m.GetIndices());
+        m.SetOffset(_2DMeshBuffer->AddVertices(m.GetVertices()));
+        _2DMeshBuffer->AddIndices(m.GetIndices());
         m.ClearDirty();
       }
     }
-    if (_quadsBuffer->Dirty())
+    if (_2DMeshBuffer->Dirty())
     {
-      _quadsBuffer->BufferData();
+      _2DMeshBuffer->BufferData();
+    }
+    for (auto& m : _3DMeshes)
+    {
+      if (m.Dirty())
+      {
+        m.SetOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
+        _3DMeshBuffer->AddIndices(m.GetIndices());
+        m.ClearDirty();
+      }
+    }
+    if (_3DMeshBuffer->Dirty())
+    {
+      _3DMeshBuffer->BufferData();
     }
 
+    // Render!
     renderOneFrame();
 
     glfwSwapBuffers(_window);
@@ -227,24 +244,46 @@ void Renderer::renderOneFrame()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  _videoShader.enable();
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, _2DQuads[0].GetTexture());
-  glUniform1i(_videoShader.getUniform("videotex"), 0);
-
-  for (auto& m : _2DQuads)
+  /*************
+  * First pass:
+  *   render all 2D textured shapes
+  *************/
+  glDisable(GL_DEPTH_TEST);
+  for (auto& m : _2DMeshes)
   {
-    _quadsBuffer->Draw(m.IndexCount(), m.GetOffset());
+    m.GetShader()->enable();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m.GetTexture());
+    glUniform1i(m.GetShader()->getUniform("tex"), 0);
+
+    _2DMeshBuffer->Draw(m.IndexCount(), m.GetOffset());
+  }
+
+  /*************
+  * Second pass:
+  *   render all 3D objects on top of the previous 2D shapes
+  *************/
+  glClear(GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
+  for (auto& m : _3DMeshes)
+  {
+    m.GetShader()->enable();
+    glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * m.GetTransform();
+    glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+
+    _3DMeshBuffer->Draw(m.IndexCount(), m.GetOffset());
   }
 
   // cleanup
   glBindTexture(GL_TEXTURE_2D, 0);
-  _videoShader.disable();
+  glUseProgram(0);
 }
 
 void Renderer::shutdown()
 {
-  delete(_quadsBuffer);
+  delete(_2DMeshBuffer);
+  delete(_3DMeshBuffer);
   glfwDestroyWindow(_window);
 }
 

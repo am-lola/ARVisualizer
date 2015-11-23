@@ -36,6 +36,9 @@ public:
   int GetOffset() { return _offset; };
   void SetOffset(int o) { _offset = o; };
 
+  glm::mat4 GetTransform() { return _transform; };
+  void SetTransform(glm::mat4 t) { _transform = t; };
+
 private:
   int _id = 0;
   bool _dirty = false; // marked True if we have vertex data the renderer doesn't know about, yet
@@ -43,6 +46,7 @@ private:
   std::vector<VertexT> _vertices;
   std::vector<GLuint> _indices;
   ShaderProgram* _shader;
+  glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
 };
 
 class TexturedQuad : public Mesh<VertexP2T2>
