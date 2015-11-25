@@ -1,7 +1,9 @@
 #ifndef _ARRENDERER_H
 #define _ARRENDERER_H
 
+#ifndef GL_GLEXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES
+#endif
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
@@ -39,6 +41,8 @@ public:
 
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
   void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
+
+  unsigned int Add3DMesh(Mesh<VertexP3C3> mesh);
 
   // Gets the View matrix
   glm::mat4 GetViewMatrix()

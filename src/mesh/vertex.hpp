@@ -1,6 +1,11 @@
 #ifndef _VERTEX_H
 #define _VERTEX_H
 
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES
+#endif
+#include <GLFW/glfw3.h>
+
 namespace ar
 {
 

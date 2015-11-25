@@ -6,6 +6,8 @@ namespace ar
 
 class Renderer;
 
+typedef unsigned int mesh_handle;
+
 /*
   The main interface to the AR Visualization library
 */
@@ -29,6 +31,10 @@ public:
 
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
   void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
+
+  mesh_handle AddTriangle(double vertexPositions[3][3], double color[3]);
+
+  mesh_handle AddQuad(double* center, double* normal, double width, double height, double* color);
 
 private:
   Renderer* _renderer;

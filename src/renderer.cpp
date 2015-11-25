@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 #include "mesh/vertex.hpp"
 #include "mesh/mesh.hpp"
+#include "mesh/meshfactory.hpp"
 
 namespace ar
 {
@@ -75,6 +76,13 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
   }
 
   _newVideoFrame = true;
+}
+
+unsigned int Renderer::Add3DMesh(Mesh<VertexP3C3> mesh)
+{
+  mesh.SetShader(&_defaultShader);
+  _3DMeshes.push_back(mesh);
+  return 0; // TODO: Make this meaningful
 }
 
 void Renderer::init(int windowWidth, int windowHeight)
@@ -206,8 +214,8 @@ void Renderer::render()
     {
       if (m.Dirty())
       {
-        m.SetOffset(_2DMeshBuffer->AddVertices(m.GetVertices()));
-        _2DMeshBuffer->AddIndices(m.GetIndices());
+        m.SetVertexOffset(_2DMeshBuffer->AddVertices(m.GetVertices()));
+        m.SetIndexOffset(_2DMeshBuffer->AddIndices(m.GetIndices()));
         m.ClearDirty();
       }
     }
@@ -219,8 +227,8 @@ void Renderer::render()
     {
       if (m.Dirty())
       {
-        m.SetOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
-        _3DMeshBuffer->AddIndices(m.GetIndices());
+        m.SetVertexOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
+        m.SetIndexOffset(_3DMeshBuffer->AddIndices(m.GetIndices()));
         m.ClearDirty();
       }
     }
@@ -257,7 +265,7 @@ void Renderer::renderOneFrame()
     glBindTexture(GL_TEXTURE_2D, m.GetTexture());
     glUniform1i(m.GetShader()->getUniform("tex"), 0);
 
-    _2DMeshBuffer->Draw(m.IndexCount(), m.GetOffset());
+    _2DMeshBuffer->Draw(m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }
 
   /*************
@@ -272,7 +280,7 @@ void Renderer::renderOneFrame()
     glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * m.GetTransform();
     glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
-    _3DMeshBuffer->Draw(m.IndexCount(), m.GetOffset());
+    _3DMeshBuffer->Draw(m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }
 
   // cleanup

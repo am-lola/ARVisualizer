@@ -1,6 +1,7 @@
 #ifndef _MESH_H
 #define _MESH_H
 #include <vector>
+#include "ShaderProgram.hpp"
 #include "vertex.hpp"
 
 namespace ar
@@ -33,8 +34,11 @@ public:
   ShaderProgram* GetShader() { return _shader; };
   void SetShader(ShaderProgram* s) { _shader = s; };
 
-  int GetOffset() { return _offset; };
-  void SetOffset(int o) { _offset = o; };
+  int GetVertexOffset() { return _vtx_offset; };
+  void SetVertexOffset(int o) { _vtx_offset = o; };
+
+  int GetIndexOffset() { return _idx_offset; };
+  void SetIndexOffset(int o) { _idx_offset = o; };
 
   glm::mat4 GetTransform() { return _transform; };
   void SetTransform(glm::mat4 t) { _transform = t; };
@@ -42,7 +46,8 @@ public:
 private:
   int _id = 0;
   bool _dirty = false; // marked True if we have vertex data the renderer doesn't know about, yet
-  int _offset = 0;     // offset of first vertex of this mesh in the VBO it's drawn from
+  int _vtx_offset = 0;     // offset of first vertex of this mesh in the VBO it's drawn from
+  int _idx_offset = 0;     // offset of first index of this mesh in the index buffer it's drawn from
   std::vector<VertexT> _vertices;
   std::vector<GLuint> _indices;
   ShaderProgram* _shader;
