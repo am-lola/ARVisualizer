@@ -2,26 +2,19 @@
 #include <vector>
 #include "arvisualizer.hpp"
 
-struct quad
-{
-  double center[3];
-  double normal[3];
-  double color[3];
-  double width;
-  double height;
-};
+/*
+  A small sample application to show basic usage of ARVisualizer
 
-struct tri
-{
-  double vertices[3][3];
-  double color[3];
-};
+  This sample just uses ARVisualizer to create and render several
+  simple 3D meshes.
+*/
 
 int main(void)
 {
   ar::ARVisualizer* visualizer = new ar::ARVisualizer(1024, 768);
 
-  // start the visualizer before doing anything else with it!
+  // Start the visualizer before doing anything else with it!
+  // This opens the window used for rendering, creates the OpenGL context, etc.
   visualizer->Start();
 
   // make some shapes
@@ -57,7 +50,7 @@ int main(void)
   visualizer->AddTriangle(triVertices2, triColor2);
   visualizer->AddQuad(quadCenter2, quadNormal2, quadWidth2, quadHeight2, quadColor2);
 
-
+  // Keep rendering until the user wants to quit
   std::cout << "Pres enter to exit..." << std::endl;
   std::cin.get();
   std::cout << "Shutting down..." << std::endl;
