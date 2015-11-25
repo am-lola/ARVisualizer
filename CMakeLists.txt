@@ -31,8 +31,8 @@ if (ARVIS_BUILD_SAMPLES)
     # PCL Is required for the grabber sample
     find_package(PCL 1.2 REQUIRED)
     include_directories(${PCL_INCLUDE_DIRS})
-    add_executable(simple_video samples/simple_video/main.cpp)
-    target_link_libraries(simple_video arvisualizer ${PCL_LIBRARIES})
+    add_executable(sample_pcl_grabber samples/pcl_grabber/main.cpp)
+    target_link_libraries(sample_pcl_grabber arvisualizer ${PCL_LIBRARIES})
 
     # OpenCV is required for the OpenCV sample
     find_package(OpenCV REQUIRED)
@@ -40,6 +40,6 @@ if (ARVIS_BUILD_SAMPLES)
     target_link_libraries(sample_opencv_camera arvisualizer ${OpenCV_LIBS})
 
     # The mesh sample has no additional dependencies
-    add_executable(simple_mesh samples/simple_mesh/main.cpp)
-    target_link_libraries(simple_mesh arvisualizer)
+    add_executable(sample_mesh_rendering samples/mesh_rendering/main.cpp)
+    target_link_libraries(sample_mesh_rendering arvisualizer)
 endif()
