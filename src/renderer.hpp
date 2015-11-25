@@ -22,6 +22,12 @@
 namespace ar
 {
 
+// define vertex format for 2D & 3D shapes here for convenience
+typedef VertexP3C3 Vertex3D;
+typedef VertexP2T2 Vertex2D;
+typedef Mesh<Vertex3D> Mesh3D;
+typedef TexturedQuad Mesh2D;
+
 class Renderer
 {
 public:
@@ -42,7 +48,7 @@ public:
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
   void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
 
-  unsigned int Add3DMesh(Mesh<VertexP3C3> mesh);
+  unsigned int Add3DMesh(Mesh3D mesh);
 
   // Gets the View matrix
   glm::mat4 GetViewMatrix()
@@ -90,10 +96,10 @@ private:
 
   ShaderProgram _defaultShader;
   std::vector<TexturedQuad> _2DMeshes;
-  VertexBuffer<VertexP2T2>* _2DMeshBuffer;
+  VertexBuffer<Vertex2D>* _2DMeshBuffer;
 
   std::vector<Mesh<VertexP3C3> > _3DMeshes;
-  VertexBuffer<VertexP3C3>* _3DMeshBuffer;
+  VertexBuffer<Vertex3D>* _3DMeshBuffer;
 
   // Sets up the OpenGL context & initializes data needed for rendering
   void init(int windowWidth, int windowHeight);

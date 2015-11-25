@@ -78,7 +78,7 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
   _newVideoFrame = true;
 }
 
-unsigned int Renderer::Add3DMesh(Mesh<VertexP3C3> mesh)
+unsigned int Renderer::Add3DMesh(Mesh3D mesh)
 {
   mesh.SetShader(&_defaultShader);
   _3DMeshes.push_back(mesh);
@@ -93,8 +93,8 @@ void Renderer::init(int windowWidth, int windowHeight)
   init_GL(windowWidth, windowHeight);
 
   // init buffers
-  _2DMeshBuffer = new VertexBuffer<VertexP2T2>();
-  _3DMeshBuffer = new VertexBuffer<VertexP3C3>();
+  _2DMeshBuffer = new VertexBuffer<Vertex2D>();
+  _3DMeshBuffer = new VertexBuffer<Vertex3D>();
 
   // load video shaders
   _defaultShader.loadAndLink("shaders/default.vert", "shaders/default.frag");
@@ -141,7 +141,7 @@ void Renderer::init_GL(int windowWidth, int windowHeight)
 void Renderer::init_geometry()
 {
   // prepare video pane
-  std::vector<VertexP2T2> videoVertices = {
+  std::vector<Vertex2D> videoVertices = {
     //   Position        UV Coords
      { {-1.0f,  1.0f}, {0.0f, 0.0f} },
      { { 1.0f,  1.0f}, {1.0f, 0.0f} },
