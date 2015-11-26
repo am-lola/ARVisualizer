@@ -15,11 +15,15 @@ public:
   static Mesh<VertexP3> MakeTriangle(std::vector<glm::vec3> vertexPositions);
   static Mesh<VertexP3C3> MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<glm::vec3> vertexColors);
   static Mesh<VertexP3C3> MakeTriangle(std::vector<glm::vec3> vertexPositions, glm::vec3 vertexColors);
+  static Mesh<VertexP3C4> MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<glm::vec4> vertexColors);
+  static Mesh<VertexP3C4> MakeTriangle(std::vector<glm::vec3> vertexPositions, glm::vec4 vertexColors);
 
   static Mesh<VertexP2> MakeQuad(glm::vec2 center, double width, double height);
   static Mesh<VertexP3> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height);
   static Mesh<VertexP3C3> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<glm::vec3> vertexColors);
   static Mesh<VertexP3C3> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, glm::vec3 vertexColors);
+  static Mesh<VertexP3C4> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<glm::vec4> vertexColors);
+  static Mesh<VertexP3C4> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, glm::vec4 vertexColors);
 
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset

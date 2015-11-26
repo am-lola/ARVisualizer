@@ -23,7 +23,7 @@ namespace ar
 {
 
 // define vertex format for 2D & 3D shapes here for convenience
-typedef VertexP3C3 Vertex3D;
+typedef VertexP3C4 Vertex3D;
 typedef VertexP2T2 Vertex2D;
 typedef Mesh<Vertex3D> Mesh3D;
 typedef TexturedQuad Mesh2D;
@@ -98,7 +98,7 @@ private:
   std::vector<TexturedQuad> _2DMeshes;
   VertexBuffer<Vertex2D>* _2DMeshBuffer;
 
-  std::vector<Mesh<VertexP3C3> > _3DMeshes;
+  std::vector<Mesh3D> _3DMeshes;
   VertexBuffer<Vertex3D>* _3DMeshBuffer;
 
   // Sets up the OpenGL context & initializes data needed for rendering

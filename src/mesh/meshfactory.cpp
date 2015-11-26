@@ -41,9 +41,27 @@ Mesh<VertexP3C3> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPosition
   return Mesh<VertexP3C3>(verts, indices);
 }
 
+Mesh<VertexP3C4> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<glm::vec4> vertexColors)
+{
+  std::vector<VertexP3C4> verts;
+  std::vector<GLuint> indices = {0, 1, 2};
+  for (size_t i = 0; i < 3; i++) {
+    verts.push_back({vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z,
+                     vertexColors[i].r,    vertexColors[i].g,    vertexColors[i].b, vertexColors[i].a});
+  }
+
+  return Mesh<VertexP3C4>(verts, indices);
+}
+
 Mesh<VertexP3C3> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPositions, glm::vec3 color)
 {
   std::vector<glm::vec3> vertexColors = { color, color, color };
+  return MakeTriangle(vertexPositions, vertexColors);
+}
+
+Mesh<VertexP3C4> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPositions, glm::vec4 color)
+{
+  std::vector<glm::vec4> vertexColors = { color, color, color };
   return MakeTriangle(vertexPositions, vertexColors);
 }
 
@@ -116,9 +134,40 @@ Mesh<VertexP3C3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, doubl
   return m;
 }
 
+Mesh<VertexP3C4> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<glm::vec4> vertexColors)
+{
+  float halfwidth = width / 2.0;
+  float halfheight = height / 2.0;
+
+  // create quad at origin aligned with XY plane
+  std::vector<VertexP3C4> verts  = {
+    {{ -halfwidth,  halfheight, 0.0f }, { vertexColors[0].r, vertexColors[0].g, vertexColors[0].b, vertexColors[0].a }}, // top-left
+    {{  halfwidth,  halfheight, 0.0f }, { vertexColors[1].r, vertexColors[1].g, vertexColors[1].b, vertexColors[1].a }}, // top-right
+    {{ -halfwidth, -halfheight, 0.0f }, { vertexColors[2].r, vertexColors[2].g, vertexColors[2].b, vertexColors[2].a }}, // bottom-left
+    {{  halfwidth, -halfheight, 0.0f }, { vertexColors[3].r, vertexColors[3].g, vertexColors[3].b, vertexColors[3].a }}, // bottom-right
+  };
+
+  std::vector<GLuint> indices = {
+    0, 1, 3,
+    0, 2, 3
+  };
+
+  // make mesh
+  Mesh<VertexP3C4> m = Mesh<VertexP3C4>(verts, indices);
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
+
+  return m;
+}
+
 Mesh<VertexP3C3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, glm::vec3 color)
 {
   std::vector<glm::vec3> vertexColors = {color, color, color, color};
+  return MakeQuad(center, normal, width, height, vertexColors);
+}
+
+Mesh<VertexP3C4> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, glm::vec4 color)
+{
+  std::vector<glm::vec4> vertexColors = {color, color, color, color};
   return MakeQuad(center, normal, width, height, vertexColors);
 }
 

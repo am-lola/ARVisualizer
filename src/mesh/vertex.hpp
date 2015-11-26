@@ -94,6 +94,25 @@ struct VertexP3C3
   }
 };
 
+// A vertex with three position coordinates and four color values (XYZRGBA)
+struct VertexP3C4
+{
+  GLfloat position[3];
+  GLfloat color[4];
+
+  static void EnableVertexAttribArray()
+  {
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                         sizeof(VertexP3C4),
+                         (const GLvoid*)offsetof(VertexP3C4, position));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
+                         sizeof(VertexP3C4),
+                         (const GLvoid*)offsetof(VertexP3C4, color));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+  }
+};
+
 } // namespace ar
 
 #endif // _VERTEX_H

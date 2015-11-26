@@ -7,11 +7,11 @@
 *****************/
 
 layout(location = 0) in vec3 vertexPosition;
-layout(location = 1) in vec3 vertexColor;
+layout(location = 1) in vec4 vertexColor;
 
 uniform mat4 MVP;
 
-out vec3 frag_color;
+out vec4 frag_color;
 
 void main()
 {
