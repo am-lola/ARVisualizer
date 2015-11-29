@@ -62,7 +62,7 @@ int main(void)
   bool frame_rgb_ready = false;
 
   // Start the visualizer!
-  visualizer.Start();
+  visualizer.Start(1024, 768);
 
   if (!cvcapture.open(0))
   {

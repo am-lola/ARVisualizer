@@ -38,7 +38,7 @@ int main(void)
   interface = new pcl::OpenNIGrabber();
 
   // Create ar::ARVisualizer to send data to
-  visualizer = new ar::ARVisualizer(1024, 768);
+  visualizer = new ar::ARVisualizer();
 
   // subscribe to grabber's image callback so we get RGB data
   boost::function<void (const boost::shared_ptr<openni_wrapper::Image>&)> f = boost::bind (&image_callback, _1);
@@ -48,7 +48,7 @@ int main(void)
   interface->start ();
 
   // start the visualizer
-  visualizer->Start();
+  visualizer->Start(1024, 768);
 
   // everything else is async, so just wait until the user has had enough
   std::cout << "Press enter to exit..." << std::endl;

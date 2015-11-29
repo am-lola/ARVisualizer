@@ -1,6 +1,7 @@
 #include "arvisualizer.hpp"
 #include "renderer.hpp"
 #include "mesh/meshfactory.hpp"
+#include "windowmanager/windowmanager.hpp"
 #include <iostream>
 #include <stdlib.h>
 
@@ -9,12 +10,7 @@ namespace ar
 
 ARVisualizer::ARVisualizer()
 {
-  _renderer = new Renderer();
-}
-
-ARVisualizer::ARVisualizer(int windowWidth, int windowHeight)
-{
-  _renderer = new Renderer(windowWidth, windowHeight);
+  _renderer = nullptr;
 }
 
 ARVisualizer::~ARVisualizer()
@@ -25,19 +21,29 @@ ARVisualizer::~ARVisualizer()
   }
 }
 
-void ARVisualizer::Start()
+void ARVisualizer::Start(int width, int height)
 {
-  _renderer->Start();
+  _renderer = WindowManager::Instance().NewRenderer(width, height, "AR visualizer");
 }
 
 void ARVisualizer::Stop()
 {
-  _renderer->Stop();
+  if (_renderer)
+  {
+    _renderer->Stop();
+  }
 }
 
 bool ARVisualizer::IsRunning()
 {
-  return _renderer->IsRunning();
+  if (_renderer)
+  {
+    return _renderer->IsRunning();
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)

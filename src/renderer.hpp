@@ -31,8 +31,7 @@ typedef TexturedQuad Mesh2D;
 class Renderer
 {
 public:
-  Renderer() : Renderer(1024, 768) {};
-  Renderer(int windowWidth, int windowHeight);
+  Renderer(GLFWwindow* window);
 
   ~Renderer();
 
@@ -102,10 +101,10 @@ private:
   VertexBuffer<Vertex3D>* _3DMeshBuffer;
 
   // Sets up the OpenGL context & initializes data needed for rendering
-  void init(int windowWidth, int windowHeight);
+  void init();
 
-  // handles OpenGL context creation and window creation
-  void init_GL(int windowWidth, int windowHeight);
+  // handles OpenGL context binding and default rendering settings
+  void init_GL();
 
   // sets up vertex data for objects we know we need (e.g. a plane to render the video on)
   void init_geometry();   /// TODO: Move this to another class

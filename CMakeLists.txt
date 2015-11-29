@@ -20,7 +20,8 @@ if (ARVIS_BUILD_LIBRARY)
         src/loadShaders.*pp
         src/ShaderProgram.*pp
         src/mesh/mesh.*pp
-        src/mesh/meshfactory.*pp)
+        src/mesh/meshfactory.*pp
+        src/windowmanager/windowmanager.*pp)
     add_library(arvisualizer SHARED ${libarvis_src})
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
@@ -42,4 +43,7 @@ if (ARVIS_BUILD_SAMPLES)
     # The mesh sample has no additional dependencies
     add_executable(sample_mesh_rendering samples/mesh_rendering/main.cpp)
     target_link_libraries(sample_mesh_rendering arvisualizer)
+
+    add_executable(sample_multiple_windows samples/multiple_windows/main.cpp)
+    target_link_libraries(sample_multiple_windows arvisualizer)
 endif()

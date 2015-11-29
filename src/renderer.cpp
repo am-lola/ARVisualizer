@@ -2,14 +2,15 @@
 #include "mesh/vertex.hpp"
 #include "mesh/mesh.hpp"
 #include "mesh/meshfactory.hpp"
+#include "windowmanager/windowmanager.hpp"
 
 namespace ar
 {
 
-Renderer::Renderer(int windowWidth, int windowHeight)
+Renderer::Renderer(GLFWwindow* window)
 {
-  _width = windowWidth;
-  _height = windowHeight;
+  _window = window;
+  glfwGetWindowSize(window, &_width, &_height);
 }
 
 Renderer::~Renderer()
@@ -18,7 +19,6 @@ Renderer::~Renderer()
   {
     Stop();
   }
-  glfwTerminate();
 }
 
 void Renderer::Start()
@@ -28,12 +28,17 @@ void Renderer::Start()
     return;
   }
 
-  _running = true;
-  _renderThread = std::thread([&]()
+  std::condition_variable init_complete;
+  _renderThread = std::thread([this, &init_complete]()
   {
-    init(_width, _height);
-    render();
+    this->init();
+    init_complete.notify_all();
+    this->render();
   });
+
+  // wait for initialization to finish before returning
+  std::unique_lock<std::mutex> lock(_mutex);
+  init_complete.wait(lock, [this]{return this->_running;});
 }
 
 void Renderer::Stop()
@@ -44,6 +49,7 @@ void Renderer::Stop()
   }
   _running = false;
   _renderThread.join();
+  WindowManager::Instance().DeleteRenderer(this, _window);
 }
 
 bool Renderer::IsRunning()
@@ -85,12 +91,12 @@ unsigned int Renderer::Add3DMesh(Mesh3D mesh)
   return 0; // TODO: Make this meaningful
 }
 
-void Renderer::init(int windowWidth, int windowHeight)
+void Renderer::init()
 {
   std::lock_guard<std::mutex> guard(_mutex);
 
   // setup OpenGL context and open a window for rendering
-  init_GL(windowWidth, windowHeight);
+  init_GL();
 
   // init buffers
   _2DMeshBuffer = new VertexBuffer<Vertex2D>();
@@ -107,29 +113,13 @@ void Renderer::init(int windowWidth, int windowHeight)
 
   // generate texture handles and allocate space for default textures
   init_textures();
+
+  // notify initialization is complete
+  _running = true;
 }
 
-void Renderer::init_GL(int windowWidth, int windowHeight)
+void Renderer::init_GL()
 {
-  if (!glfwInit())
-  {
-    throw std::runtime_error("Failed to initialize GLFW!");
-  }
-
-  // tell GLFW what we want from OpenGL
-  glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  // Open window & create OpenGL context
-  _window = glfwCreateWindow(windowWidth, windowHeight, "AR Visualizer", NULL, NULL);
-  if (!_window)
-  {
-    glfwTerminate();
-    throw std::runtime_error("Failed to open GLFW Window!");
-  }
-
   // bind GL context to this thread
   glfwMakeContextCurrent(_window);
 
@@ -246,7 +236,7 @@ void Renderer::render()
     glfwPollEvents();
   }
 
-  // if we've stopped rendering, close/destroy the window & cleanup
+  // if we've stopped rendering, cleanup
   shutdown();
 }
 
@@ -294,7 +284,7 @@ void Renderer::shutdown()
 {
   delete(_2DMeshBuffer);
   delete(_3DMeshBuffer);
-  glfwDestroyWindow(_window);
+  glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 
 } // namespace ar

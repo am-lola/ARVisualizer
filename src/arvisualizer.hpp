@@ -16,12 +16,10 @@ class ARVisualizer
 {
 public:
   ARVisualizer();
-  ARVisualizer(int windowWidth, int windowHeight);
-
   ~ARVisualizer();
 
   // Begins rendering
-  void Start();
+  void Start(int width, int height);
 
   // Stops all rendering activity
   void Stop();

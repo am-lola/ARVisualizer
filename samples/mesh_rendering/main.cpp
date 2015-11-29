@@ -11,11 +11,11 @@
 
 int main(void)
 {
-  ar::ARVisualizer* visualizer = new ar::ARVisualizer(1024, 768);
+  ar::ARVisualizer* visualizer = new ar::ARVisualizer();
 
   // Start the visualizer before doing anything else with it!
   // This opens the window used for rendering, creates the OpenGL context, etc.
-  visualizer->Start();
+  visualizer->Start(1024, 768);
 
   // make some shapes
   double quadCenter1[3] = {-0.5, 0.0, 2.0 };
@@ -51,7 +51,7 @@ int main(void)
   visualizer->AddTriangle(triVertices2, triColor2);
 
   // Keep rendering until the user wants to quit
-  std::cout << "Pres enter to exit..." << std::endl;
+  std::cout << "Press enter to exit..." << std::endl;
   std::cin.get();
   std::cout << "Shutting down..." << std::endl;
 
