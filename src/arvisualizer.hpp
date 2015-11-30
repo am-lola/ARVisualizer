@@ -4,6 +4,8 @@
 namespace ar
 {
 
+#define SPHERE_SUBDIV_LEVELS 2
+
 class Renderer;
 
 typedef unsigned int mesh_handle;
@@ -33,6 +35,8 @@ public:
   mesh_handle AddTriangle(double vertexPositions[3][3], double color[4]);
 
   mesh_handle AddQuad(double center[3], double normal[3], double width, double height, double color[4]);
+
+  mesh_handle AddSphere(double center[3], double radius, double color[4]);
 
 private:
   Renderer* _renderer;

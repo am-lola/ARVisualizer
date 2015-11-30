@@ -44,7 +44,12 @@ int main(void)
   };
   double triColor2[4] = { 1.0, 0.5, 0.25, 0.25 };
 
+  double sphereCenter[3] = { 0.0, 0.0, 4.0 };
+  double sphereRadius = 2.0;
+  double sphereColor[4]  = { 0.6, 0.35, 0.2, 1.0 };
+
   // tell the visualizer about our fancy new shapes
+  visualizer->AddSphere(sphereCenter, sphereRadius, sphereColor);
   visualizer->AddQuad(quadCenter1, quadNormal1, quadWidth1, quadHeight1, quadColor1);
   visualizer->AddQuad(quadCenter2, quadNormal2, quadWidth2, quadHeight2, quadColor2);
   visualizer->AddTriangle(triVertices1, triColor1);

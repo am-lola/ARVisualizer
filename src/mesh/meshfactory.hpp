@@ -25,6 +25,8 @@ public:
   static Mesh<VertexP3C4> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<glm::vec4> vertexColors);
   static Mesh<VertexP3C4> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, glm::vec4 vertexColors);
 
+  static Mesh<VertexP3C4> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, glm::vec4 color);
+
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset
   static glm::mat4 MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation);

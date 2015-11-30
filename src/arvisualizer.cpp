@@ -72,4 +72,12 @@ mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double wid
   return _renderer->Add3DMesh(MeshFactory::MakeQuad(vCenter, vNormal, width, height, vColor));
 }
 
+mesh_handle ARVisualizer::AddSphere(double center[3], double radius, double color[4])
+{
+  glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
+  glm::vec4 vColor  = glm::vec4(  color[0],  color[1],  color[2], color[3] );
+
+  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere(vCenter, radius, SPHERE_SUBDIV_LEVELS, vColor));
+}
+
 } // namespace ar
