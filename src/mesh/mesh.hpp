@@ -21,7 +21,7 @@ public:
   int ID() { return _id; };
 
   bool Dirty() { return _dirty; };
-  bool ClearDirty() { _dirty = false; };
+  void ClearDirty() { _dirty = false; };
 
   unsigned int VertexCount() { return _vertices.size(); };
   std::vector<VertexT> GetVertices() { return _vertices; };
@@ -46,8 +46,8 @@ public:
 private:
   int _id = 0;
   bool _dirty = false; // marked True if we have vertex data the renderer doesn't know about, yet
-  int _vtx_offset = 0;     // offset of first vertex of this mesh in the VBO it's drawn from
-  int _idx_offset = 0;     // offset of first index of this mesh in the index buffer it's drawn from
+  int _vtx_offset = 0; // offset of first vertex of this mesh in the VBO it's drawn from
+  int _idx_offset = 0; // offset of first index of this mesh in the index buffer it's drawn from
   std::vector<VertexT> _vertices;
   std::vector<GLuint> _indices;
   ShaderProgram* _shader;

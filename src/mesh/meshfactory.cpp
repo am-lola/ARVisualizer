@@ -79,7 +79,7 @@ Mesh<VertexP2> MeshFactory::MakeQuad(glm::vec2 center, double width, double heig
   };
 
   std::vector<GLuint> indices = {
-    0, 1, 3,
+    0, 3, 1,
     0, 2, 3
   };
 
@@ -100,7 +100,7 @@ Mesh<VertexP3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double 
   };
 
   std::vector<GLuint> indices = {
-    0, 1, 3,
+    0, 3, 1,
     0, 2, 3
   };
 
@@ -124,7 +124,7 @@ Mesh<VertexP3C3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, doubl
   };
 
   std::vector<GLuint> indices = {
-    0, 1, 3,
+    0, 3, 1,
     0, 2, 3
   };
 
@@ -149,7 +149,7 @@ Mesh<VertexP3C4> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, doubl
   };
 
   std::vector<GLuint> indices = {
-    0, 1, 3,
+    0, 3, 1,
     0, 2, 3
   };
 
@@ -180,7 +180,6 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere(glm::vec3 center, double radius, uns
 
   // create a sphere centered at origin, and assign it a transform translating it to center
   // Adapted from: http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
-  int index = 0;
 
   // create the 12 vertices of an icosahedron
   double t = (1.0 + glm::sqrt(5.0f)) / 2.0;
@@ -270,7 +269,7 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere(glm::vec3 center, double radius, uns
         mid2 = vertex_positions.size();
         vertex_positions.push_back(midpoint);
       }
-      else // if midpoint already exists, just give mid1 the existing index
+      else // if midpoint already exists, just give mid2 the existing index
       {
         mid2 = v2 - vertex_positions.begin();
       }
@@ -290,7 +289,7 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere(glm::vec3 center, double radius, uns
         mid3 = vertex_positions.size();
         vertex_positions.push_back(midpoint);
       }
-      else // if midpoint already exists, just give mid1 the existing index
+      else // if midpoint already exists, just give mid3 the existing index
       {
         mid3 = v3 - vertex_positions.begin();
       }
@@ -313,7 +312,7 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere(glm::vec3 center, double radius, uns
   // assemble vertex data
   for (auto v : vertex_positions)
   {
-    v = glm::normalize(v) * (float)radius;
+    v = glm::normalize(v) * (float)radius; // normalize all vertices to the given radius
     vertices.push_back({
       { v.x, v.y, v.z },
       { color.r, color.g, color.b, color.a }

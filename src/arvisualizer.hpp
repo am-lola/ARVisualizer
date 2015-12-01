@@ -4,6 +4,8 @@
 namespace ar
 {
 
+// Number of times to subdivide sphere meshes (larger == smoother spheres)
+// This should be a non-negative number between 0 and 5. Smaller is faster.
 #define SPHERE_SUBDIV_LEVELS 2
 
 class Renderer;
