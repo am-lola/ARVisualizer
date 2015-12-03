@@ -283,8 +283,16 @@ void Renderer::renderOneFrame()
 
 void Renderer::shutdown()
 {
+  // Clean up any textures still in use
+  for (auto m : _2DMeshes)
+  {
+    GLuint tex = m.GetTexture();
+    glDeleteTextures(1, &tex);
+  }
+
   delete(_2DMeshBuffer);
   delete(_3DMeshBuffer);
+  delete(_currentVideoFrame);
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 
