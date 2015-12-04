@@ -17,7 +17,11 @@ int main(void)
   // This opens the window used for rendering, creates the OpenGL context, etc.
   visualizer->Start(1024, 768);
 
-  // make some shapes
+  /******************
+    Make some shapes
+   *******************/
+
+   // Quads are built from a position, a normal, and width/height
   double quadCenter1[3] = {-0.5, 0.0, 2.0 };
   double quadNormal1[3] = { 1.0, 0.0,-1.0 };
   double quadColor1[4]  = { 0.5, 0.5, 0.25, 1.0 };
@@ -30,6 +34,7 @@ int main(void)
   double quadWidth2 = 0.5;
   double quadHeight2 = 0.5;
 
+   // Triangles are specified by three points in space
   double triVertices1[3][3] = {
     { 0.0, 0.5, 3.0 },
     { 0.5, 0.25, 2.0 },
@@ -44,11 +49,19 @@ int main(void)
   };
   double triColor2[4] = { 1.0, 0.5, 0.25, 0.25 };
 
+   // A sphere is specified with just a position and a radius
   double sphereCenter[3] = { 0.0, 0.0, 4.0 };
   double sphereRadius = 2.0;
-  double sphereColor[4]  = { 0.6, 0.35, 0.2, 1.0 };
+  double sphereColor[4]  = { 0.6, 0.35, 0.2, 0.7 };
+
+   // Capsules need two positions (one for each end) and a radius
+  double capsuleCenter1[3] = { 2.5, 2.0, 6.0 };
+  double capsuleCenter2[3] = { 2.0,-1.0, 5.0 };
+  double capsuleRadius = 1.0;
+  double capsuleColor[4] = { 0.1, 0.8, 0.3, 1.0 };
 
   // tell the visualizer about our fancy new shapes
+  visualizer->AddCapsule(capsuleCenter1, capsuleCenter2, capsuleRadius, capsuleColor);
   visualizer->AddSphere(sphereCenter, sphereRadius, sphereColor);
   visualizer->AddQuad(quadCenter1, quadNormal1, quadWidth1, quadHeight1, quadColor1);
   visualizer->AddQuad(quadCenter2, quadNormal2, quadWidth2, quadHeight2, quadColor2);

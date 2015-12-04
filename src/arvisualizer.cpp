@@ -77,7 +77,16 @@ mesh_handle ARVisualizer::AddSphere(double center[3], double radius, double colo
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
   glm::vec4 vColor  = glm::vec4(  color[0],  color[1],  color[2], color[3] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere(vCenter, radius, SPHERE_SUBDIV_LEVELS, vColor));
+  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere(vCenter, radius, ICOSPHERE_SUBDIV_LEVELS, vColor));
+}
+
+mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, double color[4])
+{
+  glm::vec3 vCenter1 = glm::vec3( center1[0], center1[1], center1[2] );
+  glm::vec3 vCenter2 = glm::vec3( center2[0], center2[1], center2[2] );
+  glm::vec4 vColor   = glm::vec4(   color[0],   color[1],   color[2], color[3] );
+
+  return _renderer->Add3DMesh(MeshFactory::MakeCapsule(vCenter1, vCenter2, radius, vColor, UVSPHERE_RESOLUTION));
 }
 
 } // namespace ar

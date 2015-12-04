@@ -27,6 +27,10 @@ public:
 
   static Mesh<VertexP3C4> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, glm::vec4 color);
 
+  static Mesh<VertexP3C4> MakeUVSphere(glm::vec3 center, double radius, glm::vec4 color, int resolution);
+
+  static Mesh<VertexP3C4> MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, glm::vec4 color, int resolution);
+
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset
   static glm::mat4 MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation);

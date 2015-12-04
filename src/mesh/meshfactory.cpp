@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/constants.hpp>
 
 namespace ar
 {
@@ -324,6 +325,140 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere(glm::vec3 center, double radius, uns
   return m;
 }
 
+Mesh<VertexP3C4> MeshFactory::MakeUVSphere(glm::vec3 center, double radius, glm::vec4 color, int resolution)
+{
+  std::vector<glm::vec3> vertex_positions;
+  std::vector<VertexP3C4> vertices;
+  std::vector<GLuint> indices;
+
+  float dx = 1.0 / (float)(resolution - 1); // distance between vertices
+  float dy = dx;
+
+  for (int i = 0; i < resolution; i++)
+  {
+    for (int j = 0; j < resolution; j++)
+    {
+      double x = glm::sin( - glm::half_pi<float>() + glm::pi<float>() * i * dx);
+      double y = glm::cos( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
+      double z = glm::sin( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
+
+      vertex_positions.push_back(glm::vec3((float)x, (float)y, (float)z));
+    }
+  }
+
+  // generate a quad (as two tris) for each face on the sphere
+  for (int i = 0; i < resolution-1; i++)
+  {
+    for (int j = 0; j < resolution-1; j++)
+    {
+      // First triangle
+      indices.push_back(i * resolution + j);         // bottom-left
+      indices.push_back((i+1) * resolution + (j+1)); // top-right
+      indices.push_back((i+1) * resolution + j);     // top-left
+
+      // Second triangle
+      indices.push_back(i * resolution + j);         // bottom-left
+      indices.push_back(i * resolution + (j + 1));   // bottom-right
+      indices.push_back((i+1) * resolution + (j+1)); // top-right
+    }
+  }
+
+  // assemble vertex data
+  for (auto v : vertex_positions)
+  {
+    v = glm::normalize(v) * (float)radius; // normalize all vertices to the given radius
+    vertices.push_back({
+      { v.x, v.y, v.z },
+      { color.r, color.g, color.b, color.a }
+    });
+  }
+
+  Mesh<VertexP3C4> m = Mesh<VertexP3C4>(vertices, indices);
+  m.SetTransform(glm::translate(glm::mat4(1.0f), center));
+  return m;
+}
+
+Mesh<VertexP3C4> MeshFactory::MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, glm::vec4 color, int resolution)
+{
+  std::vector<glm::vec3> vertex_positions;
+  std::vector<VertexP3C4> vertices;
+  std::vector<GLuint> indices;
+
+  float dx = 1.0 / (float)(resolution - 1); // distance between vertices
+  float dy = dx;
+
+  /// The capsule is generated as two halves of a UVSphere, with each half being
+  /// offset along the polar axis by half the distance between center1 & center2
+  /// We then generate a transform to translate & rotate the resulting shape into
+  /// the correct position.
+
+  glm::vec3 axis = glm::normalize(center2 - center1);    // axis capsule aligns to
+  float distance = glm::length(center2 - center1);       // distance between centers
+  glm::vec3 center = center1 + (distance / 2.0f) * axis; // midpoint between centers ("location" of resulting mesh)
+
+  // first half -- centered at (-dist/2,0,0)
+  for (int i = 0; i < resolution / 2; i++)
+  {
+    for (int j = 0; j < resolution; j++)
+    {
+      double x = glm::sin( - glm::half_pi<float>() + glm::pi<float>() * i * dx);
+      double y = glm::cos( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
+      double z = glm::sin( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
+
+      glm::vec3 newVert = (float)radius * glm::vec3((float)x, (float)y, (float)z);
+      newVert.x -= (distance / 2.0f);
+
+      vertex_positions.push_back(newVert);
+    }
+  }
+
+  // second half -- centered at (+dist/2,0,0)
+  for (int i = resolution / 2; i < resolution; i++)
+  {
+    for (int j = 0; j < resolution; j++)
+    {
+      double x = glm::sin( - glm::half_pi<float>() + glm::pi<float>() * i * dx);
+      double y = glm::cos( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
+      double z = glm::sin( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
+
+      glm::vec3 newVert = (float)radius * glm::vec3((float)x, (float)y, (float)z);
+      newVert.x += (distance / 2.0f);
+
+      vertex_positions.push_back(newVert);
+    }
+  }
+
+  // generate a quad (as two tris) for each face (done as if this were a regular sphere)
+  for (int i = 0; i < resolution-1; i++)
+  {
+    for (int j = 0; j < resolution-1; j++)
+    {
+      // First triangle
+      indices.push_back(i * resolution + j);         // bottom-left
+      indices.push_back((i+1) * resolution + (j+1)); // top-right
+      indices.push_back((i+1) * resolution + j);     // top-left
+
+      // Second triangle
+      indices.push_back(i * resolution + j);         // bottom-left
+      indices.push_back(i * resolution + (j + 1));   // bottom-right
+      indices.push_back((i+1) * resolution + (j+1)); // top-right
+    }
+  }
+
+  // assemble vertex data
+  for (auto v : vertex_positions)
+  {
+    vertices.push_back({
+      { v.x, v.y, v.z },
+      { color.r, color.g, color.b, color.a }
+    });
+  }
+
+  Mesh<VertexP3C4> m = Mesh<VertexP3C4>(vertices, indices);
+  m.SetTransform(MakeTransform(center, glm::vec3(1,0,0), axis)); // from_rotation is (1,0,0) because our capsule is generated along the x-axis
+  return m;
+}
+
 glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation)
 {
   float eps = 0.001f; // tolerance for detecting vectors which are nearly opposite
@@ -337,7 +472,6 @@ glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, 
   glm::mat4 trans_mat = glm::translate(glm::mat4(1.0f), offset);
 
   float d = glm::dot(source_vec, target_vec);
-
   // if dot product is 1, vectors are the same; we only rotate if they're different
   if (d < 1.0f)
   {
@@ -362,7 +496,6 @@ glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, 
     // final rotation from from_rotation to to_rotation
     rot_mat = glm::rotate(rot_mat, rot_angle, rot_axis);
   }
-
 
   return trans_mat * rot_mat;
 }

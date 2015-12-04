@@ -4,9 +4,13 @@
 namespace ar
 {
 
-// Number of times to subdivide sphere meshes (larger == smoother spheres)
+// Number of times to subdivide icosphere meshes (larger == smoother spheres)
 // This should be a non-negative number between 0 and 5. Smaller is faster.
-#define SPHERE_SUBDIV_LEVELS 2
+#define ICOSPHERE_SUBDIV_LEVELS 2
+
+// Number of vertices around major axis to generate on UV sphere-based meshes.
+// This should be a non-negative even number. Smaller is faster, larger is smoother.
+#define UVSPHERE_RESOLUTION 16
 
 class Renderer;
 
@@ -39,6 +43,8 @@ public:
   mesh_handle AddQuad(double center[3], double normal[3], double width, double height, double color[4]);
 
   mesh_handle AddSphere(double center[3], double radius, double color[4]);
+
+  mesh_handle AddCapsule(double center1[3], double center2[3], double radius, double color[4]);
 
 private:
   Renderer* _renderer;
