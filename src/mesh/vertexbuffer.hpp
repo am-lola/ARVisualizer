@@ -91,6 +91,15 @@ public:
     _dirty = false;
   }
 
+  // removes ALL vertex and index data from the buffer
+  void ClearAll()
+  {
+    _indices.clear();
+    _vertices.clear();
+
+    _dirty = true;
+  }
+
   // Draws numVertices previously-buffered vertices beginning at offset in the vertex buffer
   void Draw(unsigned int numVertices, int vertex_offset, int index_offset)
   {

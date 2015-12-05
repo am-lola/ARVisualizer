@@ -86,9 +86,34 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
 
 unsigned int Renderer::Add3DMesh(Mesh3D mesh)
 {
+  unsigned int handle = GenerateMeshHandle(mesh);
   mesh.SetShader(&_defaultShader);
+  mesh.SetID(handle);
   _3DMeshes.push_back(mesh);
-  return 0; // TODO: Make this meaningful
+  return handle;
+}
+
+void Renderer::RemoveMesh(unsigned int handle)
+{
+  if (handle == 0) { return; } // zero is reserved as a non-unique default ID
+
+  for (auto& m : _3DMeshes)
+  {
+    if (m.ID() == handle)
+    {
+      m.MarkForDeletion();
+      break;
+    }
+  }
+}
+
+/// TODO: make this more robust
+/// Each mesh should get a unique ID we can use later to find it, even if
+/// the renderer has resorted the vector containing it.
+unsigned int Renderer::GenerateMeshHandle(Mesh3D mesh)
+{
+  static unsigned int nextID = 0;
+  return ++nextID;
 }
 
 void Renderer::init()
@@ -194,41 +219,8 @@ void Renderer::render()
 {
   while (_running)
   {
-    // if we've received a new video frame, send it to the GPU
-    if (_newVideoFrame)
-    {
-      std::lock_guard<std::mutex> guard(_mutex);
-      bufferTexture(_width, _height, _2DMeshes[0].GetTexture(), _currentVideoFrame);
-      _newVideoFrame = false;
-    }
-
-    // if we have any new mesh data, update buffers and send it to the GPU
-    for (auto& m : _2DMeshes)
-    {
-      if (m.Dirty())
-      {
-        m.SetVertexOffset(_2DMeshBuffer->AddVertices(m.GetVertices()));
-        m.SetIndexOffset(_2DMeshBuffer->AddIndices(m.GetIndices()));
-        m.ClearDirty();
-      }
-    }
-    if (_2DMeshBuffer->Dirty())
-    {
-      _2DMeshBuffer->BufferData();
-    }
-    for (auto& m : _3DMeshes)
-    {
-      if (m.Dirty())
-      {
-        m.SetVertexOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
-        m.SetIndexOffset(_3DMeshBuffer->AddIndices(m.GetIndices()));
-        m.ClearDirty();
-      }
-    }
-    if (_3DMeshBuffer->Dirty())
-    {
-      _3DMeshBuffer->BufferData();
-    }
+    // check for new meshes, video data, etc.
+    update();
 
     // Render!
     renderOneFrame();
@@ -239,6 +231,71 @@ void Renderer::render()
 
   // if we've stopped rendering, cleanup
   shutdown();
+}
+
+void Renderer::update()
+{
+  // if we've received a new video frame, send it to the GPU
+  if (_newVideoFrame)
+  {
+    std::lock_guard<std::mutex> guard(_mutex);
+    bufferTexture(_width, _height, _2DMeshes[0].GetTexture(), _currentVideoFrame);
+    _newVideoFrame = false;
+  }
+
+  // if one or more meshes was marked for deletion, delete it and regenerate VBO/VEOs
+  // The implementation here causes us to trash and rebuild any VertexBuffer which contained
+  // a deleted mesh. It may be faster to just delete the range of vertices covered by that
+  // mesh, but we'd still have to go through all the other meshes to update their offsets
+  // and re-send the modified buffer to the GPU, so the gains may not be terribly meaningful.
+  bool mustRegenerateVBO_2D = false;
+  for (int i = 0; i < _2DMeshes.size(); i++)
+  {
+    if (_2DMeshes[i].PendingDelete())
+    {
+      _2DMeshes.erase(_2DMeshes.begin() + i); // remove mesh
+      _2DMeshBuffer->ClearAll();   // empty vertex buffer so it can be rebuilt
+      mustRegenerateVBO_2D = true;
+    }
+  }
+  bool mustRegenerateVBO_3D = false;
+  for (int i = 0; i < _3DMeshes.size(); i++)
+  {
+    if (_3DMeshes[i].PendingDelete())
+    {
+      _3DMeshes.erase(_3DMeshes.begin() + i);
+      _3DMeshBuffer->ClearAll();
+      mustRegenerateVBO_3D = true;
+    }
+  }
+
+  // if we have any new mesh data, update buffers and send it to the GPU
+  for (auto& m : _2DMeshes)
+  {
+    if (m.Dirty() || mustRegenerateVBO_2D)
+    {
+      m.SetVertexOffset(_2DMeshBuffer->AddVertices(m.GetVertices()));
+      m.SetIndexOffset(_2DMeshBuffer->AddIndices(m.GetIndices()));
+      m.ClearDirty();
+    }
+  }
+  if (_2DMeshBuffer->Dirty())
+  {
+    _2DMeshBuffer->BufferData();
+  }
+  for (auto& m : _3DMeshes)
+  {
+    if (m.Dirty() || mustRegenerateVBO_3D)
+    {
+      m.SetVertexOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
+      m.SetIndexOffset(_3DMeshBuffer->AddIndices(m.GetIndices()));
+      m.ClearDirty();
+    }
+  }
+  if (_3DMeshBuffer->Dirty())
+  {
+    _3DMeshBuffer->BufferData();
+  }
 }
 
 void Renderer::renderOneFrame()

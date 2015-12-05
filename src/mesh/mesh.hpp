@@ -18,10 +18,14 @@ public:
   Mesh(std::vector<VertexT> v, ShaderProgram* s) : _id(0), _vertices(v), _shader(s), _dirty(true) {};
   Mesh(std::vector<VertexT> v, std::vector<GLuint> i, ShaderProgram* s) : _id(0), _vertices(v), _indices(i), _shader(s), _dirty(true) {};
 
-  int ID() { return _id; };
+  unsigned int ID() { return _id; };
+  void SetID(unsigned int id) { _id = id; };
 
   bool Dirty() { return _dirty; };
   void ClearDirty() { _dirty = false; };
+
+  bool PendingDelete() { return _pendingDelete; };
+  bool MarkForDeletion() { _pendingDelete = true; };
 
   unsigned int VertexCount() { return _vertices.size(); };
   std::vector<VertexT> GetVertices() { return _vertices; };
@@ -44,8 +48,9 @@ public:
   void SetTransform(glm::mat4 t) { _transform = t; };
 
 private:
-  int _id = 0;
+  unsigned int _id = 0;
   bool _dirty = false; // marked True if we have vertex data the renderer doesn't know about, yet
+  bool _pendingDelete = false; // True if this mesh should be removed from the renderer (and corresponding VBO)
   int _vtx_offset = 0; // offset of first vertex of this mesh in the VBO it's drawn from
   int _idx_offset = 0; // offset of first index of this mesh in the index buffer it's drawn from
   std::vector<VertexT> _vertices;

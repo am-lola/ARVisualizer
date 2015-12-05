@@ -49,6 +49,8 @@ public:
 
   unsigned int Add3DMesh(Mesh3D mesh);
 
+  void RemoveMesh(unsigned int handle);
+
   // Gets the View matrix
   glm::mat4 GetViewMatrix()
   {
@@ -100,6 +102,8 @@ private:
   std::vector<Mesh3D> _3DMeshes;
   VertexBuffer<Vertex3D>* _3DMeshBuffer;
 
+  unsigned int GenerateMeshHandle(Mesh3D mesh);
+
   // Sets up the OpenGL context & initializes data needed for rendering
   void init();
 
@@ -117,6 +121,9 @@ private:
 
   // the main render loop
   void render();
+
+  // checks for new mesh data, video data, meshes which should be deleted, etc.
+  void update();
 
   // renders just one frame
   void renderOneFrame();

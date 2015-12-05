@@ -46,6 +46,8 @@ public:
 
   mesh_handle AddCapsule(double center1[3], double center2[3], double radius, double color[4]);
 
+  void Remove(mesh_handle handle);
+
 private:
   Renderer* _renderer;
 };

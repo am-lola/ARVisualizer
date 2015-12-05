@@ -89,4 +89,9 @@ mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], doubl
   return _renderer->Add3DMesh(MeshFactory::MakeCapsule(vCenter1, vCenter2, radius, vColor, UVSPHERE_RESOLUTION));
 }
 
+void ARVisualizer::Remove(mesh_handle handle)
+{
+  _renderer->RemoveMesh(handle);
+}
+
 } // namespace ar
