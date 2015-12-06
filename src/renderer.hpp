@@ -47,6 +47,9 @@ public:
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
   void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
 
+  // Updates camera parameters with the given values
+  void SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up);
+
   unsigned int Add3DMesh(Mesh3D mesh);
 
   void RemoveMesh(unsigned int handle);

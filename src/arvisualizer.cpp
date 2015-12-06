@@ -51,6 +51,15 @@ void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pix
   _renderer->NotifyNewVideoFrame(width, height, pixels);
 }
 
+void ARVisualizer::SetCameraPose(double position[3], double forward[3], double up[3])
+{
+  glm::vec3 vPos = glm::vec3( position[0], position[1], position[2] );
+  glm::vec3 vFor = glm::vec3(  forward[0],  forward[1],  forward[2] );
+  glm::vec3 vUp  = glm::vec3(       up[0],       up[1],       up[2] );
+
+  _renderer->SetCameraPose(vPos, vFor, vUp);
+}
+
 mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], double color[4])
 {
   std::vector<glm::vec3> positions = {

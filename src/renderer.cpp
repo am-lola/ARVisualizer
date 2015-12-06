@@ -84,6 +84,13 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
   _newVideoFrame = true;
 }
 
+void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up)
+{
+  _camera.position = position;
+  _camera.forward = glm::normalize(forward);
+  _camera.up = glm::normalize(up);
+}
+
 unsigned int Renderer::Add3DMesh(Mesh3D mesh)
 {
   unsigned int handle = GenerateMeshHandle(mesh);

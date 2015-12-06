@@ -38,6 +38,13 @@ public:
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
   void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
 
+  // Updates the camera parameters used for rendering. Values should correspond
+  // as closely as possible to the physical position & orientation of the camera
+  //    Position: Position of the camera in world-coordinates
+  //    Forward:  Vector pointing in the direction the camera is facing
+  //    Up:       Orthogonal to Forward, defines the vertical axis for the camera
+  void SetCameraPose(double position[3], double forward[3], double up[3]);
+
   mesh_handle AddTriangle(double vertexPositions[3][3], double color[4]);
 
   mesh_handle AddQuad(double center[3], double normal[3], double width, double height, double color[4]);
