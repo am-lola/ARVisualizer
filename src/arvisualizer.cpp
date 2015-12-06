@@ -60,42 +60,38 @@ void ARVisualizer::SetCameraPose(double position[3], double forward[3], double u
   _renderer->SetCameraPose(vPos, vFor, vUp);
 }
 
-mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], double color[4])
+mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
 {
   std::vector<glm::vec3> positions = {
     { vertexPositions[0][0], vertexPositions[0][1], vertexPositions[0][2] },
     { vertexPositions[1][0], vertexPositions[1][1], vertexPositions[1][2] },
     { vertexPositions[2][0], vertexPositions[2][1], vertexPositions[2][2] }
   };
-  glm::vec4 vColor = glm::vec4( color[0], color[1], color[2], color[3] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeTriangle(positions, vColor));
+  return _renderer->Add3DMesh(MeshFactory::MakeTriangle(positions, color));
 }
 
-mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double width, double height, double color[4])
+mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double width, double height, Color color)
 {
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
   glm::vec3 vNormal = glm::vec3( normal[0], normal[1], normal[2] );
-  glm::vec4 vColor  = glm::vec4(  color[0],  color[1],  color[2], color[3] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeQuad(vCenter, vNormal, width, height, vColor));
+  return _renderer->Add3DMesh(MeshFactory::MakeQuad(vCenter, vNormal, width, height, color));
 }
 
-mesh_handle ARVisualizer::AddSphere(double center[3], double radius, double color[4])
+mesh_handle ARVisualizer::AddSphere(double center[3], double radius, Color color)
 {
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
-  glm::vec4 vColor  = glm::vec4(  color[0],  color[1],  color[2], color[3] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere(vCenter, radius, ICOSPHERE_SUBDIV_LEVELS, vColor));
+  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere(vCenter, radius, ICOSPHERE_SUBDIV_LEVELS, color));
 }
 
-mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, double color[4])
+mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, Color color)
 {
   glm::vec3 vCenter1 = glm::vec3( center1[0], center1[1], center1[2] );
   glm::vec3 vCenter2 = glm::vec3( center2[0], center2[1], center2[2] );
-  glm::vec4 vColor   = glm::vec4(   color[0],   color[1],   color[2], color[3] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeCapsule(vCenter1, vCenter2, radius, vColor, UVSPHERE_RESOLUTION));
+  return _renderer->Add3DMesh(MeshFactory::MakeCapsule(vCenter1, vCenter2, radius, color, UVSPHERE_RESOLUTION));
 }
 
 void ARVisualizer::Remove(mesh_handle handle)

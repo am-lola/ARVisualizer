@@ -24,13 +24,13 @@ int main(void)
    // Quads are built from a position, a normal, and width/height
   double quadCenter1[3] = {-0.5, 0.0, 2.0 };
   double quadNormal1[3] = { 1.0, 0.0,-1.0 };
-  double quadColor1[4]  = { 0.5, 0.5, 0.25, 1.0 };
+  ar::Color quadColor1  = ar::Color( 0.5, 0.5, 0.25, 1.0 );
   double quadWidth1 = 1.0;
   double quadHeight1 = 1.5;
 
   double quadCenter2[3] = { 0.5, 0.0, 2.0 };
   double quadNormal2[3] = { 0.0, 1.0,-1.0 };
-  double quadColor2[4]  = { 0.25, 0.0, 0.25, 0.5 };
+  ar::Color quadColor2  = ar::Color( 0.25, 0.0, 0.25, 0.5 );
   double quadWidth2 = 0.5;
   double quadHeight2 = 0.5;
 
@@ -40,25 +40,25 @@ int main(void)
     { 0.5, 0.25, 2.0 },
     { 0.0, 0.0, 1.0 }
   };
-  double triColor1[4] = { 0.0, 0.5, 0.25, 0.75 };
+  ar::Color triColor1 = ar::Color( 0.0, 0.5, 0.25, 0.75 );
 
   double triVertices2[3][3] = {
     { -0.5, 0.0, 1.0 },
     { -0.5, 0.0, 2.0 },
     { 0.5, -0.5, 2.0 }
   };
-  double triColor2[4] = { 1.0, 0.5, 0.25, 0.25 };
+  ar::Color triColor2 = ar::Color( 1.0, 0.5, 0.25, 0.25 );
 
    // A sphere is specified with just a position and a radius
   double sphereCenter[3] = { 0.0, 0.0, 4.0 };
   double sphereRadius = 2.0;
-  double sphereColor[4]  = { 0.6, 0.35, 0.2, 0.7 };
+  ar::Color sphereColor  = ar::Color( 0.6, 0.35, 0.2, 0.7 );
 
    // Capsules need two positions (one for each end) and a radius
   double capsuleCenter1[3] = { 2.5, 2.0, 6.0 };
   double capsuleCenter2[3] = { 2.0,-1.0, 5.0 };
   double capsuleRadius = 1.0;
-  double capsuleColor[4] = { 0.1, 0.8, 0.3, 1.0 };
+  ar::Color capsuleColor = ar::Color( 0.1, 0.8, 0.3, 1.0 );
 
   // tell the visualizer about our fancy new shapes
   visualizer->AddCapsule(capsuleCenter1, capsuleCenter2, capsuleRadius, capsuleColor);

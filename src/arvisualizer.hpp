@@ -1,6 +1,8 @@
 #ifndef _ARVISUALIZER_H
 #define _ARVISUALIZER_H
 
+#include "color.hpp"
+
 namespace ar
 {
 
@@ -45,13 +47,13 @@ public:
   //    Up:       Orthogonal to Forward, defines the vertical axis for the camera
   void SetCameraPose(double position[3], double forward[3], double up[3]);
 
-  mesh_handle AddTriangle(double vertexPositions[3][3], double color[4]);
+  mesh_handle AddTriangle(double vertexPositions[3][3], Color color);
 
-  mesh_handle AddQuad(double center[3], double normal[3], double width, double height, double color[4]);
+  mesh_handle AddQuad(double center[3], double normal[3], double width, double height, Color color);
 
-  mesh_handle AddSphere(double center[3], double radius, double color[4]);
+  mesh_handle AddSphere(double center[3], double radius, Color color);
 
-  mesh_handle AddCapsule(double center1[3], double center2[3], double radius, double color[4]);
+  mesh_handle AddCapsule(double center1[3], double center2[3], double radius, Color color);
 
   void Remove(mesh_handle handle);
 
