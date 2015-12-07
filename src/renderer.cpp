@@ -168,15 +168,15 @@ void Renderer::init_geometry()
   // prepare video pane
   std::vector<Vertex2D> videoVertices = {
     //   Position        UV Coords
-     { {-1.0f,  1.0f}, {0.0f, 0.0f} },
-     { { 1.0f,  1.0f}, {1.0f, 0.0f} },
+     { {-1.0f, -1.0f}, {0.0f, 1.0f} },
      { { 1.0f, -1.0f}, {1.0f, 1.0f} },
-     { {-1.0f, -1.0f}, {0.0f, 1.0f} }
+     { {-1.0f,  1.0f}, {0.0f, 0.0f} },
+     { { 1.0f,  1.0f}, {1.0f, 0.0f} }
   };
 
   std::vector<GLuint> videoIndices = {
-      0, 1, 2, // first triangle
-      0, 2, 3  // second triangle
+      0, 1, 3, // first triangle
+      0, 3, 2  // second triangle
   };
 
   _2DMeshes.push_back(TexturedQuad(videoVertices, videoIndices, &_videoShader));
