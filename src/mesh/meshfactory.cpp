@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
-
+#include <glm/gtx/string_cast.hpp>
 namespace ar
 {
 
@@ -51,41 +51,32 @@ Mesh<VertexP3C4> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPosition
 
 Mesh<VertexP2> MeshFactory::MakeQuad(glm::vec2 center, double width, double height)
 {
-  float halfwidth = width / 2.0;
-  float halfheight = height / 2.0;
+  std::vector<glm::vec3> vertex_positions;
+  std::vector<GLuint> indices;
+  std::vector<VertexP2> verts;
 
-  std::vector<VertexP2> verts = {
-    { center.x - halfwidth, center.y - halfheight }, // top-left
-    { center.x + halfwidth, center.y - halfheight }, // top-right
-    { center.x - halfwidth, center.y + halfheight }, // bottom-left
-    { center.x + halfwidth, center.y + halfheight }  // bottom-right
-  };
+  MakeQuadMesh(width, height, &vertex_positions, &indices);
 
-  std::vector<GLuint> indices = {
-    0, 3, 1,
-    0, 2, 3
-  };
+  for (auto v : vertex_positions)
+  {
+    verts.push_back( {v.x, v.y} );
+  }
 
   return Mesh<VertexP2>(verts, indices);
 }
 
 Mesh<VertexP3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height)
 {
-  float halfwidth = width / 2.0;
-  float halfheight = height / 2.0;
+  std::vector<glm::vec3> vertex_positions;
+  std::vector<GLuint> indices;
+  std::vector<VertexP3> verts;
 
-  // create quad at origin aligned with XY plane
-  std::vector<VertexP3> verts  = {
-    { -halfwidth, -halfheight, 0.0f }, // top-left
-    {  halfwidth, -halfheight, 0.0f }, // top-right
-    { -halfwidth,  halfheight, 0.0f }, // bottom-left
-    {  halfwidth,  halfheight, 0.0f }  // bottom-right
-  };
+  MakeQuadMesh(width, height, &vertex_positions, &indices);
 
-  std::vector<GLuint> indices = {
-    0, 3, 1,
-    0, 2, 3
-  };
+  for (auto v : vertex_positions)
+  {
+    verts.push_back( {v.x, v.y, v.z} );
+  }
 
   Mesh<VertexP3> m = Mesh<VertexP3>(verts, indices);
   m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
@@ -95,23 +86,20 @@ Mesh<VertexP3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double 
 
 Mesh<VertexP3C4> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<Color> vertexColors)
 {
-  float halfwidth = width / 2.0;
-  float halfheight = height / 2.0;
+  std::vector<glm::vec3> vertex_positions;
+  std::vector<GLuint> indices;
+  std::vector<VertexP3C4> verts;
 
-  // create quad at origin aligned with XY plane
-  std::vector<VertexP3C4> verts  = {
-    {{ -halfwidth,  halfheight, 0.0f }, { vertexColors[0].r, vertexColors[0].g, vertexColors[0].b, vertexColors[0].a }}, // top-left
-    {{  halfwidth,  halfheight, 0.0f }, { vertexColors[1].r, vertexColors[1].g, vertexColors[1].b, vertexColors[1].a }}, // top-right
-    {{ -halfwidth, -halfheight, 0.0f }, { vertexColors[2].r, vertexColors[2].g, vertexColors[2].b, vertexColors[2].a }}, // bottom-left
-    {{  halfwidth, -halfheight, 0.0f }, { vertexColors[3].r, vertexColors[3].g, vertexColors[3].b, vertexColors[3].a }}, // bottom-right
-  };
+  MakeQuadMesh(width, height, &vertex_positions, &indices);
 
-  std::vector<GLuint> indices = {
-    0, 3, 1,
-    0, 2, 3
-  };
+  for (int i = 0; i < vertex_positions.size(); i++)
+  {
+    verts.push_back({
+      { vertex_positions[i].x, vertex_positions[i].y, vertex_positions[i].z },
+      { vertexColors[i].r, vertexColors[i].g, vertexColors[i].b, vertexColors[i].a }
+    });
+  }
 
-  // make mesh
   Mesh<VertexP3C4> m = Mesh<VertexP3C4>(verts, indices);
   m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
 
@@ -246,6 +234,25 @@ glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, 
   return trans_mat * rot_mat;
 }
 
+void MeshFactory::MakeQuadMesh(double width, double height, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices)
+{
+  float halfwidth = width / 2.0;
+  float halfheight = height / 2.0;
+
+  // create quad at origin aligned with XY plane
+  *vertex_positions  = {
+    { -halfwidth, -halfheight, 0.0f }, // top-left
+    {  halfwidth, -halfheight, 0.0f }, // top-right
+    { -halfwidth,  halfheight, 0.0f }, // bottom-left
+    {  halfwidth,  halfheight, 0.0f }  // bottom-right
+  };
+
+  *indices = {
+    0, 1, 3,  // first triangle
+    0, 3, 2   // second triangle
+  };
+}
+
 // Adapted from: http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 void MeshFactory::MakeIcosphereMesh(unsigned int subdivisions, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices)
 {
@@ -373,7 +380,7 @@ void MeshFactory::MakeIcosphereMesh(unsigned int subdivisions, std::vector<glm::
     }
 
     // replace indices from previous subdivision level with new ones
-    indices->clear();
+    r_indices.clear();
     for (auto idx : newIndices)
     {
       r_indices.push_back(idx);
