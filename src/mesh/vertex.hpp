@@ -113,6 +113,25 @@ struct VertexP3C4
   }
 };
 
+// A vertex with three position coordinates and three normal coordinates (XYZNNN)
+struct VertexP3N3
+{
+  GLfloat position[3];
+  GLfloat normal[3];
+
+  static void EnableVertexAttribArray()
+  {
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexP3N3),
+                          (const GLvoid*)offsetof(VertexP3N3, position));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexP3N3),
+                          (const GLvoid*)offsetof(VertexP3N3, position));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+  }
+};
+
 } // namespace ar
 
 #endif // _VERTEX_H
