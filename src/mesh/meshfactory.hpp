@@ -31,6 +31,15 @@ public:
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset
   static glm::mat4 MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation);
+
+  // Creates a unit Icosphere and returns the vertex positions & indices in the given vectors
+  static void MakeIcosphereMesh(unsigned int subdivisions, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices);
+
+  // Creates a unit UVSphere and returns the vertex positions & indices in the given vectors
+  static void MakeUVSphereMesh(unsigned int resolution, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices);
+
+  // Creates a capsule at the origin with the given dimensions & returns the positions & indices in the given vectors
+  static void MakeCapsuleMesh(double length, double radius, unsigned int resolution, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices);
 };
 
 } // namespace ar
