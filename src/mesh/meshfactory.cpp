@@ -146,6 +146,7 @@ Mesh<VertexP3N3> MeshFactory::MakeQuad<VertexP3N3>(glm::vec3 center, glm::vec3 n
   std::vector<glm::vec3> vertex_positions;
   std::vector<GLuint> indices;
   std::vector<VertexP3N3> verts;
+  glm::vec3 n_normal = glm::normalize(normal); // make sure normal is a unit vector
 
   MakeQuadMesh(width, height, &vertex_positions, &indices);
 
@@ -153,12 +154,12 @@ Mesh<VertexP3N3> MeshFactory::MakeQuad<VertexP3N3>(glm::vec3 center, glm::vec3 n
   {
     verts.push_back({
       { v.x, v.y, v.z },
-      { normal.x, normal.y, normal.z }
+      { n_normal.x, n_normal.y, n_normal.z }
     });
   }
 
   Mesh<VertexP3N3> m = Mesh<VertexP3N3>(verts, indices);
-  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), n_normal));
 
   return m;
 }
@@ -205,6 +206,7 @@ Mesh<VertexP3N3> MeshFactory::MakeIcosphere<VertexP3N3>(glm::vec3 center, double
   {
     v = glm::normalize(v) * (float)radius; // normalize all vertices to the given radius
     glm::vec3 n = glm::normalize(v);
+
     vertices.push_back({
       { v.x, v.y, v.z },
       { n.x, n.y, n.z }

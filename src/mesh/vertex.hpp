@@ -126,7 +126,7 @@ struct VertexP3N3
                           (const GLvoid*)offsetof(VertexP3N3, position));
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexP3N3),
-                          (const GLvoid*)offsetof(VertexP3N3, position));
+                          (const GLvoid*)offsetof(VertexP3N3, normal));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
   }

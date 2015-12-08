@@ -23,7 +23,7 @@ namespace ar
 {
 
 // define vertex format for 2D & 3D shapes here for convenience
-typedef VertexP3C4 Vertex3D;
+typedef VertexP3N3 Vertex3D;
 typedef VertexP2T2 Vertex2D;
 typedef Mesh<Vertex3D> Mesh3D;
 typedef TexturedQuad Mesh2D;

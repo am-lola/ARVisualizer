@@ -135,8 +135,11 @@ void Renderer::init()
   _3DMeshBuffer = new VertexBuffer<Vertex3D>();
 
   // load video shaders
-  _defaultShader.loadAndLink("shaders/default.vert", "shaders/default.frag");
+  _defaultShader.loadAndLink("shaders/simpleNormal.vert", "shaders/normal.frag");
   _defaultShader.addUniform("MVP");
+  _defaultShader.addUniform("M");
+  _defaultShader.addUniform("V");
+
   _videoShader.loadAndLink("shaders/2D_passthru.vert", "shaders/simpleTexture.frag");
   _videoShader.addUniform("tex");
 
@@ -336,6 +339,8 @@ void Renderer::renderOneFrame()
     m.GetShader()->enable();
     glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * m.GetTransform();
     glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(m.GetShader()->getUniform("M"), 1, GL_FALSE, &(m.GetTransform()[0][0]));
+    glUniformMatrix4fv(m.GetShader()->getUniform("V"), 1, GL_FALSE, &(GetViewMatrix()[0][0]));
 
     _3DMeshBuffer->Draw(m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }
