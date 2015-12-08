@@ -21,7 +21,7 @@ public:
   template <typename VertexT>
   static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions);
 
-  // 3D colored triangles (colored per-vertex)
+  // 3D triangles with per-vertex colors
   template <typename VertexT>
   static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<Color> vertexColors);
 
@@ -47,15 +47,26 @@ public:
   static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Color vertexColors);
 
 
+  // Basic Icosphere
+  template <typename VertexT>
+  static Mesh<VertexT> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions);
+
   // Icosphere with constant color
   template <typename VertexT>
   static Mesh<VertexT> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, Color color);
 
 
+  // Basic UVSphere
+  template <typename VertexT>
+  static Mesh<VertexT> MakeUVSphere(glm::vec3 center, double radius, int resolution);
+
   // UVSphere with constant color
   template <typename VertexT>
   static Mesh<VertexT> MakeUVSphere(glm::vec3 center, double radius, Color color, int resolution);
 
+  // Basic Capsule
+  template <typename VertexT>
+  static Mesh<VertexT> MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, int resolution);
 
   // Capsule with constant color
   template <typename VertexT>
