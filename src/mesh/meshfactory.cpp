@@ -7,7 +7,8 @@
 namespace ar
 {
 
-Mesh<VertexP2> MeshFactory::MakeTriangle(std::vector<glm::vec2> vertexPositions)
+template <>
+Mesh<VertexP2> MeshFactory::MakeTriangle<VertexP2>(std::vector<glm::vec2> vertexPositions)
 {
   std::vector<VertexP2> verts;
   std::vector<GLuint> indices = {0, 1, 2};
@@ -19,7 +20,8 @@ Mesh<VertexP2> MeshFactory::MakeTriangle(std::vector<glm::vec2> vertexPositions)
   return Mesh<VertexP2>(verts, indices);
 }
 
-Mesh<VertexP3> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPositions)
+template <>
+Mesh<VertexP3> MeshFactory::MakeTriangle<VertexP3>(std::vector<glm::vec3> vertexPositions)
 {
   std::vector<VertexP3> verts;
   std::vector<GLuint> indices = {0, 1, 2};
@@ -31,7 +33,8 @@ Mesh<VertexP3> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPositions)
   return Mesh<VertexP3>(verts, indices);
 }
 
-Mesh<VertexP3C4> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<Color> vertexColors)
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(std::vector<glm::vec3> vertexPositions, std::vector<Color> vertexColors)
 {
   std::vector<VertexP3C4> verts;
   std::vector<GLuint> indices = {0, 1, 2};
@@ -43,13 +46,15 @@ Mesh<VertexP3C4> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPosition
   return Mesh<VertexP3C4>(verts, indices);
 }
 
-Mesh<VertexP3C4> MeshFactory::MakeTriangle(std::vector<glm::vec3> vertexPositions, Color color)
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(std::vector<glm::vec3> vertexPositions, Color color)
 {
   std::vector<Color> vertexColors = { color, color, color };
-  return MakeTriangle(vertexPositions, vertexColors);
+  return MakeTriangle<VertexP3C4>(vertexPositions, vertexColors);
 }
 
-Mesh<VertexP2> MeshFactory::MakeQuad(glm::vec2 center, double width, double height)
+template <>
+Mesh<VertexP2> MeshFactory::MakeQuad<VertexP2>(glm::vec2 center, double width, double height)
 {
   std::vector<glm::vec3> vertex_positions;
   std::vector<GLuint> indices;
@@ -65,7 +70,8 @@ Mesh<VertexP2> MeshFactory::MakeQuad(glm::vec2 center, double width, double heig
   return Mesh<VertexP2>(verts, indices);
 }
 
-Mesh<VertexP3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height)
+template <>
+Mesh<VertexP3> MeshFactory::MakeQuad<VertexP3>(glm::vec3 center, glm::vec3 normal, double width, double height)
 {
   std::vector<glm::vec3> vertex_positions;
   std::vector<GLuint> indices;
@@ -84,7 +90,8 @@ Mesh<VertexP3> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double 
   return Mesh<VertexP3>(verts, indices);
 }
 
-Mesh<VertexP3C4> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<Color> vertexColors)
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<Color> vertexColors)
 {
   std::vector<glm::vec3> vertex_positions;
   std::vector<GLuint> indices;
@@ -106,13 +113,15 @@ Mesh<VertexP3C4> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, doubl
   return m;
 }
 
-Mesh<VertexP3C4> MeshFactory::MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Color color)
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 normal, double width, double height, Color color)
 {
   std::vector<Color> vertexColors = {color, color, color, color};
-  return MakeQuad(center, normal, width, height, vertexColors);
+  return MakeQuad<VertexP3C4>(center, normal, width, height, vertexColors);
 }
 
-Mesh<VertexP3C4> MeshFactory::MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, Color color)
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeIcosphere<VertexP3C4>(glm::vec3 center, double radius, unsigned int subdivisions, Color color)
 {
   std::vector<glm::vec3> vertex_positions;
   std::vector<VertexP3C4> vertices;
@@ -138,7 +147,8 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere(glm::vec3 center, double radius, uns
   return m;
 }
 
-Mesh<VertexP3C4> MeshFactory::MakeUVSphere(glm::vec3 center, double radius, Color color, int resolution)
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeUVSphere<VertexP3C4>(glm::vec3 center, double radius, Color color, int resolution)
 {
   std::vector<glm::vec3> vertex_positions;
   std::vector<VertexP3C4> vertices;
@@ -162,7 +172,8 @@ Mesh<VertexP3C4> MeshFactory::MakeUVSphere(glm::vec3 center, double radius, Colo
   return m;
 }
 
-Mesh<VertexP3C4> MeshFactory::MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution)
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeCapsule<VertexP3C4>(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution)
 {
   std::vector<glm::vec3> vertex_positions;
   std::vector<VertexP3C4> vertices;

@@ -12,21 +12,54 @@ namespace ar
 class MeshFactory
 {
 public:
-  static Mesh<VertexP2> MakeTriangle(std::vector<glm::vec2> vertexPositions);
-  static Mesh<VertexP3> MakeTriangle(std::vector<glm::vec3> vertexPositions);
-  static Mesh<VertexP3C4> MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<Color> vertexColors);
-  static Mesh<VertexP3C4> MakeTriangle(std::vector<glm::vec3> vertexPositions, Color vertexColors);
 
-  static Mesh<VertexP2> MakeQuad(glm::vec2 center, double width, double height);
-  static Mesh<VertexP3> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height);
-  static Mesh<VertexP3C4> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<Color> vertexColors);
-  static Mesh<VertexP3C4> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Color vertexColors);
+  // 2D triangles
+  template <typename VertexT>
+  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec2> vertexPositions);
 
-  static Mesh<VertexP3C4> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, Color color);
+  // 3D triangles
+  template <typename VertexT>
+  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions);
 
-  static Mesh<VertexP3C4> MakeUVSphere(glm::vec3 center, double radius, Color color, int resolution);
+  // 3D colored triangles (colored per-vertex)
+  template <typename VertexT>
+  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<Color> vertexColors);
 
-  static Mesh<VertexP3C4> MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution);
+  // 3D colored triangles (constant color)
+  template <typename VertexT>
+  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions, Color vertexColors);
+
+
+  // 2D quads
+  template <typename VertexT>
+  static Mesh<VertexT> MakeQuad(glm::vec2 center, double width, double height);
+
+  // 3D quads
+  template <typename VertexT>
+  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height);
+
+  // 3D quads with per-vertex colors
+  template <typename VertexT>
+  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<Color> vertexColors);
+
+  // 3D quads with constant color
+  template <typename VertexT>
+  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Color vertexColors);
+
+
+  // Icosphere with constant color
+  template <typename VertexT>
+  static Mesh<VertexT> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, Color color);
+
+
+  // UVSphere with constant color
+  template <typename VertexT>
+  static Mesh<VertexT> MakeUVSphere(glm::vec3 center, double radius, Color color, int resolution);
+
+
+  // Capsule with constant color
+  template <typename VertexT>
+  static Mesh<VertexT> MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution);
 
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset
