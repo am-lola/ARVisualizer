@@ -134,14 +134,9 @@ void Renderer::init()
   _2DMeshBuffer = new VertexBuffer<Vertex2D>();
   _3DMeshBuffer = new VertexBuffer<Vertex3D>();
 
-  // load video shaders
+  // load shaders
   _defaultShader.loadAndLink("shaders/simpleNormal.vert", "shaders/normal.frag");
-  _defaultShader.addUniform("MVP");
-  _defaultShader.addUniform("M");
-  _defaultShader.addUniform("V");
-
   _videoShader.loadAndLink("shaders/2D_passthru.vert", "shaders/simpleTexture.frag");
-  _videoShader.addUniform("tex");
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();

@@ -24,6 +24,29 @@ class ShaderProgram
     // Map of uniforms and their binding locations
     std::map<std::string,int> uniformLocList;
 
+    // retrieves all uniforms available in the currently-linked program
+    void populateUniformList()
+    {
+      // nothing to be done without a linked program
+      if (programId == 0)
+      {
+        return;
+      }
+
+      GLint uniformCount; // number of active uniforms in the linked program
+      glGetProgramiv(programId, GL_ACTIVE_UNIFORMS, &uniformCount);
+
+      std::vector<GLchar> nameData(256);
+      for(int i = 0; i < uniformCount; i++)
+      {
+        GLint arraySize = 0;
+        GLenum type = 0;
+        GLsizei nameLength = 0;
+        glGetActiveUniform(programId, i, nameData.size(), &nameLength, &arraySize, &type, &nameData[0]);
+        addUniform(std::string((char*)&nameData[0], nameLength));
+      }
+    }
+
   public:
     // Constructor
     ShaderProgram()
@@ -43,6 +66,7 @@ class ShaderProgram
       if (programId != 0)
       {
         shaderCount = 2;
+        populateUniformList();
       }
     }
 
@@ -69,6 +93,7 @@ class ShaderProgram
       if (programId != 0)
       {
         shaderCount = 2;
+        populateUniformList();
       }
     }
 
