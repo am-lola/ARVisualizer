@@ -105,7 +105,7 @@ Mesh<VertexP3> MeshFactory::MakeQuad<VertexP3>(glm::vec3 center, glm::vec3 norma
   }
 
   Mesh<VertexP3> m = Mesh<VertexP3>(verts, indices);
-  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, -1.0f), normal));
 
   return Mesh<VertexP3>(verts, indices);
 }
@@ -128,7 +128,7 @@ Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 n
   }
 
   Mesh<VertexP3C4> m = Mesh<VertexP3C4>(verts, indices);
-  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, -1.0f), normal));
 
   return m;
 }
@@ -159,7 +159,7 @@ Mesh<VertexP3N3> MeshFactory::MakeQuad<VertexP3N3>(glm::vec3 center, glm::vec3 n
   }
 
   Mesh<VertexP3N3> m = Mesh<VertexP3N3>(verts, indices);
-  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), n_normal));
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, -1.0f), n_normal));
 
   return m;
 }
@@ -394,8 +394,8 @@ void MeshFactory::MakeQuadMesh(double width, double height, std::vector<glm::vec
   };
 
   *indices = {
-    0, 1, 3,  // first triangle
-    0, 3, 2   // second triangle
+    0, 3, 1,  // first triangle
+    0, 2, 3   // second triangle
   };
 }
 
