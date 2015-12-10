@@ -91,9 +91,10 @@ void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up
   _camera.up = glm::normalize(up);
 }
 
-unsigned int Renderer::Add3DMesh(Mesh3D mesh)
+unsigned int Renderer::Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material)
 {
   unsigned int handle = GenerateMeshHandle(mesh);
+  mesh.SetMaterial(material);
   mesh.SetShader(&_defaultShader);
   mesh.SetID(handle);
   _3DMeshes.push_back(mesh);
@@ -135,7 +136,7 @@ void Renderer::init()
   _3DMeshBuffer = new VertexBuffer<Vertex3D>();
 
   // load shaders
-  _defaultShader.loadAndLink("shaders/simpleNormal.vert", "shaders/normal.frag");
+  _defaultShader.loadAndLink("shaders/simpleNormal.vert", "shaders/simpleLit.frag");
   _videoShader.loadAndLink("shaders/2D_passthru.vert", "shaders/simpleTexture.frag");
 
   // setup default goemetry needed for rendering and send it to OpenGL
@@ -332,10 +333,16 @@ void Renderer::renderOneFrame()
   for (auto& m : _3DMeshes)
   {
     m.GetShader()->enable();
-    glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * m.GetTransform();
-    glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+
+    // uniforms global to all objects
     glUniformMatrix4fv(m.GetShader()->getUniform("M"), 1, GL_FALSE, &(m.GetTransform()[0][0]));
     glUniformMatrix4fv(m.GetShader()->getUniform("V"), 1, GL_FALSE, &(GetViewMatrix()[0][0]));
+    glUniform3fv(m.GetShader()->getUniform("light_dir"), 1, &(light_dir[0]));
+
+    // object-specific uniforms
+    glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * m.GetTransform();
+    glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    m.GetMaterial()->Apply();
 
     _3DMeshBuffer->Draw(m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }

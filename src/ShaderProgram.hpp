@@ -176,12 +176,12 @@ class ShaderProgram
       return uniformLocList[uniformName];
     }
 
-    class UniformDoesNotExistException : std::runtime_error
+    class UniformDoesNotExistException : public std::runtime_error
     {
     public:
       UniformDoesNotExistException(const std::string& what_arg) : std::runtime_error(what_arg) {}
     };
-    class AttributeDoesNotExistException : std::runtime_error
+    class AttributeDoesNotExistException : public std::runtime_error
     {
     public:
       AttributeDoesNotExistException(const std::string& what_arg) : std::runtime_error(what_arg) {}

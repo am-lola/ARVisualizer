@@ -68,7 +68,7 @@ mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
     { vertexPositions[2][0], vertexPositions[2][1], vertexPositions[2][2] }
   };
 
-  return _renderer->Add3DMesh(MeshFactory::MakeTriangle<Vertex3D>(positions));
+  return _renderer->Add3DMesh(MeshFactory::MakeTriangle<Vertex3D>(positions), std::make_shared<FlatColorMaterial>(color));
 }
 
 mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double width, double height, Color color)
@@ -76,14 +76,14 @@ mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double wid
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
   glm::vec3 vNormal = glm::vec3( normal[0], normal[1], normal[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeQuad<Vertex3D>(vCenter, vNormal, width, height));
+  return _renderer->Add3DMesh(MeshFactory::MakeQuad<Vertex3D>(vCenter, vNormal, width, height), std::make_shared<FlatColorMaterial>(color));
 }
 
 mesh_handle ARVisualizer::AddSphere(double center[3], double radius, Color color)
 {
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere<Vertex3D>(vCenter, radius, ICOSPHERE_SUBDIV_LEVELS));
+  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere<Vertex3D>(vCenter, radius, ICOSPHERE_SUBDIV_LEVELS), std::make_shared<FlatColorMaterial>(color));
 }
 
 mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, Color color)
@@ -91,7 +91,7 @@ mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], doubl
   glm::vec3 vCenter1 = glm::vec3( center1[0], center1[1], center1[2] );
   glm::vec3 vCenter2 = glm::vec3( center2[0], center2[1], center2[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, radius, UVSPHERE_RESOLUTION));
+  return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
 }
 
 void ARVisualizer::Remove(mesh_handle handle)

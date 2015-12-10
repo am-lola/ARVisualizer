@@ -1,7 +1,9 @@
 #ifndef _MESH_H
 #define _MESH_H
 #include <vector>
+#include <memory>
 #include "ShaderProgram.hpp"
+#include "material.hpp"
 #include "vertex.hpp"
 
 namespace ar
@@ -36,7 +38,18 @@ public:
   void SetIndices(std::vector<GLuint> v) { _indices = v; _dirty = true; };
 
   ShaderProgram* GetShader() { return _shader; };
-  void SetShader(ShaderProgram* s) { _shader = s; };
+  void SetShader(ShaderProgram* s) {
+    _shader = s;
+    if (_material != nullptr)
+      _material->SetShader(s);
+  };
+
+  std::shared_ptr<Material> GetMaterial() { return _material; };
+  void SetMaterial(std::shared_ptr<Material> m) {
+    _material = m;
+    if (_shader != nullptr)
+      _material->SetShader(_shader);
+  };
 
   int GetVertexOffset() { return _vtx_offset; };
   void SetVertexOffset(int o) { _vtx_offset = o; };
@@ -55,7 +68,8 @@ private:
   int _idx_offset = 0; // offset of first index of this mesh in the index buffer it's drawn from
   std::vector<VertexT> _vertices;
   std::vector<GLuint> _indices;
-  ShaderProgram* _shader;
+  ShaderProgram* _shader = nullptr;
+  std::shared_ptr<Material> _material;
   glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
 };
 

@@ -15,6 +15,7 @@
 #include <thread>
 #include <mutex>
 #include "ShaderProgram.hpp"
+#include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
 
@@ -50,7 +51,7 @@ public:
   // Updates camera parameters with the given values
   void SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up);
 
-  unsigned int Add3DMesh(Mesh3D mesh);
+  unsigned int Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material);
 
   void RemoveMesh(unsigned int handle);
 
@@ -97,6 +98,7 @@ private:
   unsigned char* _currentVideoFrame;
   ShaderProgram _videoShader;
   bool _newVideoFrame = false;
+  glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
   std::vector<TexturedQuad> _2DMeshes;
