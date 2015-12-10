@@ -61,6 +61,7 @@ namespace ar
   private:
     Color _color;
   };
-}
+
+} // namespace ar
 
 #endif // _MATERIAL_H

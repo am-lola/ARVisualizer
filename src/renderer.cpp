@@ -155,11 +155,10 @@ void Renderer::init_GL()
   glfwMakeContextCurrent(_window);
 
   glfwSwapInterval(1);
-  glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glClearColor(0, 0, 0.15, 1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glClearColor(0, 0, 0, 0);
 }
 
 void Renderer::init_geometry()
@@ -328,8 +327,6 @@ void Renderer::renderOneFrame()
   * Second pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  glClear(GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_DEPTH_TEST);
   for (auto& m : _3DMeshes)
   {
     m.GetShader()->enable();

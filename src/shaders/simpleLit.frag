@@ -17,5 +17,5 @@ void main() {
 
   float d = dot( normalize(frag_normal), normalize(light_dir) );
 
-  outColor = color * mix(0.5, 1.0, d);
+  outColor = color * mix(0.2, 1.0, d);
 }
