@@ -4,6 +4,8 @@
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
 
+#include <bitset>
+
 namespace ar
 {
 
@@ -156,8 +158,7 @@ void Renderer::init_GL()
 
   glfwSwapInterval(1);
   glEnable(GL_CULL_FACE);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
+  glBlendEquation(GL_FUNC_ADD);
   glClearColor(0, 0, 0, 0);
 }
 
@@ -218,6 +219,42 @@ void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* p
       );
 
   glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Renderer::enableRenderPass(RenderPassParams pass)
+{
+  // Enable Depth if set, otherwise ensure it's disabled
+  if (pass & EnableDepth)
+  {
+    glEnable(GL_DEPTH_TEST);
+  }
+  else
+  {
+    glDisable(GL_DEPTH_TEST);
+  }
+
+  if (pass & Blend_Add)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  }
+
+  if (pass & Blend_Mul)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_DST_COLOR, GL_ZERO);
+  }
+
+  if (pass & Blend_Alpha)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  }
+
+  if (pass & Blend_None)
+  {
+    glDisable(GL_BLEND);
+  }
 }
 
 void Renderer::render()
@@ -311,7 +348,7 @@ void Renderer::renderOneFrame()
   * First pass:
   *   render all 2D textured shapes
   *************/
-  glDisable(GL_DEPTH_TEST);
+  enableRenderPass(Blend_None);
   for (auto& m : _2DMeshes)
   {
     m.GetShader()->enable();
@@ -327,6 +364,7 @@ void Renderer::renderOneFrame()
   * Second pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
+  enableRenderPass(Blend_Add);
   for (auto& m : _3DMeshes)
   {
     m.GetShader()->enable();

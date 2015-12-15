@@ -14,6 +14,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include "RenderPassParams.hpp"
 #include "ShaderProgram.hpp"
 #include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
@@ -28,6 +29,7 @@ typedef VertexP3N3 Vertex3D;
 typedef VertexP2T2 Vertex2D;
 typedef Mesh<Vertex3D> Mesh3D;
 typedef TexturedQuad Mesh2D;
+
 
 class Renderer
 {
@@ -124,6 +126,9 @@ private:
   // sends the data in pixels to the texture unit on the GPU referenced by tex
   void bufferTexture(int width, int height, GLuint tex, unsigned char* pixels);
 
+  // Prepares OpenGL state for rendering with the given parameters
+  void enableRenderPass(RenderPassParams pass);
+
   // the main render loop
   void render();
 
@@ -135,7 +140,9 @@ private:
 
   // Final cleanup which needs to be done (from the render thread) when we stop rendering
   void shutdown();
+
 };
+
 
 } // namespace ar
 
