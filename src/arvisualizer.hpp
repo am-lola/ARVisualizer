@@ -30,6 +30,7 @@ public:
 
   // Begins rendering
   void Start(int width, int height);
+  void Start();
 
   // Stops all rendering activity
   void Stop();
@@ -46,6 +47,10 @@ public:
   //    Forward:  Vector pointing in the direction the camera is facing
   //    Up:       Orthogonal to Forward, defines the vertical axis for the camera
   void SetCameraPose(double position[3], double forward[3], double up[3]);
+
+  //    Position:    Position of the camera in world-coordinates
+  //    Orientation: Rotation matrix describing the current orientation of the camera
+  void SetCameraPose(double position[3], double orientation[3][3]);
 
   mesh_handle AddTriangle(double vertexPositions[3][3], Color color);
 

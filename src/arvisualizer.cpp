@@ -26,6 +26,11 @@ void ARVisualizer::Start(int width, int height)
   _renderer = WindowManager::Instance().NewRenderer(width, height, "AR visualizer");
 }
 
+void ARVisualizer::Start()
+{
+  Start(1024, 768);
+}
+
 void ARVisualizer::Stop()
 {
   if (_renderer)
@@ -56,6 +61,32 @@ void ARVisualizer::SetCameraPose(double position[3], double forward[3], double u
   glm::vec3 vPos = glm::vec3( position[0], position[1], position[2] );
   glm::vec3 vFor = glm::vec3(  forward[0],  forward[1],  forward[2] );
   glm::vec3 vUp  = glm::vec3(       up[0],       up[1],       up[2] );
+
+  _renderer->SetCameraPose(vPos, vFor, vUp);
+}
+
+void ARVisualizer::SetCameraPose(double position[3], double orientation[3][3])
+{
+  glm::vec3 vPos = glm::vec3( position[0], position[1], position[2] );
+  glm::vec3 vFor = glm::vec3( 0.0,         0.0,         1.0 );  /// TODO: Confirm default forward & up vectors
+  glm::vec3 vUp  = glm::vec3( 0.0,         1.0,         0.0 );
+
+  // fill rotation matrix from given orientation
+  glm::mat3 r(1.0);
+  for (size_t i = 0; i < 3; i++)
+  {
+    for (size_t j = 0; j < 3; j++)
+    {
+      r[i][j] = orientation[i][j];
+    }
+  }
+
+  // incoming rotation matrix needs to be inverted (?)
+  r = glm::transpose(r);
+
+  // rotate forward & up vectors
+  vFor = r * vFor;
+  vUp  = r * vUp;
 
   _renderer->SetCameraPose(vPos, vFor, vUp);
 }
