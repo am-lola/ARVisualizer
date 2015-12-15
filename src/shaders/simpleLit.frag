@@ -12,10 +12,7 @@ in vec3 frag_normal;
 out vec4 outColor;
 
 void main() {
-  // ensure normal vector is normalized
-  vec3 n = normalize(frag_normal);
-
   float d = dot( normalize(frag_normal), normalize(light_dir) );
 
-  outColor = color * mix(0.2, 1.0, d);
+  outColor = color * mix(0.5, 1.0, d);
 }
