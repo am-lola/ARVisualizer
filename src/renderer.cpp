@@ -4,6 +4,8 @@
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
 
+#include <bitset>
+
 namespace ar
 {
 
@@ -91,9 +93,10 @@ void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up
   _camera.up = glm::normalize(up);
 }
 
-unsigned int Renderer::Add3DMesh(Mesh3D mesh)
+unsigned int Renderer::Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material)
 {
   unsigned int handle = GenerateMeshHandle(mesh);
+  mesh.SetMaterial(material);
   mesh.SetShader(&_defaultShader);
   mesh.SetID(handle);
   _3DMeshes.push_back(mesh);
@@ -134,11 +137,9 @@ void Renderer::init()
   _2DMeshBuffer = new VertexBuffer<Vertex2D>();
   _3DMeshBuffer = new VertexBuffer<Vertex3D>();
 
-  // load video shaders
-  _defaultShader.loadAndLink("shaders/default.vert", "shaders/default.frag");
-  _defaultShader.addUniform("MVP");
+  // load shaders
+  _defaultShader.loadAndLink("shaders/simpleNormal.vert", "shaders/simpleLit.frag");
   _videoShader.loadAndLink("shaders/2D_passthru.vert", "shaders/simpleTexture.frag");
-  _videoShader.addUniform("tex");
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();
@@ -156,11 +157,9 @@ void Renderer::init_GL()
   glfwMakeContextCurrent(_window);
 
   glfwSwapInterval(1);
-  glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glClearColor(0, 0, 0.15, 1);
+  glBlendEquation(GL_FUNC_ADD);
+  glClearColor(0, 0, 0, 0);
 }
 
 void Renderer::init_geometry()
@@ -220,6 +219,42 @@ void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* p
       );
 
   glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Renderer::enableRenderPass(RenderPassParams pass)
+{
+  // Enable Depth if set, otherwise ensure it's disabled
+  if (pass & EnableDepth)
+  {
+    glEnable(GL_DEPTH_TEST);
+  }
+  else
+  {
+    glDisable(GL_DEPTH_TEST);
+  }
+
+  if (pass & Blend_Add)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  }
+
+  if (pass & Blend_Mul)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_DST_COLOR, GL_ZERO);
+  }
+
+  if (pass & Blend_Alpha)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  }
+
+  if (pass & Blend_None)
+  {
+    glDisable(GL_BLEND);
+  }
 }
 
 void Renderer::render()
@@ -313,7 +348,7 @@ void Renderer::renderOneFrame()
   * First pass:
   *   render all 2D textured shapes
   *************/
-  glDisable(GL_DEPTH_TEST);
+  enableRenderPass(Blend_None);
   for (auto& m : _2DMeshes)
   {
     m.GetShader()->enable();
@@ -329,13 +364,20 @@ void Renderer::renderOneFrame()
   * Second pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  glClear(GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_DEPTH_TEST);
+  enableRenderPass(Blend_Add);
   for (auto& m : _3DMeshes)
   {
     m.GetShader()->enable();
+
+    // uniforms global to all objects
+    glUniformMatrix4fv(m.GetShader()->getUniform("M"), 1, GL_FALSE, &(m.GetTransform()[0][0]));
+    glUniformMatrix4fv(m.GetShader()->getUniform("V"), 1, GL_FALSE, &(GetViewMatrix()[0][0]));
+    glUniform3fv(m.GetShader()->getUniform("light_dir"), 1, &(light_dir[0]));
+
+    // object-specific uniforms
     glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * m.GetTransform();
     glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    m.GetMaterial()->Apply();
 
     _3DMeshBuffer->Draw(m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }

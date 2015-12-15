@@ -14,7 +14,9 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include "RenderPassParams.hpp"
 #include "ShaderProgram.hpp"
+#include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
 
@@ -23,10 +25,11 @@ namespace ar
 {
 
 // define vertex format for 2D & 3D shapes here for convenience
-typedef VertexP3C4 Vertex3D;
+typedef VertexP3N3 Vertex3D;
 typedef VertexP2T2 Vertex2D;
 typedef Mesh<Vertex3D> Mesh3D;
 typedef TexturedQuad Mesh2D;
+
 
 class Renderer
 {
@@ -50,7 +53,7 @@ public:
   // Updates camera parameters with the given values
   void SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up);
 
-  unsigned int Add3DMesh(Mesh3D mesh);
+  unsigned int Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material);
 
   void RemoveMesh(unsigned int handle);
 
@@ -97,6 +100,7 @@ private:
   unsigned char* _currentVideoFrame;
   ShaderProgram _videoShader;
   bool _newVideoFrame = false;
+  glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
   std::vector<TexturedQuad> _2DMeshes;
@@ -122,6 +126,9 @@ private:
   // sends the data in pixels to the texture unit on the GPU referenced by tex
   void bufferTexture(int width, int height, GLuint tex, unsigned char* pixels);
 
+  // Prepares OpenGL state for rendering with the given parameters
+  void enableRenderPass(RenderPassParams pass);
+
   // the main render loop
   void render();
 
@@ -133,7 +140,9 @@ private:
 
   // Final cleanup which needs to be done (from the render thread) when we stop rendering
   void shutdown();
+
 };
+
 
 } // namespace ar
 
