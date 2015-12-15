@@ -72,8 +72,8 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
   // create a new array to match the new frame size
   if (width != _width || height != _height)
   {
-    delete(_currentVideoFrame);
-    _currentVideoFrame = new unsigned char[width * height * 3];
+    _currentVideoFrame.reset();
+    _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[width * height * 3]());
     _width = width;
     _height = height;
   }
@@ -134,8 +134,8 @@ void Renderer::init()
   init_GL();
 
   // init buffers
-  _2DMeshBuffer = new VertexBuffer<Vertex2D>();
-  _3DMeshBuffer = new VertexBuffer<Vertex3D>();
+  _2DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex2D> >(new VertexBuffer<Vertex2D>());
+  _3DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex3D> >(new VertexBuffer<Vertex3D>());
 
   // load shaders
   _defaultShader.loadAndLink("shaders/simpleNormal.vert", "shaders/simpleLit.frag");
@@ -184,7 +184,7 @@ void Renderer::init_geometry()
 void Renderer::init_textures()
 {
     // initialize video texture to be the same size as our window
-    _currentVideoFrame = new unsigned char[_width * _height * 3];
+    _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[_width * _height * 3]());
     for (size_t i = 0; i < _width * _height * 3; i++)
     {
       _currentVideoFrame[i] = 50;
@@ -192,7 +192,7 @@ void Renderer::init_textures()
 
     GLuint videoTexture;
     glGenTextures(1, &videoTexture);
-    bufferTexture(_width, _height, videoTexture, _currentVideoFrame);
+    bufferTexture(_width, _height, videoTexture, _currentVideoFrame.get());
 
     _2DMeshes[0].SetTexture(videoTexture); /// TODO: Don't do this...
 }
@@ -281,7 +281,7 @@ void Renderer::update()
   if (_newVideoFrame)
   {
     std::lock_guard<std::mutex> guard(_mutex);
-    bufferTexture(_width, _height, _2DMeshes[0].GetTexture(), _currentVideoFrame);
+    bufferTexture(_width, _height, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
     _newVideoFrame = false;
   }
 
@@ -396,9 +396,9 @@ void Renderer::shutdown()
     glDeleteTextures(1, &tex);
   }
 
-  delete(_2DMeshBuffer);
-  delete(_3DMeshBuffer);
-  delete(_currentVideoFrame);
+  _2DMeshBuffer.reset();;
+  _3DMeshBuffer.reset();
+  _currentVideoFrame.reset();
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 

@@ -97,17 +97,17 @@ private:
   } _camera;
 
     /// TODO: move this to its own class
-  unsigned char* _currentVideoFrame;
+  std::unique_ptr<unsigned char[]> _currentVideoFrame;
   ShaderProgram _videoShader;
   bool _newVideoFrame = false;
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
   std::vector<TexturedQuad> _2DMeshes;
-  VertexBuffer<Vertex2D>* _2DMeshBuffer;
+  std::unique_ptr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
 
   std::vector<Mesh3D> _3DMeshes;
-  VertexBuffer<Vertex3D>* _3DMeshBuffer;
+  std::unique_ptr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
 
   unsigned int GenerateMeshHandle(Mesh3D mesh);
 
