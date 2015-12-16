@@ -1,5 +1,5 @@
 #include "windowevents.hpp"
-#include <iostream>
+
 namespace ar
 {
 
@@ -85,7 +85,6 @@ void WindowEvents::NotifyFrameBufferSizeCallback(int width, int height)
 
 WindowEvents::event_handle WindowEvents::SubscribeEvent(Event e, std::function<void(int)> cb)
 {
-  std::cout << "wtf?" << std::endl;
   event_handle eh = NextHandle();
   switch (e)
   {
@@ -191,7 +190,6 @@ WindowEvents::event_handle WindowEvents::SubscribeEvent(Event e, std::function<v
 
 WindowEvents::event_handle WindowEvents::SubscribeEvent(Event e, std::function<void(unsigned int)> cb)
 {
-  std::cout << "...?" << std::endl;
   event_handle eh = NextHandle();
   switch (e)
   {
