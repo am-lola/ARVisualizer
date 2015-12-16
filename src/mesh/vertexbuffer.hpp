@@ -101,12 +101,12 @@ public:
   }
 
   // Draws numVertices previously-buffered vertices beginning at offset in the vertex buffer
-  void Draw(unsigned int numVertices, int vertex_offset, int index_offset)
+  void Draw(GLuint primitive, unsigned int numVertices, int vertex_offset, int index_offset)
   {
     glBindVertexArray(_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _vio);
 
-    glDrawElementsBaseVertex(GL_TRIANGLES, numVertices, GL_UNSIGNED_INT, (void*)(index_offset*sizeof(GLuint)), vertex_offset);
+    glDrawElementsBaseVertex(primitive, numVertices, GL_UNSIGNED_INT, (void*)(index_offset*sizeof(GLuint)), vertex_offset);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

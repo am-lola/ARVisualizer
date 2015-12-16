@@ -4,8 +4,6 @@
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
 
-#include <bitset>
-
 namespace ar
 {
 
@@ -14,17 +12,37 @@ Renderer::Renderer(GLFWwindow* window) : _windowEvents(window)
   _window = window;
   glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
 
+  // Ensure we're notified when the window size changes
   _windowEvents.SubscribeEvent(WindowEvents::WindowResized, (std::function<void(int,int)>)(
     [this] (int w, int h)
     {
       this->onWindowResized(w,h);
     }));
 
+  // Ensure we're notified when the Framebuffer size changes
   _windowEvents.SubscribeEvent(WindowEvents::FrameBufferResized, (std::function<void(int,int)>)(
     [this] (int w, int h)
     {
       this->onFramebufferResized(w,h);
     }));
+
+  // Listen for keyboard input
+  _windowEvents.SubscribeEvent(WindowEvents::KeyboardKey,
+    [this](int k, int scan, int action, int mods)
+    {
+      if (k == GLFW_KEY_1)
+      {
+        this->_renderType = GL_TRIANGLES;
+      }
+      else if (k == GLFW_KEY_2)
+      {
+        this->_renderType = GL_LINE_LOOP;
+      }
+      else if (k == GLFW_KEY_3)
+      {
+        this->_renderType = GL_POINTS;
+      }
+    });
 }
 
 Renderer::~Renderer()
@@ -195,7 +213,9 @@ void Renderer::init_geometry()
 
 void Renderer::init_textures()
 {
+
     // initialize video texture to be the same size as our window
+    _videoWidth = _windowWidth; _videoHeight = _windowHeight;
     _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]());
     for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++)
     {
@@ -380,7 +400,7 @@ void Renderer::renderOneFrame()
     glBindTexture(GL_TEXTURE_2D, m.GetTexture());
     glUniform1i(m.GetShader()->getUniform("tex"), 0);
 
-    _2DMeshBuffer->Draw(m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
+    _2DMeshBuffer->Draw(_renderType, m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }
 
   /*************
@@ -402,7 +422,7 @@ void Renderer::renderOneFrame()
     glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
     m.GetMaterial()->Apply();
 
-    _3DMeshBuffer->Draw(m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
+    _3DMeshBuffer->Draw(_renderType, m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }
 
   // cleanup

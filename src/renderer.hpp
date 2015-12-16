@@ -104,6 +104,8 @@ private:
       float farClip      = 100.0f; // distance to far clipping plane
   } _camera;
 
+  GLuint _renderType = GL_TRIANGLES;
+
     /// TODO: move this to its own class
   std::unique_ptr<unsigned char[]> _currentVideoFrame;
   int _videoWidth, _videoHeight;

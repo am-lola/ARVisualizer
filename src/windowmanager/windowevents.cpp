@@ -1,5 +1,5 @@
 #include "windowevents.hpp"
-
+#include <iostream>
 namespace ar
 {
 
@@ -85,6 +85,7 @@ void WindowEvents::NotifyFrameBufferSizeCallback(int width, int height)
 
 WindowEvents::event_handle WindowEvents::SubscribeEvent(Event e, std::function<void(int)> cb)
 {
+  std::cout << "wtf?" << std::endl;
   event_handle eh = NextHandle();
   switch (e)
   {
@@ -177,6 +178,7 @@ WindowEvents::event_handle WindowEvents::SubscribeEvent(Event e, std::function<v
     case Event::Scroll:
     {
       _scrollCallbacks.insert(std::make_pair(eh, cb));
+      break;
     }
     default:
     {
@@ -189,12 +191,14 @@ WindowEvents::event_handle WindowEvents::SubscribeEvent(Event e, std::function<v
 
 WindowEvents::event_handle WindowEvents::SubscribeEvent(Event e, std::function<void(unsigned int)> cb)
 {
+  std::cout << "...?" << std::endl;
   event_handle eh = NextHandle();
   switch (e)
   {
     case Event::CharacterInput:
     {
       _charCallbacks.insert(std::make_pair(eh, cb));
+      break;
     }
     default:
     {
