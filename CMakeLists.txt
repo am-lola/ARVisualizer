@@ -22,7 +22,9 @@ if (ARVIS_BUILD_LIBRARY)
         src/material.*pp
         src/mesh/mesh.*pp
         src/mesh/meshfactory.*pp
-        src/windowmanager/windowmanager.*pp)
+        src/windowmanager/windowmanager.*pp
+        src/windowmanager/windowevents.*pp
+)
     add_library(arvisualizer SHARED ${libarvis_src})
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
