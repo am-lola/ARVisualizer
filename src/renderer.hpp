@@ -19,6 +19,7 @@
 #include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
+#include "windowmanager/windowevents.hpp"
 
 
 namespace ar
@@ -71,19 +72,26 @@ public:
   {
     return glm::perspective( // this one, too
       _camera.fov,
-      (float)_width / (float)_height,
+      (float)_windowWidth / (float)_windowHeight,
       _camera.nearClip,
       _camera.farClip
     );
   }
+
+  // Updates projection as needed when the window changes size
+  void onWindowResized(int newWidth, int newHeight);
+
+  // Updates the GL viewport when the framebuffer changes size
+  void onFramebufferResized(int newWidth, int newHeight);
 
 private:
   bool _running = false;
 
   std::mutex _mutex;
 
+  WindowEvents _windowEvents;
   GLFWwindow* _window;
-  int _width, _height;
+  int _windowWidth, _windowHeight;
 
   std::thread _renderThread;
 
@@ -98,6 +106,7 @@ private:
 
     /// TODO: move this to its own class
   std::unique_ptr<unsigned char[]> _currentVideoFrame;
+  int _videoWidth, _videoHeight;
   ShaderProgram _videoShader;
   bool _newVideoFrame = false;
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);

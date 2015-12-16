@@ -9,10 +9,22 @@
 namespace ar
 {
 
-Renderer::Renderer(GLFWwindow* window)
+Renderer::Renderer(GLFWwindow* window) : _windowEvents(window)
 {
   _window = window;
-  glfwGetWindowSize(window, &_width, &_height);
+  glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
+
+  _windowEvents.SubscribeEvent(WindowEvents::WindowResized, (std::function<void(int,int)>)(
+    [this] (int w, int h)
+    {
+      this->onWindowResized(w,h);
+    }));
+
+  _windowEvents.SubscribeEvent(WindowEvents::FrameBufferResized, (std::function<void(int,int)>)(
+    [this] (int w, int h)
+    {
+      this->onFramebufferResized(w,h);
+    }));
 }
 
 Renderer::~Renderer()
@@ -70,12 +82,12 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
 
   // if the incoming image is a different size from the last frame we saw,
   // create a new array to match the new frame size
-  if (width != _width || height != _height)
+  if (width != _videoWidth || height != _videoHeight)
   {
     _currentVideoFrame.reset();
     _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[width * height * 3]());
-    _width = width;
-    _height = height;
+    _videoWidth = width;
+    _videoHeight = height;
   }
 
   for (size_t i = 0; i < width * height * 3; i++)
@@ -184,17 +196,28 @@ void Renderer::init_geometry()
 void Renderer::init_textures()
 {
     // initialize video texture to be the same size as our window
-    _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[_width * _height * 3]());
-    for (size_t i = 0; i < _width * _height * 3; i++)
+    _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]());
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++)
     {
       _currentVideoFrame[i] = 50;
     }
 
     GLuint videoTexture;
     glGenTextures(1, &videoTexture);
-    bufferTexture(_width, _height, videoTexture, _currentVideoFrame.get());
+    bufferTexture(_videoWidth, _videoHeight, videoTexture, _currentVideoFrame.get());
 
     _2DMeshes[0].SetTexture(videoTexture); /// TODO: Don't do this...
+}
+
+void Renderer::onWindowResized(int newWidth, int newHeight)
+{
+  _windowWidth = newWidth;
+  _windowHeight = newHeight;
+}
+
+void Renderer::onFramebufferResized(int newWidth, int newHeight)
+{
+  glViewport(0, 0, newWidth, newHeight);
 }
 
 void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
@@ -281,7 +304,7 @@ void Renderer::update()
   if (_newVideoFrame)
   {
     std::lock_guard<std::mutex> guard(_mutex);
-    bufferTexture(_width, _height, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
+    bufferTexture(_videoWidth, _videoHeight, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
     _newVideoFrame = false;
   }
 
