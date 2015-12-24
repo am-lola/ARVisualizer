@@ -190,6 +190,7 @@ void Renderer::init_GL()
   glEnable(GL_CULL_FACE);
   glBlendEquation(GL_FUNC_ADD);
   glClearColor(0, 0, 0, 0);
+  glPointSize(5.0);
 }
 
 void Renderer::init_geometry()
