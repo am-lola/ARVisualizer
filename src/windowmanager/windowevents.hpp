@@ -1,11 +1,6 @@
 #ifndef _WINDOWEVENTS_H
 #define _WINDOWEVENTS_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-#include <GLFW/glfw3.h>
-
 #include <functional>
 #include <map>
 
@@ -44,8 +39,6 @@ public:
   static const Event KeyboardChar       = Event::CharacterInput;
   static const Event Scroll             = Event::Scroll;
 
-  WindowEvents(GLFWwindow* window);
-
   // Registers a callback to be invoked when the given Event is detected
   event_handle SubscribeEvent(Event e, std::function<void(int)> cb);
   event_handle SubscribeEvent(Event e, std::function<void(int,int)> cb);
@@ -83,16 +76,6 @@ private:
   std::map<event_handle, std::function<void(double,double)> >   _mouseMoveCallbacks;
   std::map<event_handle, std::function<void(double,double)> >   _scrollCallbacks;
   std::map<event_handle, std::function<void(unsigned int)> >    _charCallbacks;
-
-  // callbacks registered with GLFW to notify us when events happen
-  static void glfw_mousebutton_callback( GLFWwindow *window, int button, int action, int mods );
-  static void glfw_mousemove_callback( GLFWwindow *window, double xpos, double ypos );
-  static void glfw_mouseenter_callback( GLFWwindow *window, int entered );
-  static void glfw_scroll_callback( GLFWwindow *window, double xoffset, double yoffset );
-  static void glfw_keyboard_callback( GLFWwindow *window, int key, int scancode, int action, int mods );
-  static void glfw_char_callback( GLFWwindow *window, unsigned int codepoint );
-  static void glfw_windowsize_callback( GLFWwindow *window, int width, int height );
-  static void glfw_framebuffersize_callback( GLFWwindow *window, int width, int height );
 
   // gets a new unique handle to assign to an event
   static event_handle NextHandle();

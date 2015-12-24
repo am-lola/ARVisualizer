@@ -19,7 +19,7 @@
 #include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
-#include "windowmanager/windowevents.hpp"
+#include "windowmanager/glfwwindowevents.hpp"
 
 
 namespace ar
@@ -89,7 +89,7 @@ private:
 
   std::mutex _mutex;
 
-  WindowEvents _windowEvents;
+  GLFWWindowEvents _windowEvents;
   GLFWwindow* _window;
   int _windowWidth, _windowHeight;
 
