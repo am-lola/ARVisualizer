@@ -30,15 +30,15 @@ Renderer::Renderer(GLFWwindow* window) : _windowEvents(window)
   _windowEvents.SubscribeEvent(WindowEvents::KeyboardKey,
     [this](int k, int scan, int action, int mods)
     {
-      if (k == GLFW_KEY_1)
+      if (action == GLFW_PRESS && k == GLFW_KEY_1)
       {
         this->_renderType = GL_TRIANGLES;
       }
-      else if (k == GLFW_KEY_2)
+      else if (action == GLFW_PRESS && k == GLFW_KEY_2)
       {
         this->_renderType = GL_LINE_LOOP;
       }
-      else if (k == GLFW_KEY_3)
+      else if (action == GLFW_PRESS && k == GLFW_KEY_3)
       {
         this->_renderType = GL_POINTS;
       }
