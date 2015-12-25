@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <vector>
 #include <thread>
@@ -70,12 +71,21 @@ public:
 
   glm::mat4 GetProjectionMatrix()
   {
-    return glm::perspective( // this one, too
-      _camera.fov,
-      (float)_windowWidth / (float)_windowHeight,
-      _camera.nearClip,
-      _camera.farClip
-    );
+    return _projectionMatrix;
+  }
+
+  void SetCameraIntrinsics(double camera_matrix[3][3])
+  {
+      for (int i = 0; i < 3; i++)
+      {
+        for (int j = 0; j < 3; j++)
+        {
+          _cameraMatrix[i][j] = camera_matrix[i][j];
+        }
+      }
+
+      _useCameraIntrinsics = true;
+      UpdateProjection();
   }
 
   // Updates projection as needed when the window changes size
@@ -101,10 +111,14 @@ private:
       glm::vec3 up       = glm::vec3(0.0f, 1.0f, 0.0f);  // "up" from camera's perspective (orthogonal to forward)
       float fov          = 45.0f;  // field of view, in degrees
       float nearClip     = 0.1f;   // distance to near clipping plane
-      float farClip      = 100.0f; // distance to far clipping plane
+      float farClip      = 10000.0f; // distance to far clipping plane
   } _camera;
 
   GLuint _renderType = GL_TRIANGLES;
+
+  glm::mat3 _cameraMatrix;
+  glm::mat4 _projectionMatrix;
+  bool _useCameraIntrinsics = false;
 
     /// TODO: move this to its own class
   std::unique_ptr<unsigned char[]> _currentVideoFrame;
@@ -121,6 +135,9 @@ private:
   std::unique_ptr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
 
   unsigned int GenerateMeshHandle(Mesh3D mesh);
+
+  // Regenerates projection matrix
+  void UpdateProjection();
 
   // Sets up the OpenGL context & initializes data needed for rendering
   void init();

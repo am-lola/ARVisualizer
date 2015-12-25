@@ -88,6 +88,11 @@ void ARVisualizer::SetCameraPose(double position[3], double orientation[3][3])
   _renderer->SetCameraPose(vPos, vFor, vUp);
 }
 
+void ARVisualizer::SetCameraIntrinsics(double camera_matrix[3][3])
+{
+  _renderer->SetCameraIntrinsics(camera_matrix);
+}
+
 mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
 {
   std::vector<glm::vec3> positions = {
@@ -111,7 +116,7 @@ mesh_handle ARVisualizer::AddSphere(double center[3], double radius, Color color
 {
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeIcosphere<Vertex3D>(vCenter, radius, ICOSPHERE_SUBDIV_LEVELS), std::make_shared<FlatColorMaterial>(color));
+  return _renderer->Add3DMesh(MeshFactory::MakeUVSphere<Vertex3D>(vCenter, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
 }
 
 mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, Color color)

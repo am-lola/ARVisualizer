@@ -34,6 +34,15 @@ void image_callback (const boost::shared_ptr<openni_wrapper::Image>& image)
 
 int main(void)
 {
+  // Camera intrinsic parameters for a kinect model 1473 rgb sensor
+  // Should be fine for testing most similar sensors, but for best results you may
+  // want to calibrate your own camera.
+  double camera_matrix[3][3] = {
+    5.2921508098293293e+02, 0.0, 3.2894272028759258e+02,
+    0.0, 5.2556393630057437e+02, 2.6748068171871557e+02,
+    0.0, 0.0, 1.0
+  };
+
   // Create a pcl::Grabber to get data from sensor
   interface = new pcl::OpenNIGrabber();
 
@@ -48,7 +57,10 @@ int main(void)
   interface->start ();
 
   // start the visualizer
-  visualizer->Start(1024, 768);
+  visualizer->Start(640, 480);
+
+  // set the camera intrinsic parameters
+  visualizer->SetCameraIntrinsics(camera_matrix);
 
   // everything else is async, so just wait until the user has had enough
   std::cout << "Press enter to exit..." << std::endl;

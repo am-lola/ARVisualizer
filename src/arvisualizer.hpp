@@ -52,6 +52,9 @@ public:
   //    Orientation: Rotation matrix describing the current orientation of the camera
   void SetCameraPose(double position[3], double orientation[3][3]);
 
+  // Updates the projection based on the given camera matrix
+  void SetCameraIntrinsics(double camera_matrix[3][3]);
+
   mesh_handle AddTriangle(double vertexPositions[3][3], Color color);
 
   mesh_handle AddQuad(double center[3], double normal[3], double width, double height, Color color);

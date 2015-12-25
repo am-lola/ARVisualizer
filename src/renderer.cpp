@@ -4,6 +4,7 @@
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
 
+
 namespace ar
 {
 
@@ -43,6 +44,9 @@ Renderer::Renderer(GLFWwindow* window) : _windowEvents(window)
         this->_renderType = GL_POINTS;
       }
     });
+
+    // set a default projection matrix
+    UpdateProjection();
 }
 
 Renderer::~Renderer()
@@ -154,6 +158,28 @@ unsigned int Renderer::GenerateMeshHandle(Mesh3D mesh)
 {
   static unsigned int nextID = 0;
   return ++nextID;
+}
+
+void Renderer::UpdateProjection()
+{
+  if (_useCameraIntrinsics)
+  {
+    _projectionMatrix = glm::mat4(
+      _cameraMatrix[0][0] / _cameraMatrix[0][2], 0, 0, 0,
+      0, _cameraMatrix[1][1] / _cameraMatrix[1][2], 0, 0,
+      0, 0, -(_camera.farClip + _camera.nearClip) / (_camera.farClip - _camera.nearClip), -1.0,
+      0, 0, (-2.0 * _camera.farClip * _camera.nearClip) / (_camera.farClip - _camera.nearClip), 0
+    );
+  }
+  else
+  {
+    _projectionMatrix = glm::perspective(
+       _camera.fov,
+       (float)_windowWidth / (float)_windowHeight,
+       _camera.nearClip,
+       _camera.farClip
+     );
+  }
 }
 
 void Renderer::init()
