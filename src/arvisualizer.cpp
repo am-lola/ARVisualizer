@@ -132,4 +132,9 @@ void ARVisualizer::Remove(mesh_handle handle)
   _renderer->RemoveMesh(handle);
 }
 
+void ARVisualizer::RemoveAll()
+{
+  _renderer->RemoveAllMeshes();
+}
+
 } // namespace ar

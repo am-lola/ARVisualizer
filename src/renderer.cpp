@@ -90,6 +90,7 @@ void Renderer::Stop()
 
 bool Renderer::IsRunning()
 {
+  std::lock_guard<std::mutex> guard(_mutex);
   return _running;
 }
 
@@ -129,10 +130,12 @@ void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up
 
 unsigned int Renderer::Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material)
 {
+  std::lock_guard<std::mutex> guard(_mutex);
   unsigned int handle = GenerateMeshHandle(mesh);
   mesh.SetMaterial(material);
   mesh.SetShader(&_defaultShader);
   mesh.SetID(handle);
+
   _3DMeshes.push_back(mesh);
   return handle;
 }
@@ -148,6 +151,14 @@ void Renderer::RemoveMesh(unsigned int handle)
       m.MarkForDeletion();
       break;
     }
+  }
+}
+
+void Renderer::RemoveAllMeshes()
+{
+  for (auto& m : _3DMeshes)
+  {
+    m.MarkForDeletion();
   }
 }
 

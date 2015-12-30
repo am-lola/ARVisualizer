@@ -65,6 +65,7 @@ public:
 
   void Remove(mesh_handle handle);
 
+  void RemoveAll();
 private:
   Renderer* _renderer;
 };

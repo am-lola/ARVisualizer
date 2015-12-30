@@ -59,6 +59,8 @@ public:
 
   void RemoveMesh(unsigned int handle);
 
+  void RemoveAllMeshes();
+
   // Gets the View matrix
   glm::mat4 GetViewMatrix()
   {
