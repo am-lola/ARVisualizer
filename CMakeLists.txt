@@ -13,6 +13,13 @@ option(ARVIS_BUILD_LIBRARY "Build AR Visualization library" TRUE)
 option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
 
 if (ARVIS_BUILD_LIBRARY)
+    # shader generation scripts
+    add_custom_target(
+        shader_gen
+        COMMAND "python" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/genshaders_cpp.py" "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/" "${CMAKE_CURRENT_SOURCE_DIR}/src/ShaderSources.g.hpp"
+        COMMENT "Generating Shader Source Strings..."
+    )
+
     set(CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++")
     file(GLOB libarvis_src
         src/arvisualizer.*pp
@@ -27,9 +34,10 @@ if (ARVIS_BUILD_LIBRARY)
         src/windowmanager/glfwwindowevents.*pp
 )
     add_library(arvisualizer SHARED ${libarvis_src})
+    add_dependencies(arvisualizer shader_gen)
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
-    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders" DESTINATION "${CMAKE_BINARY_DIR}")
+
 endif()
 
 if (ARVIS_BUILD_SAMPLES)
