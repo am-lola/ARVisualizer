@@ -59,7 +59,7 @@ def get_include_guard(filename):
 
 # generates a variable declaration for the given shader filename
 def get_decl(name):
-    return "static constexpr auto " + "_" + name.replace('.', '_')
+    return "static constexpr auto " + "sh_" + name.replace('.', '_')
 
 # writes out the necessary code for the include guard, class, etc
 def write_header(file, filename):
