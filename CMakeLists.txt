@@ -38,6 +38,16 @@ if (ARVIS_BUILD_LIBRARY)
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
 
+    # install target for the visualization library
+    install(TARGETS arvisualizer
+      LIBRARY DESTINATION lib
+    )
+    install(FILES
+      src/arvisualizer.hpp
+      src/color.hpp
+      DESTINATION include/am2b-ar
+    )
+
 endif()
 
 if (ARVIS_BUILD_SAMPLES)
