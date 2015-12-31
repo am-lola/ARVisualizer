@@ -205,8 +205,8 @@ void Renderer::init()
   _3DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex3D> >(new VertexBuffer<Vertex3D>());
 
   // load shaders
-  _defaultShader.loadAndLink("shaders/simpleNormal.vert", "shaders/simpleLit.frag");
-  _videoShader.loadAndLink("shaders/2D_passthru.vert", "shaders/simpleTexture.frag");
+  _defaultShader.loadAndLink(ShaderSources::sh_simpleNormal_vert, ShaderSources::sh_simpleLit_frag);
+  _videoShader.loadAndLink(ShaderSources::sh_2D_passthru_vert, ShaderSources::sh_simpleTexture_frag);
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();

@@ -7,7 +7,8 @@
 namespace ar
 {
 
-GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path);
+GLuint LoadShadersFromFiles(const char* vertex_file_path, const char* fragment_file_path);
+GLuint LoadShadersFromSource(const std::string vertex_source, const std::string fragment_source);
 
 } // namespace ar
 

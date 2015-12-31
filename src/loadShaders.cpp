@@ -1,4 +1,4 @@
-/* Taken from http://www.opengl-tutorial.org/ */
+/* Adapted from http://www.opengl-tutorial.org/ */
 /* opengl-tutorial licenses all their code under WTFPL */
 
 #include <iostream>
@@ -14,12 +14,8 @@
 namespace ar
 {
 
-GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path){
-
-    // Create the shaders
-    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
+GLuint LoadShadersFromFiles(const char * vertex_file_path,const char * fragment_file_path)
+{
     // Read the Vertex Shader code from the file
     std::string VertexShaderCode;
     std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
@@ -41,11 +37,21 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
         FragmentShaderStream.close();
     }
 
+    return LoadShadersFromSource(VertexShaderCode, FragmentShaderCode);
+}
+
+GLuint LoadShadersFromSource(const std::string vertex_source, const std::string fragment_source)
+{
+
+    // Create the shaders
+    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
     GLint Result = GL_FALSE;
     int InfoLogLength;
 
     // Compile Vertex Shader
-    char const * VertexSourcePointer = VertexShaderCode.c_str();
+    char const * VertexSourcePointer = vertex_source.c_str();
     glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
     glCompileShader(VertexShaderID);
 
@@ -61,7 +67,7 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
     }
 
     // Compile Fragment Shader
-    char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+    char const * FragmentSourcePointer = fragment_source.c_str();
     glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
     glCompileShader(FragmentShaderID);
 
@@ -98,5 +104,6 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
     return ProgramID;
 }
+
 
 } // namespace ar

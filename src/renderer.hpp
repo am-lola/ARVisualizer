@@ -16,6 +16,7 @@
 #include <thread>
 #include <mutex>
 #include "RenderPassParams.hpp"
+#include "ShaderSources.g.hpp"
 #include "ShaderProgram.hpp"
 #include "material.hpp"
 #include "mesh/vertexbuffer.hpp"

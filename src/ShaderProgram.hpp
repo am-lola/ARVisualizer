@@ -57,10 +57,10 @@ class ShaderProgram
       shaderCount = 0;
     }
 
-    ShaderProgram(const char* vertex_file_path, const char* fragment_file_path)
+    ShaderProgram(const std::string vertex_source, const std::string fragment_source)
     {
       // load the given shaders
-      programId = LoadShaders(vertex_file_path, fragment_file_path);
+      programId = LoadShadersFromSource(vertex_source, fragment_source);
 
       // If LoadShaders was successful, we now have two shaders linked in this program
       if (programId != 0)
@@ -78,7 +78,7 @@ class ShaderProgram
       glDeleteProgram(programId);
     }
 
-    void loadAndLink(const char* vertex_file_path, const char* fragment_file_path)
+    void loadAndLink(const std::string vertex_source, const std::string fragment_source)
     {
       // delete old shader program if we have one
       if (shaderCount > 0 && programId > 0)
@@ -87,7 +87,7 @@ class ShaderProgram
       }
 
       // load new shaders
-      programId = LoadShaders(vertex_file_path, fragment_file_path);
+      programId = LoadShadersFromSource(vertex_source, fragment_source);
 
       // if we succeeded, we now have two shaders
       if (programId != 0)
