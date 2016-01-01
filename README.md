@@ -17,7 +17,7 @@ The ARVisualizer class can be found by including `<am2b-ar/arvisualizer.hpp>`:
     int main(void)
     {
         ar::ARVisualizer visualizer;
-        visualizer->Start();
+        visualizer.Start();
         
         ...
     }
