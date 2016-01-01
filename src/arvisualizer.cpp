@@ -15,7 +15,7 @@ ARVisualizer::ARVisualizer()
 
 ARVisualizer::~ARVisualizer()
 {
-  if (_renderer->IsRunning())
+  if (IsRunning())
   {
     Stop();
   }
@@ -36,6 +36,7 @@ void ARVisualizer::Stop()
   if (_renderer)
   {
     _renderer->Stop();
+    _renderer = nullptr;
   }
 }
 
@@ -53,11 +54,13 @@ bool ARVisualizer::IsRunning()
 
 void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
 {
+  if (!IsRunning()) { return; }
   _renderer->NotifyNewVideoFrame(width, height, pixels);
 }
 
 void ARVisualizer::SetCameraPose(double position[3], double forward[3], double up[3])
 {
+  if (!IsRunning()) { return; }
   glm::vec3 vPos = glm::vec3( position[0], position[1], position[2] );
   glm::vec3 vFor = glm::vec3(  forward[0],  forward[1],  forward[2] );
   glm::vec3 vUp  = glm::vec3(       up[0],       up[1],       up[2] );
@@ -67,6 +70,7 @@ void ARVisualizer::SetCameraPose(double position[3], double forward[3], double u
 
 void ARVisualizer::SetCameraPose(double position[3], double orientation[3][3])
 {
+  if (!IsRunning()) { return; }
   glm::vec3 vPos = glm::vec3( position[0], position[1], position[2] );
   glm::vec3 vFor = glm::vec3( 1.0, 0.0, 0.0 );
   glm::vec3 vUp  = glm::vec3( 0.0, 0.0, 1.0 );
@@ -90,11 +94,13 @@ void ARVisualizer::SetCameraPose(double position[3], double orientation[3][3])
 
 void ARVisualizer::SetCameraIntrinsics(double camera_matrix[3][3])
 {
+  if (!IsRunning()) { return; }
   _renderer->SetCameraIntrinsics(camera_matrix);
 }
 
 mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
 {
+  if (!IsRunning()) { return 0; }
   std::vector<glm::vec3> positions = {
     { vertexPositions[0][0], vertexPositions[0][1], vertexPositions[0][2] },
     { vertexPositions[1][0], vertexPositions[1][1], vertexPositions[1][2] },
@@ -106,6 +112,7 @@ mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
 
 mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double width, double height, Color color)
 {
+  if (!IsRunning()) { return 0; }
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
   glm::vec3 vNormal = glm::vec3( normal[0], normal[1], normal[2] );
 
@@ -114,6 +121,7 @@ mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double wid
 
 mesh_handle ARVisualizer::AddSphere(double center[3], double radius, Color color)
 {
+  if (!IsRunning()) { return 0; }
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
 
   return _renderer->Add3DMesh(MeshFactory::MakeUVSphere<Vertex3D>(vCenter, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
@@ -121,6 +129,7 @@ mesh_handle ARVisualizer::AddSphere(double center[3], double radius, Color color
 
 mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, Color color)
 {
+  if (!IsRunning()) { return 0; }
   glm::vec3 vCenter1 = glm::vec3( center1[0], center1[1], center1[2] );
   glm::vec3 vCenter2 = glm::vec3( center2[0], center2[1], center2[2] );
 
@@ -129,11 +138,13 @@ mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], doubl
 
 void ARVisualizer::Remove(mesh_handle handle)
 {
+  if (!IsRunning()) { return; }
   _renderer->RemoveMesh(handle);
 }
 
 void ARVisualizer::RemoveAll()
 {
+  if (!IsRunning()) { return; }
   _renderer->RemoveAllMeshes();
 }
 
