@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(am2b-ar)
 
-
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 
@@ -32,11 +31,13 @@ if (ARVIS_BUILD_LIBRARY)
         src/windowmanager/windowmanager.*pp
         src/windowmanager/windowevents.*pp
         src/windowmanager/glfwwindowevents.*pp
-)
+    )
+
     add_library(arvisualizer SHARED ${libarvis_src})
     add_dependencies(arvisualizer shader_gen)
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
+    # workaround: manually specify glfw3 dependencies
+    target_link_libraries(arvisualizer X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL glfw3 pthread)
 
     # install target for the visualization library
     set(config_install_dir "lib/cmake/${PROJECT_NAME}")

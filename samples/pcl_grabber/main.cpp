@@ -44,7 +44,7 @@ int main(void)
   };
 
   // Create a pcl::Grabber to get data from sensor
-  interface = new pcl::OpenNIGrabber();
+  interface = new pcl::OpenNIGrabber("", pcl::OpenNIGrabber::OpenNI_QVGA_30Hz);
 
   // Create ar::ARVisualizer to send data to
   visualizer = new ar::ARVisualizer();
