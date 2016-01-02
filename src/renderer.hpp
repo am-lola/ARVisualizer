@@ -15,6 +15,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include "RenderPassParams.hpp"
 #include "ShaderSources.g.hpp"
 #include "ShaderProgram.hpp"
@@ -98,7 +99,7 @@ public:
   void onFramebufferResized(int newWidth, int newHeight);
 
 private:
-  bool _running = false;
+  std::atomic_bool _running {false};
 
   std::mutex _mutex;
 
@@ -127,7 +128,7 @@ private:
   std::unique_ptr<unsigned char[]> _currentVideoFrame;
   int _videoWidth, _videoHeight;
   ShaderProgram _videoShader;
-  bool _newVideoFrame = false;
+  std::atomic_bool _newVideoFrame {false};
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;

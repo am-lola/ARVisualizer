@@ -74,7 +74,7 @@ void Renderer::Start()
 
   // wait for initialization to finish before returning
   std::unique_lock<std::mutex> lock(_mutex);
-  init_complete.wait(lock, [this]{return this->_running;});
+  init_complete.wait(lock, [this]{return (bool)this->_running;});
 }
 
 void Renderer::Stop()
@@ -90,6 +90,7 @@ void Renderer::Stop()
 
 bool Renderer::IsRunning()
 {
+  // TODO: Is this necessary?
   std::lock_guard<std::mutex> guard(_mutex);
   return _running;
 }

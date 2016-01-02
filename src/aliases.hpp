@@ -14,6 +14,8 @@ namespace ar
   using SharedPtr = std::shared_ptr<T>;
   template <typename T>
   using Vector = std::vector<T>;
+
+  typedef std::lock_guard<std::mutex> MutexLockGuard;
 }
 
 #endif // _ALIASES_H
