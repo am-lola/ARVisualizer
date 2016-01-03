@@ -3,12 +3,15 @@
 #include "mesh/mesh.hpp"
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
+#include "common.hpp"
 
+#include <imgui.h>
 
 namespace ar
 {
 
-Renderer::Renderer(GLFWwindow* window) : _windowEvents(window)
+Renderer::Renderer(GLFWwindow* window)
+  : _windowEvents(window), _imguiRenderer(window)
 {
   _window = window;
   glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
@@ -43,10 +46,30 @@ Renderer::Renderer(GLFWwindow* window) : _windowEvents(window)
       {
         this->_renderType = GL_POINTS;
       }
+
+      this->_imguiRenderer.OnKeyPress(k, scan, action, mods);
     });
 
-    // set a default projection matrix
-    UpdateProjection();
+  _windowEvents.SubscribeEvent(WindowEvents::KeyboardChar, (std::function<void(unsigned int)>)(
+    [this](unsigned int codepoint)
+    {
+      this->_imguiRenderer.OnKeyChar(codepoint);
+    }));
+
+  _windowEvents.SubscribeEvent(WindowEvents::MouseButton,
+    [this](int button, int action, int mods)
+    {
+      this->_imguiRenderer.OnMouseButton(button, action, mods);
+    });
+
+  _windowEvents.SubscribeEvent(WindowEvents::Scroll, (std::function<void(double, double)>)(
+    [this](double xoffset, double yoffset)
+    {
+      this->_imguiRenderer.OnScroll(xoffset, yoffset);
+    }));
+
+  // set a default projection matrix
+  UpdateProjection();
 }
 
 Renderer::~Renderer()
@@ -214,6 +237,8 @@ void Renderer::init()
 
   // generate texture handles and allocate space for default textures
   init_textures();
+
+  _imguiRenderer.Init();
 
   // notify initialization is complete
   _running = true;
@@ -423,7 +448,7 @@ void Renderer::update()
 }
 
 void Renderer::renderOneFrame()
-{
+{  
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   /*************
@@ -467,6 +492,28 @@ void Renderer::renderOneFrame()
   // cleanup
   glBindTexture(GL_TEXTURE_2D, 0);
   glUseProgram(0);
+
+  // Render GUI last
+  renderGUI();
+}
+
+static std::mutex _renderGUILock;
+
+void Renderer::renderGUI()
+{
+  // Still need to lock here to prevent a crash when switching focus between windows.
+  MutexLockGuard guard(_renderGUILock);
+
+  // Only draw in focused windows.
+  // Imgui has global state, so multi-threaded rendering in different windows mutually stomps previous states
+  // which prevents user interaction. Locking here doesn't help.
+  if (!glfwGetWindowAttrib(_window, GLFW_FOCUSED))
+    return;
+
+  _imguiRenderer.NewFrame();
+  ImGui::ShowTestWindow();
+  ImGui::Render();
+  _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
 }
 
 void Renderer::shutdown()
@@ -481,6 +528,9 @@ void Renderer::shutdown()
   _2DMeshBuffer.reset();;
   _3DMeshBuffer.reset();
   _currentVideoFrame.reset();
+
+  _imguiRenderer.Shutdown();
+
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 

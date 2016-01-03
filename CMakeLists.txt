@@ -7,6 +7,7 @@ pkg_search_module(GLFW REQUIRED glfw3)
 
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui")
 
 option(ARVIS_BUILD_LIBRARY "Build AR Visualization library" TRUE)
 option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
@@ -23,6 +24,7 @@ if (ARVIS_BUILD_LIBRARY)
     file(GLOB libarvis_src
         src/arvisualizer.*pp
         src/renderer.*pp
+        src/imguiRenderer.*pp
         src/loadShaders.*pp
         src/ShaderProgram.*pp
         src/material.*pp
@@ -31,6 +33,10 @@ if (ARVIS_BUILD_LIBRARY)
         src/windowmanager/windowmanager.*pp
         src/windowmanager/windowevents.*pp
         src/windowmanager/glfwwindowevents.*pp
+        extern/imgui/imgui.cpp
+        extern/imgui/imgui_draw.cpp
+        extern/imgui/imgui_demo.cpp
+        extern/imgui/imgui_impl_glfw_gl3.cpp
     )
 
     add_library(arvisualizer SHARED ${libarvis_src})

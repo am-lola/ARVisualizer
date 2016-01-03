@@ -23,7 +23,7 @@
 #include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
 #include "windowmanager/glfwwindowevents.hpp"
-
+#include "imguiRenderer.hpp"
 
 namespace ar
 {
@@ -107,6 +107,8 @@ private:
   GLFWwindow* _window;
   int _windowWidth, _windowHeight;
 
+  ImguiRenderer _imguiRenderer;
+
   std::thread _renderThread;
 
   struct camera_parms {
@@ -169,6 +171,9 @@ private:
 
   // renders just one frame
   void renderOneFrame();
+
+  // renders the GUI
+  void renderGUI();
 
   // Final cleanup which needs to be done (from the render thread) when we stop rendering
   void shutdown();
