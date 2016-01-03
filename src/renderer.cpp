@@ -11,7 +11,7 @@ namespace ar
 {
 
 Renderer::Renderer(GLFWwindow* window)
-  : _windowEvents(window), _imguiRenderer(window)
+  : _windowEvents(window), _imguiRenderer(window), _camera(_windowEvents)
 {
   _window = window;
   glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
@@ -147,9 +147,8 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
 
 void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up)
 {
-  _camera.position = position;
-  _camera.forward = glm::normalize(forward);
-  _camera.up = glm::normalize(up);
+  _camera.SetPosition(position);
+  _camera.SetForwardAndUp(glm::normalize(forward), glm::normalize(up));
 }
 
 unsigned int Renderer::Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material)
@@ -202,17 +201,17 @@ void Renderer::UpdateProjection()
     _projectionMatrix = glm::mat4(
       _cameraMatrix[0][0] / _cameraMatrix[0][2], 0, 0, 0,
       0, _cameraMatrix[1][1] / _cameraMatrix[1][2], 0, 0,
-      0, 0, -(_camera.farClip + _camera.nearClip) / (_camera.farClip - _camera.nearClip), -1.0,
-      0, 0, (-2.0 * _camera.farClip * _camera.nearClip) / (_camera.farClip - _camera.nearClip), 0
+      0, 0, -(_camera_params.farClip + _camera_params.nearClip) / (_camera_params.farClip - _camera_params.nearClip), -1.0,
+      0, 0, (-2.0 * _camera_params.farClip * _camera_params.nearClip) / (_camera_params.farClip - _camera_params.nearClip), 0
     );
   }
   else
   {
     _projectionMatrix = glm::perspective(
-       _camera.fov,
+       _camera_params.fov,
        (float)_windowWidth / (float)_windowHeight,
-       _camera.nearClip,
-       _camera.farClip
+       _camera_params.nearClip,
+       _camera_params.farClip
      );
   }
 }
@@ -445,6 +444,9 @@ void Renderer::update()
   {
     _3DMeshBuffer->BufferData();
   }
+
+  // TODO: Pass deltaTime
+  _camera.Update(0.016);
 }
 
 void Renderer::renderOneFrame()
@@ -511,6 +513,7 @@ void Renderer::renderGUI()
     return;
 
   _imguiRenderer.NewFrame();
+  _camera.RenderGUI();
   ImGui::ShowTestWindow();
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());

@@ -24,6 +24,7 @@
 #include "mesh/mesh.hpp"
 #include "windowmanager/glfwwindowevents.hpp"
 #include "imguiRenderer.hpp"
+#include "camera.hpp"
 
 namespace ar
 {
@@ -64,16 +65,12 @@ public:
   void RemoveAllMeshes();
 
   // Gets the View matrix
-  glm::mat4 GetViewMatrix()
+  glm::mat4 GetViewMatrix() const
   {
-    return glm::lookAt( // should probably cache this and only update it when it changes
-      _camera.position,
-      _camera.forward,
-      _camera.up
-    );
+    return _camera.GetViewMatrix();
   }
 
-  glm::mat4 GetProjectionMatrix()
+  glm::mat4 GetProjectionMatrix() const
   {
     return _projectionMatrix;
   }
@@ -108,17 +105,15 @@ private:
   int _windowWidth, _windowHeight;
 
   ImguiRenderer _imguiRenderer;
+  Camera _camera;
 
   std::thread _renderThread;
 
   struct camera_parms {
-      glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);  // where the camera is
-      glm::vec3 forward  = glm::vec3(0.0f, 0.0f, 1.0f);  // where the camera is looking
-      glm::vec3 up       = glm::vec3(0.0f, 1.0f, 0.0f);  // "up" from camera's perspective (orthogonal to forward)
       float fov          = 45.0f;  // field of view, in degrees
       float nearClip     = 0.1f;   // distance to near clipping plane
       float farClip      = 10000.0f; // distance to far clipping plane
-  } _camera;
+  } _camera_params;
 
   GLuint _renderType = GL_TRIANGLES;
 

@@ -28,6 +28,7 @@ if (ARVIS_BUILD_LIBRARY)
         src/loadShaders.*pp
         src/ShaderProgram.*pp
         src/material.*pp
+        src/camera.*pp
         src/mesh/mesh.*pp
         src/mesh/meshfactory.*pp
         src/windowmanager/windowmanager.*pp
