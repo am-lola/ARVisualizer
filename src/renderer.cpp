@@ -16,57 +16,49 @@ Renderer::Renderer(GLFWwindow* window)
   _window = window;
   glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
 
-  // Ensure we're notified when the window size changes
-  _windowEvents.SubscribeEvent(WindowEvents::WindowResized, (std::function<void(int,int)>)(
-    [this] (int w, int h)
-    {
-      this->onWindowResized(w,h);
-    }));
+  _windowEvents.GetFrameBufferResizedDelegate() += [this](int w, int h)
+  {
+    this->onWindowResized(w, h);
+  };
 
-  // Ensure we're notified when the Framebuffer size changes
-  _windowEvents.SubscribeEvent(WindowEvents::FrameBufferResized, (std::function<void(int,int)>)(
-    [this] (int w, int h)
-    {
-      this->onFramebufferResized(w,h);
-    }));
+  _windowEvents.GetWindowResizedDelegate() += [this](int w, int h)
+  {
+    this->onFramebufferResized(w, h);
+  };
 
   // Listen for keyboard input
-  _windowEvents.SubscribeEvent(WindowEvents::KeyboardKey,
-    [this](int k, int scan, int action, int mods)
+  _windowEvents.GetKeyboardKeyDelegate() += [this](int k, int scan, int action, int mods)
+  {
+    if (action == GLFW_PRESS && k == GLFW_KEY_1)
     {
-      if (action == GLFW_PRESS && k == GLFW_KEY_1)
-      {
-        this->_renderType = GL_TRIANGLES;
-      }
-      else if (action == GLFW_PRESS && k == GLFW_KEY_2)
-      {
-        this->_renderType = GL_LINE_LOOP;
-      }
-      else if (action == GLFW_PRESS && k == GLFW_KEY_3)
-      {
-        this->_renderType = GL_POINTS;
-      }
-
-      this->_imguiRenderer.OnKeyPress(k, scan, action, mods);
-    });
-
-  _windowEvents.SubscribeEvent(WindowEvents::KeyboardChar, (std::function<void(unsigned int)>)(
-    [this](unsigned int codepoint)
+      this->_renderType = GL_TRIANGLES;
+    }
+    else if (action == GLFW_PRESS && k == GLFW_KEY_2)
     {
-      this->_imguiRenderer.OnKeyChar(codepoint);
-    }));
-
-  _windowEvents.SubscribeEvent(WindowEvents::MouseButton,
-    [this](int button, int action, int mods)
+      this->_renderType = GL_LINE_LOOP;
+    }
+    else if (action == GLFW_PRESS && k == GLFW_KEY_3)
     {
-      this->_imguiRenderer.OnMouseButton(button, action, mods);
-    });
+      this->_renderType = GL_POINTS;
+    }
 
-  _windowEvents.SubscribeEvent(WindowEvents::Scroll, (std::function<void(double, double)>)(
-    [this](double xoffset, double yoffset)
-    {
-      this->_imguiRenderer.OnScroll(xoffset, yoffset);
-    }));
+    this->_imguiRenderer.OnKeyPress(k, scan, action, mods);
+  };
+
+  _windowEvents.GetKeyboardCharDelegate() += [this](unsigned int codepoint)
+  {
+    this->_imguiRenderer.OnKeyChar(codepoint);
+  };
+
+  _windowEvents.GetMouseButtonDelegate() += [this](int button, int action, int mods)
+  {
+    this->_imguiRenderer.OnMouseButton(button, action, mods);
+  };
+
+  _windowEvents.GetScrollDelegate() += [this](double xoffset, double yoffset)
+  {
+    this->_imguiRenderer.OnScroll(xoffset, yoffset);
+  };
 
   // set a default projection matrix
   UpdateProjection();

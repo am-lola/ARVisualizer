@@ -15,29 +15,25 @@ Camera::Camera(WindowEvents& windowEvents)
 {
   Reset();
 
-  windowEvents.SubscribeEvent(WindowEvents::MouseMove, (std::function<void(double,double)>)(
-    [this](double xpos, double ypos)
-    {
-      this->OnMouseMove(xpos, ypos);
-    }));
+  windowEvents.GetMouseMoveDelegate() += [this](double xpos, double ypos)
+  {
+    this->OnMouseMove(xpos, ypos);
+  };
 
-  windowEvents.SubscribeEvent(WindowEvents::MouseButton,
-    [this](int button, int action, int mods)
-    {
-      this->OnMouseButton(button, action, mods);
-    });
+  windowEvents.GetMouseButtonDelegate() += [this](int button, int action, int mods)
+  {
+    this->OnMouseButton(button, action, mods);
+  };
 
-  windowEvents.SubscribeEvent(WindowEvents::KeyboardKey,
-    [this](int key, int scancode, int action, int mods)
-    {
-      this->OnKey(key, scancode, action, mods);
-    });
+  windowEvents.GetKeyboardKeyDelegate() += [this](int key, int scancode, int action, int mods)
+  {
+    this->OnKey(key, scancode, action, mods);
+  };
 
-  windowEvents.SubscribeEvent(WindowEvents::Scroll, (std::function<void(double,double)>)(
-    [this](double xoffset, double yoffset)
-    {
-      this->OnScroll(yoffset);
-    }));
+  windowEvents.GetScrollDelegate() += [this](double xoffset, double yoffset)
+  {
+    this->OnScroll(yoffset);
+  };
 }
 
 void Camera::Update(float deltaTime)
@@ -46,9 +42,9 @@ void Camera::Update(float deltaTime)
   if (ImGui::IsAnyItemActive())
     return;
 
-  _position += _forward * float(_movementForward * _movementSpeed * deltaTime);
-  _position += _right * float(_movementSide * _movementSpeed * deltaTime);
-  _position += _up * float(_movementUp * _movementSpeed * deltaTime);
+  _position += _forward * (_movementForward * _movementSpeed * deltaTime);
+  _position += _right * (_movementSide * _movementSpeed * deltaTime);
+  _position += _up * (_movementUp * _movementSpeed * deltaTime);
 }
 
 void Camera::OnMouseMove(double xpos, double ypos)
@@ -135,6 +131,8 @@ void Camera::OnKey(int key, int scancode, int action, int mods)
       break;
     case GLFW_KEY_Q:
       _movementUp -= keyDown;
+      break;
+    default:
       break;
   }
 }

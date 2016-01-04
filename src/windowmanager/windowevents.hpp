@@ -1,8 +1,7 @@
 #ifndef _WINDOWEVENTS_H
 #define _WINDOWEVENTS_H
 
-#include <functional>
-#include <map>
+#include "delegate.hpp"
 
 namespace ar
 {
@@ -12,43 +11,6 @@ namespace ar
 class WindowEvents
 {
 public:
-  typedef enum class
-  {
-    WindowSizeChanged,       // called when the user resizes the window
-    FrameBufferSizeChanged,  // called when GL framebuffer is changed (in code, or due to window size changing)
-
-    MouseButtonStateChanged, // called when any mouse button is pressed or released
-    MouseEnterExit,          // called when the mouse enters or exits the window
-    MouseMove,               // called any time the mouse moves over the window
-
-    KeyboardStateChanged,    // called any time a keyboard key is pressed or released
-    CharacterInput,          // called any time a printable character is received from the keyboard
-    Scroll,                  // called when the user uses the scroll wheel on their mouse (or scrolls from the keyboard)
-  } Event;
-
-  typedef unsigned int event_handle;
-
-  static const Event MouseButton        = Event::MouseButtonStateChanged;
-  static const Event MouseEnterExit     = Event::MouseEnterExit;
-  static const Event MouseMove          = Event::MouseMove;
-
-  static const Event WindowResized      = Event::WindowSizeChanged;
-  static const Event FrameBufferResized = Event::FrameBufferSizeChanged;
-
-  static const Event KeyboardKey        = Event::KeyboardStateChanged;
-  static const Event KeyboardChar       = Event::CharacterInput;
-  static const Event Scroll             = Event::Scroll;
-
-  // Registers a callback to be invoked when the given Event is detected
-  event_handle SubscribeEvent(Event e, std::function<void(int)> cb);
-  event_handle SubscribeEvent(Event e, std::function<void(int,int)> cb);
-  event_handle SubscribeEvent(Event e, std::function<void(int,int,int)> cb);
-  event_handle SubscribeEvent(Event e, std::function<void(int,int,int,int)> cb);
-  event_handle SubscribeEvent(Event e, std::function<void(double,double)> cb);
-  event_handle SubscribeEvent(Event e, std::function<void(unsigned int)> cb);
-
-  // Ensures a previously-subscribed even handler is not called again in the future
-  void UnsubscribeEvent(Event e, event_handle eh);
 
   // Calls all subscribed handlers for the corresponding events
   void NotifyMouseButtonCallback(int button, int action, int mods);
@@ -60,25 +22,25 @@ public:
   void NotifyWindowSizeCallback(int width, int height);
   void NotifyFrameBufferSizeCallback(int width, int height);
 
-  class UnknownWindowEventException : public std::runtime_error
-  {
-  public:
-    UnknownWindowEventException(const std::string& what_arg) : std::runtime_error(what_arg) {}
-  };
+  // Don't know if it's useful to keep these getters around...
+  Delegate<void(int,int,int)>& GetMouseButtonDelegate() { return _mouseButtonDelegate; }
+  Delegate<void(int)>& GetMouseEnterExitDelegate() { return _mouseEnterExitDelegate; }
+  Delegate<void(double,double)>& GetMouseMoveDelegate() { return _mouseMoveDelegate; }
+  Delegate<void(int,int)>& GetWindowResizedDelegate() { return _windowResizedDelegate; }
+  Delegate<void(int,int)>& GetFrameBufferResizedDelegate() { return _frameBufferResizedDelegate; }
+  Delegate<void(int,int,int,int)>& GetKeyboardKeyDelegate() { return _keyboardKeyDelegate; }
+  Delegate<void(unsigned int)>& GetKeyboardCharDelegate() { return _keyboardCharDelegate; }
+  Delegate<void(double,double)>& GetScrollDelegate() { return _scrollDelegate; }
 
 private:
-  // callbacks we use to notify others when events happen
-  std::map<event_handle, std::function<void(int)> >             _mouseEnterExitCallbacks;
-  std::map<event_handle, std::function<void(int,int)> >         _windowSizeCallbacks;
-  std::map<event_handle, std::function<void(int,int)> >         _frameBufferSizeCallbacks;
-  std::map<event_handle, std::function<void(int,int,int)> >     _mouseButtonCallbacks;
-  std::map<event_handle, std::function<void(int,int,int,int)> > _keyCallbacks;
-  std::map<event_handle, std::function<void(double,double)> >   _mouseMoveCallbacks;
-  std::map<event_handle, std::function<void(double,double)> >   _scrollCallbacks;
-  std::map<event_handle, std::function<void(unsigned int)> >    _charCallbacks;
-
-  // gets a new unique handle to assign to an event
-  static event_handle NextHandle();
+  Delegate<void(int,int,int)> _mouseButtonDelegate;
+  Delegate<void(int)> _mouseEnterExitDelegate;
+  Delegate<void(double,double)> _mouseMoveDelegate;
+  Delegate<void(int,int)> _windowResizedDelegate;
+  Delegate<void(int,int)> _frameBufferResizedDelegate;
+  Delegate<void(int,int,int,int)> _keyboardKeyDelegate;
+  Delegate<void(unsigned int)> _keyboardCharDelegate;
+  Delegate<void(double,double)> _scrollDelegate;
 };
 
 } // namespace ar

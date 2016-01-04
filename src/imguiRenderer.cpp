@@ -7,17 +7,6 @@
 
 #include <imgui.h>
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-#include <GLFW/glfw3.h>
-#ifdef _WIN32
-#undef APIENTRY
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WGL
-#include <GLFW/glfw3native.h>
-#endif
-
 namespace ar
 {
 
@@ -206,7 +195,7 @@ void ImguiRenderer::NewFrame()
     _mousePressed[i] = false;
   }
 
-  io.MouseWheel = _mouseWheel;
+  io.MouseWheel = (float)_mouseWheel;
   _mouseWheel = 0.0;
 
   // Hide OS mouse cursor if ImGui is drawing it

@@ -1,6 +1,11 @@
 #ifndef _IMGUI_RENDERER_H
 #define _IMGUI_RENDERER_H
 
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES
+#endif
+#include <GLFW/glfw3.h>
+
 struct GLFWwindow;
 struct ImDrawData;
 
@@ -39,18 +44,18 @@ private:
   GLFWwindow* _window;
 
   double _time = 0.0;
-  unsigned int _fontTexture = 0;
-  int _shaderHandle = 0;
-  int _vertHandle = 0;
-  int _fragHandle = 0;
-  int _attribLocationTex = 0;
-  int _attribLocationProjMtx = 0;
-  int _attribLocationPosition = 0;
-  int _attribLocationUV = 0;
-  int _attribLocationColor = 0;
-  unsigned int _vboHandle = 0;
-  unsigned int _vaoHandle = 0;
-  unsigned int _elementsHandle = 0;
+  GLuint _fontTexture = 0;
+  GLuint _shaderHandle = 0;
+  GLuint _vertHandle = 0;
+  GLuint _fragHandle = 0;
+  GLuint _vboHandle = 0;
+  GLuint _vaoHandle = 0;
+  GLuint _elementsHandle = 0;
+  GLint _attribLocationTex = 0;
+  GLint _attribLocationProjMtx = 0;
+  GLint _attribLocationPosition = 0;
+  GLint _attribLocationUV = 0;
+  GLint _attribLocationColor = 0;
   bool _mousePressed[3] = { false, false, false };
   double _mouseWheel = 0.0;
 
