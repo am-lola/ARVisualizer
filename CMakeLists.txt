@@ -83,6 +83,9 @@ if (ARVIS_BUILD_SAMPLES)
     add_executable(sample_pcl_grabber samples/pcl_grabber/main.cpp)
     target_link_libraries(sample_pcl_grabber arvisualizer ${PCL_LIBRARIES})
 
+    add_executable(sample_pointcloud_rendering samples/pointcloud_rendering/main.cpp)
+    target_link_libraries(sample_pointcloud_rendering arvisualizer ${PCL_LIBRARIES})
+
     # OpenCV is required for the OpenCV sample
     find_package(OpenCV REQUIRED)
     add_executable(sample_opencv_camera samples/opencv_camera/main.cpp)

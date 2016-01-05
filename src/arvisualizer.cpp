@@ -148,4 +148,19 @@ void ARVisualizer::RemoveAll()
   _renderer->RemoveAllMeshes();
 }
 
+void ARVisualizer::DrawPointCloud(const void* pointData, unsigned long numPoints, PointCloudDataType dataType)
+{
+  if (!IsRunning()) { return; }
+
+  switch (dataType)
+  {
+    case PCL_PointXYZ:
+      break;
+    case PCL_PointXYZRGBA:
+      throw std::runtime_error("PCL_PointXYZRGBA is not supported yet.");
+  }
+
+  _renderer->DrawPointCloud(pointData, numPoints);
+}
+
 } // namespace ar

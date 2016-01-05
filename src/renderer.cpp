@@ -218,10 +218,14 @@ void Renderer::init()
   // init buffers
   _2DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex2D> >(new VertexBuffer<Vertex2D>());
   _3DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex3D> >(new VertexBuffer<Vertex3D>());
+  _pointCloud.InitVertexBuffer();
 
   // load shaders
   _defaultShader.loadAndLink(ShaderSources::sh_simpleNormal_vert, ShaderSources::sh_simpleLit_frag);
   _videoShader.loadAndLink(ShaderSources::sh_2D_passthru_vert, ShaderSources::sh_simpleTexture_frag);
+  _pointCloudShader.loadAndLink(ShaderSources::sh_pointCloud_vert, ShaderSources::sh_flatShaded_frag);
+
+  _pointCloud.SetShader(&_pointCloudShader);
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();
@@ -244,7 +248,7 @@ void Renderer::init_GL()
   glEnable(GL_CULL_FACE);
   glBlendEquation(GL_FUNC_ADD);
   glClearColor(0, 0, 0, 0);
-  glPointSize(5.0);
+  glPointSize(5.0f);
 }
 
 void Renderer::init_geometry()
@@ -437,6 +441,14 @@ void Renderer::update()
     _3DMeshBuffer->BufferData();
   }
 
+  {
+    MutexLockGuard guard(_mutex);
+    if (_pointCloud.GetVertexBuffer()->Dirty())
+    {
+      _pointCloud.GetVertexBuffer()->BufferData();
+    }
+  }
+
   // TODO: Pass deltaTime
   _camera.Update(0.016);
 }
@@ -452,32 +464,59 @@ void Renderer::renderOneFrame()
   enableRenderPass(Blend_None);
   for (auto& m : _2DMeshes)
   {
-    m.GetShader()->enable();
+    const auto& shader = m.GetShader();
+    shader->enable();
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m.GetTexture());
-    glUniform1i(m.GetShader()->getUniform("tex"), 0);
+    glUniform1i(shader->getUniform("tex"), 0);
 
     _2DMeshBuffer->Draw(_renderType, m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
   }
 
   /*************
   * Second pass:
+  *   render point cloud
+  *************/
+  if (_pointCloud.ShouldDraw())
+  {
+    enableRenderPass(Blend_Add);
+    const auto& shader = _pointCloud.GetShader();
+    shader->enable();
+
+    glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * _pointCloud.GetTransform();
+    glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &_pointCloud.GetTransform()[0][0]);
+    glUniform1f(shader->getUniform("fadeDepth"), _pointCloud._fadeDepth);
+
+
+    GLfloat storedPointSize;
+    glGetFloatv(GL_POINT_SIZE, &storedPointSize);
+    glPointSize(_pointCloud._pointSize);
+
+    _pointCloud.GetVertexBuffer()->Draw();
+
+    glPointSize(storedPointSize);
+  }
+
+  /*************
+  * Third pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  enableRenderPass(Blend_Add);
+  enableRenderPass(Blend_Alpha);
   for (auto& m : _3DMeshes)
   {
-    m.GetShader()->enable();
+    const auto& shader = m.GetShader();
+    shader->enable();
 
     // uniforms global to all objects
-    glUniformMatrix4fv(m.GetShader()->getUniform("M"), 1, GL_FALSE, &(m.GetTransform()[0][0]));
-    glUniformMatrix4fv(m.GetShader()->getUniform("V"), 1, GL_FALSE, &(GetViewMatrix()[0][0]));
-    glUniform3fv(m.GetShader()->getUniform("light_dir"), 1, &(light_dir[0]));
+    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &(m.GetTransform()[0][0]));
+    glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, &(GetViewMatrix()[0][0]));
+    glUniform3fv(shader->getUniform("light_dir"), 1, &(light_dir[0]));
 
     // object-specific uniforms
     glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * m.GetTransform();
-    glUniformMatrix4fv(m.GetShader()->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
     m.GetMaterial()->Apply();
 
     _3DMeshBuffer->Draw(_renderType, m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
@@ -506,6 +545,7 @@ void Renderer::renderGUI()
 
   _imguiRenderer.NewFrame();
   _camera.RenderGUI();
+  _pointCloud.RenderGUI();
   ImGui::ShowTestWindow();
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
@@ -529,4 +569,16 @@ void Renderer::shutdown()
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 
+void Renderer::DrawPointCloud(const void* pointData, size_t numPoints)
+{
+  if (!_running)
+  {
+    throw std::runtime_error("Renderer was not started before being sent data!");
+  }
+
+  MutexLockGuard guard(_mutex);
+
+  const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
+  _pointCloud.SetPoints(verts, numPoints);
+}
 } // namespace ar

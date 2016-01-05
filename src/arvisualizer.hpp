@@ -66,6 +66,18 @@ public:
   void Remove(mesh_handle handle);
 
   void RemoveAll();
+
+  enum PointCloudDataType
+  {
+    PCL_PointXYZ,
+    PCL_PointXYZRGBA
+  };
+
+  // Draw a point cloud
+  //    Points: Points xyzw (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats).
+  //    NumPoints: Number of points in the array.
+  void DrawPointCloud(const void* pointData, unsigned long numPoints, PointCloudDataType dataType);
+
 private:
   Renderer* _renderer;
 };

@@ -56,6 +56,20 @@ struct VertexP3
   }
 };
 
+// A vertex with four position coordinates (XYZW)
+struct VertexP4
+{
+  GLfloat position[4];
+
+  static void EnableVertexAttribArray()
+  {
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexP4),
+                          (const GLvoid*)offsetof(VertexP4, position));
+    glEnableVertexAttribArray(0);
+  }
+};
+
 // A vertex with three position coordinates and two texture coords (XYZUV)
 struct VertexP3T2
 {
@@ -108,6 +122,26 @@ struct VertexP3C4
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3C4),
                          (const GLvoid*)offsetof(VertexP3C4, color));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+  }
+};
+
+// PCL-specific pcl::PointXYZRGBA format
+struct Vertex_PCL_PointXYZRGBA
+{
+  GLfloat position[4];
+  uint32_t color;
+  uint32_t padding[3];
+
+  static void EnableVertexAttribArray()
+  {
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex_PCL_PointXYZRGBA),
+                          (const GLvoid*)offsetof(Vertex_PCL_PointXYZRGBA, position));
+    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+                          sizeof(Vertex_PCL_PointXYZRGBA),
+                          (const GLvoid*)offsetof(Vertex_PCL_PointXYZRGBA, color));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
   }

@@ -22,6 +22,7 @@
 #include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
+#include "pointcloud/pointCloud.hpp"
 #include "windowmanager/glfwwindowevents.hpp"
 #include "imguiRenderer.hpp"
 #include "camera.hpp"
@@ -63,6 +64,8 @@ public:
   void RemoveMesh(unsigned int handle);
 
   void RemoveAllMeshes();
+
+  void DrawPointCloud(const void* pointData, size_t numPoints);
 
   // Gets the View matrix
   glm::mat4 GetViewMatrix() const
@@ -134,6 +137,9 @@ private:
 
   std::vector<Mesh3D> _3DMeshes;
   std::unique_ptr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
+
+  PointCloud<VertexP4> _pointCloud;
+  ShaderProgram _pointCloudShader;
 
   unsigned int GenerateMeshHandle(Mesh3D mesh);
 
