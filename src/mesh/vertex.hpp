@@ -14,12 +14,13 @@ struct VertexP2
 {
   GLfloat position[2];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 2, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP2),
                          (const GLvoid*)offsetof(VertexP2, position));
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(attribOffset);
+    return 1;
   }
 };
 
@@ -29,16 +30,17 @@ struct VertexP2T2
   GLfloat position[2];
   GLfloat uv[2];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 2, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP2T2),
                          (const GLvoid*)offsetof(VertexP2T2, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset + 1, 2, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP2T2),
                          (const GLvoid*)offsetof(VertexP2T2, uv));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    return 2;
   }
 };
 
@@ -47,12 +49,13 @@ struct VertexP3
 {
   GLfloat position[3];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 3, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3),
                          (const GLvoid*)offsetof(VertexP3, position));
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(attribOffset);
+    return 1;
   }
 };
 
@@ -61,12 +64,13 @@ struct VertexP4
 {
   GLfloat position[4];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 4, GL_FLOAT, GL_FALSE,
                           sizeof(VertexP4),
                           (const GLvoid*)offsetof(VertexP4, position));
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(attribOffset);
+    return 1;
   }
 };
 
@@ -76,16 +80,17 @@ struct VertexP3T2
   GLfloat position[3];
   GLfloat uv[2];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 3, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3T2),
                          (const GLvoid*)offsetof(VertexP3T2, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset + 1, 2, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3T2),
                          (const GLvoid*)offsetof(VertexP3T2, uv));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    return 2;
   }
 };
 
@@ -95,16 +100,17 @@ struct VertexP3C3
   GLfloat position[3];
   GLfloat color[3];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 3, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3C3),
                          (const GLvoid*)offsetof(VertexP3C3, position));
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset + 1, 3, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3C3),
                          (const GLvoid*)offsetof(VertexP3C3, color));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    return 2;
   }
 };
 
@@ -114,16 +120,41 @@ struct VertexP3C4
   GLfloat position[3];
   GLfloat color[4];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 3, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3C4),
                          (const GLvoid*)offsetof(VertexP3C4, position));
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset + 1, 4, GL_FLOAT, GL_FALSE,
                          sizeof(VertexP3C4),
                          (const GLvoid*)offsetof(VertexP3C4, color));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    return 2;
+  }
+};
+
+struct VertexP3C4S
+{
+  GLfloat position[3];
+  GLfloat color[4];
+  GLfloat scale;
+
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
+  {
+    glVertexAttribPointer(attribOffset, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexP3C4S),
+                          (const GLvoid*)offsetof(VertexP3C4S, position));
+    glVertexAttribPointer(attribOffset + 1, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexP3C4S),
+                          (const GLvoid*)offsetof(VertexP3C4S, color));
+    glVertexAttribPointer(attribOffset + 2, 1, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexP3C4S),
+                          (const GLvoid*)offsetof(VertexP3C4S, scale));
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    glEnableVertexAttribArray(attribOffset + 2);
+    return 3;
   }
 };
 
@@ -134,16 +165,17 @@ struct Vertex_PCL_PointXYZRGBA
   uint32_t color;
   uint32_t padding[3];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 4, GL_FLOAT, GL_FALSE,
                           sizeof(Vertex_PCL_PointXYZRGBA),
                           (const GLvoid*)offsetof(Vertex_PCL_PointXYZRGBA, position));
-    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+    glVertexAttribPointer(attribOffset + 1, 4, GL_UNSIGNED_BYTE, GL_TRUE,
                           sizeof(Vertex_PCL_PointXYZRGBA),
                           (const GLvoid*)offsetof(Vertex_PCL_PointXYZRGBA, color));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    return 2;
   }
 };
 
@@ -153,16 +185,17 @@ struct VertexP3N3
   GLfloat position[3];
   GLfloat normal[3];
 
-  static void EnableVertexAttribArray()
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
   {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexP3N3),
                           (const GLvoid*)offsetof(VertexP3N3, position));
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attribOffset + 1, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexP3N3),
                           (const GLvoid*)offsetof(VertexP3N3, normal));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    return 2;
   }
 };
 

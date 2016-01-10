@@ -26,6 +26,8 @@
 #include "windowmanager/glfwwindowevents.hpp"
 #include "imguiRenderer.hpp"
 #include "camera.hpp"
+#include "arvisualizer.hpp"
+#include "instancedVertexBuffer.hpp"
 
 namespace ar
 {
@@ -66,6 +68,8 @@ public:
   void RemoveAllMeshes();
 
   void DrawPointCloud(const void* pointData, size_t numPoints);
+
+  void DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels);
 
   // Gets the View matrix
   glm::mat4 GetViewMatrix() const
@@ -140,6 +144,9 @@ private:
 
   PointCloud<VertexP4> _pointCloud;
   ShaderProgram _pointCloudShader;
+
+  ShaderProgram _voxelShader;
+  std::unique_ptr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
 
   unsigned int GenerateMeshHandle(Mesh3D mesh);
 

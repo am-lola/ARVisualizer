@@ -11,6 +11,7 @@
 #include <glm/gtx/euler_angles.hpp>
 
 #include <imgui.h>
+#include <fstream>
 
 namespace ar
 {
@@ -89,7 +90,33 @@ public:
     ImGui::SliderFloat("Points Size", &pointsSize, 0.0f, 5.0f);
     _pointSize = pointsSize;
 
+    ImGui::Separator();
+
+    static char filePath[1024] { 0 };
+    ImGui::InputText("File path", filePath, 1024);
+    if (ImGui::Button("Save"))
+      SaveToFile(filePath);
+
     ImGui::End();
+  }
+
+  // For prototyping
+  void SaveToFile(const char* filePath)
+  {
+    std::ofstream fout(filePath);
+    if (!fout.is_open())
+      return;
+
+    auto vertices = _vertexBuffer->GetVertices();
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+      VertexT& vert = vertices[i];
+      if (!std::isnan(vert.position[0]) && !std::isnan(vert.position[1]) && !std::isnan(vert.position[2]))
+        fout << vert.position[0] << " " << vert.position[1] << " " << vert.position[2] << std::endl;
+    }
+
+    fout.close();
   }
 
   float _fadeDepth = 5.0f;

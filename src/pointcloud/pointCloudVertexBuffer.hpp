@@ -81,6 +81,8 @@ public:
     glBindVertexArray(0);
   }
 
+  const std::vector<VertexT>& GetVertices() const { return _vertices; }
+
 private:
   bool _dirty;
   GLuint _vao;

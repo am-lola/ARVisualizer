@@ -218,12 +218,14 @@ void Renderer::init()
   // init buffers
   _2DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex2D> >(new VertexBuffer<Vertex2D>());
   _3DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex3D> >(new VertexBuffer<Vertex3D>());
+  _voxelInstancedVertexBuffer = std::unique_ptr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S> >(new InstancedVertexBuffer<VertexP3N3, VertexP3C4S>());
   _pointCloud.InitVertexBuffer();
 
   // load shaders
   _defaultShader.loadAndLink(ShaderSources::sh_simpleNormal_vert, ShaderSources::sh_simpleLit_frag);
   _videoShader.loadAndLink(ShaderSources::sh_2D_passthru_vert, ShaderSources::sh_simpleTexture_frag);
   _pointCloudShader.loadAndLink(ShaderSources::sh_pointCloud_vert, ShaderSources::sh_flatShaded_frag);
+  _voxelShader.loadAndLink(ShaderSources::sh_voxel_vert, ShaderSources::sh_voxel_frag);
 
   _pointCloud.SetShader(&_pointCloudShader);
 
@@ -268,6 +270,48 @@ void Renderer::init_geometry()
   };
 
   _2DMeshes.push_back(TexturedQuad(videoVertices, videoIndices, &_videoShader));
+
+  // create a flat shaded cube for the voxel buffer
+  Vector<Vertex3D> cube
+    {
+      { -1, -1,  1 }, {  1, -1,  1 }, {  1,  1,  1 }, { -1,  1,  1 },
+      { -1, -1, -1 }, { -1,  1, -1 }, {  1,  1, -1 }, {  1, -1, -1 },
+      { -1,  1, -1 }, { -1,  1,  1 }, {  1,  1,  1 }, {  1,  1, -1 },
+      { -1, -1, -1 }, {  1, -1, -1 }, {  1, -1,  1 }, { -1, -1,  1 },
+      {  1, -1, -1 }, {  1,  1, -1 }, {  1,  1,  1 }, {  1, -1,  1 },
+      { -1, -1, -1 }, { -1, -1,  1 }, { -1,  1,  1 }, { -1,  1, -1 },
+    };
+
+  const Vector<glm::vec3> faceNormals
+    {
+      {  0,  0,  1 },
+      {  0,  0, -1 },
+      {  0,  1,  0 },
+      {  0, -1,  0 },
+      {  1,  0,  0 },
+      { -1,  0,  0 },
+    };
+
+  const Vector<GLuint> indices
+    {
+      0,  1,  2,      0,  2,  3,
+      4,  5,  6,      4,  6,  7,
+      8,  9,  10,     8,  10, 11,
+      12, 13, 14,     12, 14, 15,
+      16, 17, 18,     16, 18, 19,
+      20, 21, 22,     20, 22, 23,
+    };
+
+  // Set vertex normals
+  for (size_t i = 0; i < cube.size(); i++)
+  {
+    cube[i].normal[0] = faceNormals[i / 4].x;
+    cube[i].normal[1] = faceNormals[i / 4].y;
+    cube[i].normal[2] = faceNormals[i / 4].z;
+  }
+
+  _voxelInstancedVertexBuffer->SetVertices(cube);
+  _voxelInstancedVertexBuffer->SetIndices(indices);
 }
 
 void Renderer::init_textures()
@@ -297,6 +341,7 @@ void Renderer::onWindowResized(int newWidth, int newHeight)
 void Renderer::onFramebufferResized(int newWidth, int newHeight)
 {
   glViewport(0, 0, newWidth, newHeight);
+  UpdateProjection();
 }
 
 void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
@@ -441,13 +486,14 @@ void Renderer::update()
     _3DMeshBuffer->BufferData();
   }
 
+  MutexLockGuard guard(_mutex);
+
+  if (_pointCloud.GetVertexBuffer()->Dirty())
   {
-    MutexLockGuard guard(_mutex);
-    if (_pointCloud.GetVertexBuffer()->Dirty())
-    {
-      _pointCloud.GetVertexBuffer()->BufferData();
-    }
+    _pointCloud.GetVertexBuffer()->BufferData();
   }
+
+  _voxelInstancedVertexBuffer->BufferData();
 
   // TODO: Pass deltaTime
   _camera.Update(0.016);
@@ -497,6 +543,26 @@ void Renderer::renderOneFrame()
     _pointCloud.GetVertexBuffer()->Draw();
 
     glPointSize(storedPointSize);
+  }
+
+  if (_voxelInstancedVertexBuffer->InstanceCount() > 0)
+  {
+    ShaderProgram& shader = _voxelShader;
+    enableRenderPass(Blend_None | EnableDepth);
+    shader.enable();
+
+    glm::mat4 modelTransform = glm::mat4(1.0f);
+
+    // set uniforms
+    glm::mat4 mv = GetViewMatrix() * modelTransform;
+    glm::mat4 mvp = GetProjectionMatrix() * mv;
+    glm::vec4 lightDirWorldSpace = GetViewMatrix() * glm::vec4(light_dir.x, light_dir.y, light_dir.z ,0);
+    glm::vec3 ldir = glm::vec3(lightDirWorldSpace);
+    glUniformMatrix4fv(shader.getUniform("MV"), 1, GL_FALSE, &mv[0][0]);
+    glUniformMatrix4fv(shader.getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    glUniform3fv(shader.getUniform("light_dir"), 1, &(ldir[0]));
+
+    _voxelInstancedVertexBuffer->Draw(_renderType);
   }
 
   /*************
@@ -580,5 +646,18 @@ void Renderer::DrawPointCloud(const void* pointData, size_t numPoints)
 
   const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
   _pointCloud.SetPoints(verts, numPoints);
+}
+
+void Renderer::DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels)
+{
+  if (!_running)
+  {
+    throw std::runtime_error("Renderer was not started before being sent data!");
+  }
+
+  MutexLockGuard guard(_mutex);
+
+  const VertexP3C4S* vertices = reinterpret_cast<const VertexP3C4S*>(voxels);
+  _voxelInstancedVertexBuffer->SetInstances(vertices, numVoxels);
 }
 } // namespace ar

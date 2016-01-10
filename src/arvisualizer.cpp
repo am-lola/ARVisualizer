@@ -2,6 +2,7 @@
 #include "renderer.hpp"
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <stdlib.h>
 
@@ -136,6 +137,25 @@ mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], doubl
   return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
 }
 
+mesh_handle ARVisualizer::AddEllipsoid(float center[3], float* transformation, double radius, Color color)
+{
+  if (!IsRunning()) { return 0; }
+  glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
+
+  Mesh<Vertex3D> mesh = MeshFactory::MakeUVSphere<Vertex3D>(vCenter, radius, UVSPHERE_RESOLUTION);
+
+  float transform[16]
+    {
+      transformation[6],transformation[7],transformation[8], 0,
+      transformation[3],transformation[4],transformation[5], 0,
+      transformation[0],transformation[1],transformation[2], 0,
+      center[0], center[1], center[2], 1,
+    };
+
+  mesh.SetTransform(glm::make_mat4(transform));
+  return _renderer->Add3DMesh(mesh, std::make_shared<FlatColorMaterial>(color));
+}
+
 void ARVisualizer::Remove(mesh_handle handle)
 {
   if (!IsRunning()) { return; }
@@ -163,4 +183,9 @@ void ARVisualizer::DrawPointCloud(const void* pointData, unsigned long numPoints
   _renderer->DrawPointCloud(pointData, numPoints);
 }
 
+void ARVisualizer::DrawVoxels(const ARVisualizer::Voxel* voxels, unsigned long numVoxels)
+{
+  if (!IsRunning()) { return; }
+  _renderer->DrawVoxels(voxels, numVoxels);
+}
 } // namespace ar
