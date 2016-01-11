@@ -111,7 +111,7 @@ private:
   struct camera_parms {
       glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);  // where the camera is
       glm::vec3 forward  = glm::vec3(0.0f, 0.0f, 1.0f);  // where the camera is looking
-      glm::vec3 up       = glm::vec3(0.0f, 1.0f, 0.0f);  // "up" from camera's perspective (orthogonal to forward)
+      glm::vec3 up       = glm::vec3(0.0f,-1.0f, 0.0f);  // "up" from camera's perspective (orthogonal to forward)
       float fov          = 45.0f;  // field of view, in degrees
       float nearClip     = 0.1f;   // distance to near clipping plane
       float farClip      = 10000.0f; // distance to far clipping plane
@@ -135,6 +135,7 @@ private:
   std::unique_ptr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
 
   std::vector<Mesh3D> _3DMeshes;
+  std::vector<Mesh3D> _new3DMeshes;
   std::unique_ptr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
 
   unsigned int GenerateMeshHandle(Mesh3D mesh);

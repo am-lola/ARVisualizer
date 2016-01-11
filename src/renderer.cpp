@@ -136,7 +136,7 @@ unsigned int Renderer::Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material
   mesh.SetShader(&_defaultShader);
   mesh.SetID(handle);
 
-  _3DMeshes.push_back(mesh);
+  _new3DMeshes.push_back(mesh);
   return handle;
 }
 
@@ -152,11 +152,23 @@ void Renderer::RemoveMesh(unsigned int handle)
       break;
     }
   }
+  for (auto& m : _new3DMeshes)
+  {
+    if (m.ID() == handle)
+    {
+      m.MarkForDeletion();
+      break;
+    }
+  }
 }
 
 void Renderer::RemoveAllMeshes()
 {
   for (auto& m : _3DMeshes)
+  {
+    m.MarkForDeletion();
+  }
+  for (auto& m : _new3DMeshes)
   {
     m.MarkForDeletion();
   }
@@ -251,7 +263,6 @@ void Renderer::init_geometry()
 
 void Renderer::init_textures()
 {
-
     // initialize video texture to be the same size as our window
     _videoWidth = _windowWidth; _videoHeight = _windowHeight;
     _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]());
@@ -392,7 +403,11 @@ void Renderer::update()
     }
   }
 
-  // if we have any new mesh data, update buffers and send it to the GPU
+  // if we have any new mesh data, and nobody else is using it right now,
+  // update buffers and send it to the GPU
+  if (!_mutex.try_lock())
+    return;
+
   for (auto& m : _2DMeshes)
   {
     if (m.Dirty() || mustRegenerateVBO_2D)
@@ -406,19 +421,24 @@ void Renderer::update()
   {
     _2DMeshBuffer->BufferData();
   }
-  for (auto& m : _3DMeshes)
+  for (auto& m : _new3DMeshes)
   {
     if (m.Dirty() || mustRegenerateVBO_3D)
     {
       m.SetVertexOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
       m.SetIndexOffset(_3DMeshBuffer->AddIndices(m.GetIndices()));
       m.ClearDirty();
+      _3DMeshes.push_back(m);
     }
   }
+  _new3DMeshes.clear(); // empty new list since we've extracted all new meshes
+
   if (_3DMeshBuffer->Dirty())
   {
     _3DMeshBuffer->BufferData();
   }
+
+  _mutex.unlock();
 }
 
 void Renderer::renderOneFrame()
