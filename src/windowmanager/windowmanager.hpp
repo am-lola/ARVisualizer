@@ -7,6 +7,7 @@
 #include <chrono>
 #include <algorithm>
 #include <condition_variable>
+#include <atomic>
 #include "renderer.hpp"
 #include "wmcommand.hpp"
 
@@ -44,7 +45,7 @@ private:
   // disable assignment operator
   WindowManager& operator=(const WindowManager&) = delete;
 
-  bool _shuttingDown = false; // True if background thread should stop
+  std::atomic_bool _shuttingDown {false}; // True if background thread should stop
 
   // Main Manager thread. This thread handles creation of OpenGL contexts, handoff
   // to the render threads, initialization and shutdown of GLFW, etc.

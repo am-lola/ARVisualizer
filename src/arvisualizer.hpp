@@ -63,9 +63,33 @@ public:
 
   mesh_handle AddCapsule(double center1[3], double center2[3], double radius, Color color);
 
+  //    Transformation: Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
+  mesh_handle AddEllipsoid(float center[3], float* transformation, double radius, Color color);
+
   void Remove(mesh_handle handle);
 
   void RemoveAll();
+
+  enum PointCloudDataType
+  {
+    PCL_PointXYZ,
+    PCL_PointXYZRGBA
+  };
+
+  // Draw a point cloud
+  //    Points: Points xyzw (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats).
+  //    NumPoints: Number of points in the array.
+  void DrawPointCloud(const void* pointData, unsigned long numPoints, PointCloudDataType dataType);
+
+  struct Voxel
+  {
+    float center[3];
+    float color[4];
+    float size;
+  };
+
+  void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
+
 private:
   Renderer* _renderer;
 };

@@ -15,15 +15,19 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include "RenderPassParams.hpp"
 #include "ShaderSources.g.hpp"
 #include "ShaderProgram.hpp"
 #include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
 #include "mesh/mesh.hpp"
+#include "pointcloud/pointCloud.hpp"
 #include "windowmanager/glfwwindowevents.hpp"
-
-
+#include "imguiRenderer.hpp"
+#include "camera.hpp"
+#include "arvisualizer.hpp"
+#include "instancedVertexBuffer.hpp"
 namespace ar
 {
 
@@ -62,17 +66,17 @@ public:
 
   void RemoveAllMeshes();
 
+  void DrawPointCloud(const void* pointData, size_t numPoints);
+
+  void DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels);
+
   // Gets the View matrix
-  glm::mat4 GetViewMatrix()
+  glm::mat4 GetViewMatrix() const
   {
-    return glm::lookAt( // should probably cache this and only update it when it changes
-      _camera.position,
-      _camera.forward,
-      _camera.up
-    );
+    return _camera.GetViewMatrix();
   }
 
-  glm::mat4 GetProjectionMatrix()
+  glm::mat4 GetProjectionMatrix() const
   {
     return _projectionMatrix;
   }
@@ -98,7 +102,7 @@ public:
   void onFramebufferResized(int newWidth, int newHeight);
 
 private:
-  bool _running = false;
+  std::atomic_bool _running {false};
 
   std::mutex _mutex;
 
@@ -106,16 +110,16 @@ private:
   GLFWwindow* _window;
   int _windowWidth, _windowHeight;
 
+  ImguiRenderer _imguiRenderer;
+  Camera _camera;
+
   std::thread _renderThread;
 
   struct camera_parms {
-      glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);  // where the camera is
-      glm::vec3 forward  = glm::vec3(0.0f, 0.0f, 1.0f);  // where the camera is looking
-      glm::vec3 up       = glm::vec3(0.0f,-1.0f, 0.0f);  // "up" from camera's perspective (orthogonal to forward)
       float fov          = 45.0f;  // field of view, in degrees
       float nearClip     = 0.1f;   // distance to near clipping plane
       float farClip      = 10000.0f; // distance to far clipping plane
-  } _camera;
+  } _camera_params;
 
   GLuint _renderType = GL_TRIANGLES;
 
@@ -127,7 +131,7 @@ private:
   std::unique_ptr<unsigned char[]> _currentVideoFrame;
   int _videoWidth, _videoHeight;
   ShaderProgram _videoShader;
-  bool _newVideoFrame = false;
+  std::atomic_bool _newVideoFrame {false};
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
@@ -135,8 +139,14 @@ private:
   std::unique_ptr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
 
   std::vector<Mesh3D> _3DMeshes;
-  std::vector<Mesh3D> _new3DMeshes;
+  std::vector<Mesh3D> _new3DMeshes; // TODO: This is a temporary workaround and should be removed later
   std::unique_ptr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
+
+  PointCloud<VertexP4> _pointCloud;
+  ShaderProgram _pointCloudShader;
+
+  ShaderProgram _voxelShader;
+  std::unique_ptr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
 
   unsigned int GenerateMeshHandle(Mesh3D mesh);
 
@@ -169,6 +179,9 @@ private:
 
   // renders just one frame
   void renderOneFrame();
+
+  // renders the GUI
+  void renderGUI();
 
   // Final cleanup which needs to be done (from the render thread) when we stop rendering
   void shutdown();

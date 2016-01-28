@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(am2b-ar)
 
-
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui")
 
 option(ARVIS_BUILD_LIBRARY "Build AR Visualization library" TRUE)
 option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
@@ -24,18 +24,26 @@ if (ARVIS_BUILD_LIBRARY)
     file(GLOB libarvis_src
         src/arvisualizer.*pp
         src/renderer.*pp
+        src/imguiRenderer.*pp
         src/loadShaders.*pp
         src/ShaderProgram.*pp
         src/material.*pp
+        src/camera.*pp
         src/mesh/mesh.*pp
         src/mesh/meshfactory.*pp
         src/windowmanager/windowmanager.*pp
         src/windowmanager/windowevents.*pp
         src/windowmanager/glfwwindowevents.*pp
-)
+        extern/imgui/imgui.cpp
+        extern/imgui/imgui_draw.cpp
+        extern/imgui/imgui_demo.cpp
+        extern/imgui/imgui_impl_glfw_gl3.cpp
+    )
+
     add_library(arvisualizer SHARED ${libarvis_src})
     add_dependencies(arvisualizer shader_gen)
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    # workaround: manually specify glfw3 dependencies
     target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
 
     # install target for the visualization library
@@ -74,6 +82,9 @@ if (ARVIS_BUILD_SAMPLES)
     include_directories(${PCL_INCLUDE_DIRS})
     add_executable(sample_pcl_grabber samples/pcl_grabber/main.cpp)
     target_link_libraries(sample_pcl_grabber arvisualizer ${PCL_LIBRARIES})
+
+    add_executable(sample_pointcloud_rendering samples/pointcloud_rendering/main.cpp)
+    target_link_libraries(sample_pointcloud_rendering arvisualizer ${PCL_LIBRARIES})
 
     # OpenCV is required for the OpenCV sample
     find_package(OpenCV REQUIRED)
