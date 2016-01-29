@@ -11,6 +11,16 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui")
 
 option(ARVIS_BUILD_LIBRARY "Build AR Visualization library" TRUE)
 option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
+option(GLFW_STATIC_LINKAGE "Link GLFW3 statically" TRUE)
+
+# Figure out whether we should be linking against the static or shared version of GLFW3
+if (GLFW_STATIC_LINKAGE)
+  set(AR_GLFW_LIBS ${GLFW_STATIC_LIBRARIES})
+  message(STATUS "Using static GLFW3 Lib")
+else()
+  set(AR_GLFW_LIBS ${GLFW_LIBRARIES})
+  message(STATUS "Using shared GLFW3 Lib")
+endif()
 
 if (ARVIS_BUILD_LIBRARY)
     # shader generation scripts
@@ -43,8 +53,7 @@ if (ARVIS_BUILD_LIBRARY)
     add_library(arvisualizer SHARED ${libarvis_src})
     add_dependencies(arvisualizer shader_gen)
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    # workaround: manually specify glfw3 dependencies
-    target_link_libraries(arvisualizer ${GLFW_LIBRARIES})
+    target_link_libraries(arvisualizer ${AR_GLFW_LIBS})
 
     # install target for the visualization library
     set(config_install_dir "lib/cmake/${PROJECT_NAME}")
