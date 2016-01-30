@@ -47,7 +47,6 @@ if (ARVIS_BUILD_LIBRARY)
         extern/imgui/imgui.cpp
         extern/imgui/imgui_draw.cpp
         extern/imgui/imgui_demo.cpp
-        extern/imgui/imgui_impl_glfw_gl3.cpp
     )
 
     add_library(arvisualizer SHARED ${libarvis_src})
