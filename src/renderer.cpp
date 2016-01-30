@@ -105,8 +105,6 @@ void Renderer::Stop()
 
 bool Renderer::IsRunning()
 {
-  // TODO: Is this necessary?
-  MutexLockGuard guard(_mutex);
   return _running;
 }
 
@@ -228,9 +226,9 @@ void Renderer::init()
   init_GL();
 
   // init buffers
-  _2DMeshBuffer = UniquePtr<VertexBuffer<Vertex2D> >(new VertexBuffer<Vertex2D>());
-  _3DMeshBuffer = UniquePtr<VertexBuffer<Vertex3D> >(new VertexBuffer<Vertex3D>());
-  _voxelInstancedVertexBuffer = UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S> >(new InstancedVertexBuffer<VertexP3N3, VertexP3C4S>());
+  _2DMeshBuffer = UniquePtr<VertexBuffer<Vertex2D>>(new VertexBuffer<Vertex2D>());
+  _3DMeshBuffer = UniquePtr<VertexBuffer<Vertex3D>>(new VertexBuffer<Vertex3D>());
+  _voxelInstancedVertexBuffer = UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>>(new InstancedVertexBuffer<VertexP3N3, VertexP3C4S>());
   _pointCloud.InitVertexBuffer();
 
   // load shaders
