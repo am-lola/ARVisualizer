@@ -81,13 +81,13 @@ public:
     glBindVertexArray(0);
   }
 
-  const std::vector<VertexT>& GetVertices() const { return _vertices; }
+  const Vector<VertexT>& GetVertices() const { return _vertices; }
 
 private:
   bool _dirty;
   GLuint _vao;
   GLuint _vbo;  // vertex buffer
-  std::vector<VertexT> _vertices;
+  Vector<VertexT> _vertices;
 };
 
 }

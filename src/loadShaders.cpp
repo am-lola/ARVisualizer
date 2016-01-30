@@ -1,15 +1,12 @@
 /* Adapted from http://www.opengl-tutorial.org/ */
 /* opengl-tutorial licenses all their code under WTFPL */
 
+#include "loadShaders.hpp"
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <vector>
 #include <algorithm>
-#include <stdlib.h>
-#include <stdio.h>
-
-#include "loadShaders.hpp"
+#include "common.hpp"
 
 namespace ar
 {
@@ -61,7 +58,7 @@ GLuint LoadShadersFromSource(const std::string vertex_source, const std::string 
 
     if (InfoLogLength > 0)
     {
-        std::vector<char> VertexShaderErrorMessage(InfoLogLength);
+        Vector<char> VertexShaderErrorMessage(InfoLogLength);
         glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
         fprintf(stdout, "%s\n", &VertexShaderErrorMessage[0]);
     }
@@ -77,7 +74,7 @@ GLuint LoadShadersFromSource(const std::string vertex_source, const std::string 
 
     if (InfoLogLength > 0)
     {
-        std::vector<char> FragmentShaderErrorMessage(InfoLogLength);
+        Vector<char> FragmentShaderErrorMessage(InfoLogLength);
         glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
         fprintf(stdout, "%s\n", &FragmentShaderErrorMessage[0]);
     }
@@ -94,7 +91,7 @@ GLuint LoadShadersFromSource(const std::string vertex_source, const std::string 
 
     if (InfoLogLength > 0)
     {
-      std::vector<char> ProgramErrorMessage( std::max(InfoLogLength, int(1)) );
+      Vector<char> ProgramErrorMessage( std::max(InfoLogLength, int(1)) );
       glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
       fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
     }

@@ -51,7 +51,7 @@ public:
 
   // Adds the given vertices to the buffer
   // Returns the offset to the first new vertex
-  int AddVertices(std::vector<VertexT> v)
+  int AddVertices(Vector<VertexT> v)
   {
     int offset = _vertices.size();
 
@@ -64,7 +64,7 @@ public:
 
   // Adds the given vertex indices to the buffer
   // Returns the offset to the first new index
-  int AddIndices(std::vector<GLuint> i)
+  int AddIndices(Vector<GLuint> i)
   {
     int offset = _indices.size();
 
@@ -117,8 +117,8 @@ private:
   GLuint _vao;
   GLuint _vbo;  // vertex buffer
   GLuint _vio;  // index buffer
-  std::vector<VertexT> _vertices;
-  std::vector<GLuint> _indices;
+  Vector<VertexT> _vertices;
+  Vector<GLuint> _indices;
 };
 
 } // namespace ar

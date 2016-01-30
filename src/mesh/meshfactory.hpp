@@ -15,19 +15,19 @@ public:
 
   // 2D triangles
   template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec2> vertexPositions);
+  static Mesh<VertexT> MakeTriangle(Vector<glm::vec2> vertexPositions);
 
   // 3D triangles
   template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions);
+  static Mesh<VertexT> MakeTriangle(Vector<glm::vec3> vertexPositions);
 
   // 3D triangles with per-vertex colors
   template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions, std::vector<Color> vertexColors);
+  static Mesh<VertexT> MakeTriangle(Vector<glm::vec3> vertexPositions, Vector<Color> vertexColors);
 
   // 3D colored triangles (constant color)
   template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(std::vector<glm::vec3> vertexPositions, Color vertexColors);
+  static Mesh<VertexT> MakeTriangle(Vector<glm::vec3> vertexPositions, Color vertexColors);
 
 
   // 2D quads
@@ -40,7 +40,7 @@ public:
 
   // 3D quads with per-vertex colors
   template <typename VertexT>
-  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<Color> vertexColors);
+  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Vector<Color> vertexColors);
 
   // 3D quads with constant color
   template <typename VertexT>
@@ -77,16 +77,16 @@ protected:
   static glm::mat4 MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation);
 
   // Creates a quad, centered at the origin & aligned with the XY plane
-  static void MakeQuadMesh(double width, double height, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices);
+  static void MakeQuadMesh(double width, double height, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices);
 
   // Creates a unit Icosphere and returns the vertex positions & indices in the given vectors
-  static void MakeIcosphereMesh(unsigned int subdivisions, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices);
+  static void MakeIcosphereMesh(unsigned int subdivisions, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices);
 
   // Creates a unit UVSphere and returns the vertex positions & indices in the given vectors
-  static void MakeUVSphereMesh(unsigned int resolution, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices);
+  static void MakeUVSphereMesh(unsigned int resolution, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices);
 
   // Creates a capsule at the origin with the given dimensions & returns the positions & indices in the given vectors
-  static void MakeCapsuleMesh(double length, double radius, unsigned int resolution, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices);
+  static void MakeCapsuleMesh(double length, double radius, unsigned int resolution, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices);
 };
 
 } // namespace ar

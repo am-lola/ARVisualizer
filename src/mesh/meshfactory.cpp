@@ -8,10 +8,10 @@ namespace ar
 {
 
 template <>
-Mesh<VertexP2> MeshFactory::MakeTriangle<VertexP2>(std::vector<glm::vec2> vertexPositions)
+Mesh<VertexP2> MeshFactory::MakeTriangle<VertexP2>(Vector<glm::vec2> vertexPositions)
 {
-  std::vector<VertexP2> verts;
-  std::vector<GLuint> indices = {0, 1, 2};
+  Vector<VertexP2> verts;
+  Vector<GLuint> indices = {0, 1, 2};
   for (size_t i = 0; i < 3; i++)
   {
     verts.push_back({vertexPositions[i].x, vertexPositions[i].y});
@@ -21,10 +21,10 @@ Mesh<VertexP2> MeshFactory::MakeTriangle<VertexP2>(std::vector<glm::vec2> vertex
 }
 
 template <>
-Mesh<VertexP3> MeshFactory::MakeTriangle<VertexP3>(std::vector<glm::vec3> vertexPositions)
+Mesh<VertexP3> MeshFactory::MakeTriangle<VertexP3>(Vector<glm::vec3> vertexPositions)
 {
-  std::vector<VertexP3> verts;
-  std::vector<GLuint> indices = {0, 1, 2};
+  Vector<VertexP3> verts;
+  Vector<GLuint> indices = {0, 1, 2};
   for (size_t i = 0; i < 3; i++)
   {
     verts.push_back({vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z});
@@ -34,10 +34,10 @@ Mesh<VertexP3> MeshFactory::MakeTriangle<VertexP3>(std::vector<glm::vec3> vertex
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(std::vector<glm::vec3> vertexPositions, std::vector<Color> vertexColors)
+Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(Vector<glm::vec3> vertexPositions, Vector<Color> vertexColors)
 {
-  std::vector<VertexP3C4> verts;
-  std::vector<GLuint> indices = {0, 1, 2};
+  Vector<VertexP3C4> verts;
+  Vector<GLuint> indices = {0, 1, 2};
   for (size_t i = 0; i < 3; i++) {
     verts.push_back({vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z,
                      vertexColors[i].r,    vertexColors[i].g,    vertexColors[i].b, vertexColors[i].a});
@@ -47,17 +47,17 @@ Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(std::vector<glm::vec3> ve
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(std::vector<glm::vec3> vertexPositions, Color color)
+Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(Vector<glm::vec3> vertexPositions, Color color)
 {
-  std::vector<Color> vertexColors = { color, color, color };
+  Vector<Color> vertexColors = { color, color, color };
   return MakeTriangle<VertexP3C4>(vertexPositions, vertexColors);
 }
 
 template <>
-Mesh<VertexP3N3> MeshFactory::MakeTriangle<VertexP3N3>(std::vector<glm::vec3> vertexPositions)
+Mesh<VertexP3N3> MeshFactory::MakeTriangle<VertexP3N3>(Vector<glm::vec3> vertexPositions)
 {
-  std::vector<VertexP3N3> verts;
-  std::vector<GLuint> indices = {0, 1, 2};
+  Vector<VertexP3N3> verts;
+  Vector<GLuint> indices = {0, 1, 2};
   glm::vec3 normal = glm::normalize(glm::cross( vertexPositions[1] - vertexPositions[0],
                                                 vertexPositions[2] - vertexPositions[0]
                                               ));
@@ -76,9 +76,9 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangle<VertexP3N3>(std::vector<glm::vec3> ve
 template <>
 Mesh<VertexP2> MeshFactory::MakeQuad<VertexP2>(glm::vec2 center, double width, double height)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<GLuint> indices;
-  std::vector<VertexP2> verts;
+  Vector<glm::vec3> vertex_positions;
+  Vector<GLuint> indices;
+  Vector<VertexP2> verts;
 
   MakeQuadMesh(width, height, &vertex_positions, &indices);
 
@@ -93,9 +93,9 @@ Mesh<VertexP2> MeshFactory::MakeQuad<VertexP2>(glm::vec2 center, double width, d
 template <>
 Mesh<VertexP3> MeshFactory::MakeQuad<VertexP3>(glm::vec3 center, glm::vec3 normal, double width, double height)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<GLuint> indices;
-  std::vector<VertexP3> verts;
+  Vector<glm::vec3> vertex_positions;
+  Vector<GLuint> indices;
+  Vector<VertexP3> verts;
 
   MakeQuadMesh(width, height, &vertex_positions, &indices);
 
@@ -111,11 +111,11 @@ Mesh<VertexP3> MeshFactory::MakeQuad<VertexP3>(glm::vec3 center, glm::vec3 norma
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 normal, double width, double height, std::vector<Color> vertexColors)
+Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 normal, double width, double height, Vector<Color> vertexColors)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<GLuint> indices;
-  std::vector<VertexP3C4> verts;
+  Vector<glm::vec3> vertex_positions;
+  Vector<GLuint> indices;
+  Vector<VertexP3C4> verts;
 
   MakeQuadMesh(width, height, &vertex_positions, &indices);
 
@@ -136,16 +136,16 @@ Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 n
 template <>
 Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 normal, double width, double height, Color color)
 {
-  std::vector<Color> vertexColors = {color, color, color, color};
+  Vector<Color> vertexColors = {color, color, color, color};
   return MakeQuad<VertexP3C4>(center, normal, width, height, vertexColors);
 }
 
 template <>
 Mesh<VertexP3N3> MeshFactory::MakeQuad<VertexP3N3>(glm::vec3 center, glm::vec3 normal, double width, double height)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<GLuint> indices;
-  std::vector<VertexP3N3> verts;
+  Vector<glm::vec3> vertex_positions;
+  Vector<GLuint> indices;
+  Vector<VertexP3N3> verts;
   glm::vec3 n_normal = glm::normalize(normal); // make sure normal is a unit vector
 
   MakeQuadMesh(width, height, &vertex_positions, &indices);
@@ -167,9 +167,9 @@ Mesh<VertexP3N3> MeshFactory::MakeQuad<VertexP3N3>(glm::vec3 center, glm::vec3 n
 template <>
 Mesh<VertexP3C4> MeshFactory::MakeIcosphere<VertexP3C4>(glm::vec3 center, double radius, unsigned int subdivisions, Color color)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<VertexP3C4> vertices;
-  std::vector<GLuint> indices;
+  Vector<glm::vec3> vertex_positions;
+  Vector<VertexP3C4> vertices;
+  Vector<GLuint> indices;
 
   // create a sphere centered at origin
   MakeIcosphereMesh(subdivisions, &vertex_positions, &indices);
@@ -194,9 +194,9 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere<VertexP3C4>(glm::vec3 center, double
 template <>
 Mesh<VertexP3N3> MeshFactory::MakeIcosphere<VertexP3N3>(glm::vec3 center, double radius, unsigned int subdivisions)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<VertexP3N3> vertices;
-  std::vector<GLuint> indices;
+  Vector<glm::vec3> vertex_positions;
+  Vector<VertexP3N3> vertices;
+  Vector<GLuint> indices;
 
   // create a sphere centered at origin
   MakeIcosphereMesh(subdivisions, &vertex_positions, &indices);
@@ -223,9 +223,9 @@ Mesh<VertexP3N3> MeshFactory::MakeIcosphere<VertexP3N3>(glm::vec3 center, double
 template <>
 Mesh<VertexP3C4> MeshFactory::MakeUVSphere<VertexP3C4>(glm::vec3 center, double radius, Color color, int resolution)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<VertexP3C4> vertices;
-  std::vector<GLuint> indices;
+  Vector<glm::vec3> vertex_positions;
+  Vector<VertexP3C4> vertices;
+  Vector<GLuint> indices;
 
   // Create a sphere centered at the origin
   MakeUVSphereMesh(resolution, &vertex_positions, &indices);
@@ -248,9 +248,9 @@ Mesh<VertexP3C4> MeshFactory::MakeUVSphere<VertexP3C4>(glm::vec3 center, double 
 template <>
 Mesh<VertexP3N3> MeshFactory::MakeUVSphere<VertexP3N3>(glm::vec3 center, double radius, int resolution)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<VertexP3N3> vertices;
-  std::vector<GLuint> indices;
+  Vector<glm::vec3> vertex_positions;
+  Vector<VertexP3N3> vertices;
+  Vector<GLuint> indices;
 
   // Create a sphere centered at the origin
   MakeUVSphereMesh(resolution, &vertex_positions, &indices);
@@ -274,9 +274,9 @@ Mesh<VertexP3N3> MeshFactory::MakeUVSphere<VertexP3N3>(glm::vec3 center, double 
 template <>
 Mesh<VertexP3C4> MeshFactory::MakeCapsule<VertexP3C4>(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<VertexP3C4> vertices;
-  std::vector<GLuint> indices;
+  Vector<glm::vec3> vertex_positions;
+  Vector<VertexP3C4> vertices;
+  Vector<GLuint> indices;
 
   /// The capsule is generated as two halves of a UVSphere, with each half being
   /// offset along the polar axis by half the distance between center1 & center2
@@ -307,9 +307,9 @@ Mesh<VertexP3C4> MeshFactory::MakeCapsule<VertexP3C4>(glm::vec3 center1, glm::ve
 template <>
 Mesh<VertexP3N3> MeshFactory::MakeCapsule<VertexP3N3>(glm::vec3 center1, glm::vec3 center2, double radius, int resolution)
 {
-  std::vector<glm::vec3> vertex_positions;
-  std::vector<VertexP3N3> vertices;
-  std::vector<GLuint> indices;
+  Vector<glm::vec3> vertex_positions;
+  Vector<VertexP3N3> vertices;
+  Vector<GLuint> indices;
 
   /// The capsule is generated as two halves of a UVSphere, with each half being
   /// offset along the polar axis by half the distance between center1 & center2
@@ -380,7 +380,7 @@ glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, 
   return trans_mat * rot_mat;
 }
 
-void MeshFactory::MakeQuadMesh(double width, double height, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices)
+void MeshFactory::MakeQuadMesh(double width, double height, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices)
 {
   float halfwidth = width / 2.0;
   float halfheight = height / 2.0;
@@ -400,10 +400,10 @@ void MeshFactory::MakeQuadMesh(double width, double height, std::vector<glm::vec
 }
 
 // Adapted from: http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
-void MeshFactory::MakeIcosphereMesh(unsigned int subdivisions, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices)
+void MeshFactory::MakeIcosphereMesh(unsigned int subdivisions, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices)
 {
-  std::vector<glm::vec3>& r_positions = *vertex_positions;
-  std::vector<GLuint>& r_indices = *indices;
+  Vector<glm::vec3>& r_positions = *vertex_positions;
+  Vector<GLuint>& r_indices = *indices;
 
   // create the 12 vertices of an icosahedron
   double t = (1.0 + glm::sqrt(5.0f)) / 2.0;
@@ -451,7 +451,7 @@ void MeshFactory::MakeIcosphereMesh(unsigned int subdivisions, std::vector<glm::
   // refine faces
   for (unsigned int i = 0; i < subdivisions; i++)
   {
-    std::vector<GLuint> newIndices; // new index list for all vertices in next subdiv level
+    Vector<GLuint> newIndices; // new index list for all vertices in next subdiv level
     for (unsigned int j = 0; j < r_indices.size(); j += 3)
     {
       // find midpoint between each pair of vertices for current faces
@@ -534,10 +534,10 @@ void MeshFactory::MakeIcosphereMesh(unsigned int subdivisions, std::vector<glm::
   }
 }
 
-void MeshFactory::MakeUVSphereMesh(unsigned int resolution, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices)
+void MeshFactory::MakeUVSphereMesh(unsigned int resolution, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices)
 {
-  std::vector<glm::vec3>& r_positions = *vertex_positions;
-  std::vector<GLuint>& r_indices = *indices;
+  Vector<glm::vec3>& r_positions = *vertex_positions;
+  Vector<GLuint>& r_indices = *indices;
 
   float dx = 1.0 / (float)(resolution - 1); // distance between vertices
   float dy = dx;
@@ -572,10 +572,10 @@ void MeshFactory::MakeUVSphereMesh(unsigned int resolution, std::vector<glm::vec
   }
 }
 
-void MeshFactory::MakeCapsuleMesh(double length, double radius, unsigned int resolution, std::vector<glm::vec3>* vertex_positions, std::vector<GLuint>* indices)
+void MeshFactory::MakeCapsuleMesh(double length, double radius, unsigned int resolution, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices)
 {
-  std::vector<glm::vec3>& r_positions = *vertex_positions;
-  std::vector<GLuint>& r_indices = *indices;
+  Vector<glm::vec3>& r_positions = *vertex_positions;
+  Vector<GLuint>& r_indices = *indices;
 
   float dx = 1.0 / (float)(resolution - 1); // distance between vertices
   float dy = dx;

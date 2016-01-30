@@ -5,6 +5,7 @@
 #include "ShaderProgram.hpp"
 #include "material.hpp"
 #include "vertex.hpp"
+#include "common.hpp"
 
 namespace ar
 {
@@ -15,10 +16,10 @@ class Mesh
 public:
   Mesh() : _id(0) {};
   Mesh(ShaderProgram* s) : _id(0), _shader(s) {};
-  Mesh(std::vector<VertexT> v) : _id(0), _vertices(v), _dirty(true) {};
-  Mesh(std::vector<VertexT> v, std::vector<GLuint> i) : _id(0), _vertices(v), _indices(i), _dirty(true) {};
-  Mesh(std::vector<VertexT> v, ShaderProgram* s) : _id(0), _vertices(v), _shader(s), _dirty(true) {};
-  Mesh(std::vector<VertexT> v, std::vector<GLuint> i, ShaderProgram* s) : _id(0), _vertices(v), _indices(i), _shader(s), _dirty(true) {};
+  Mesh(Vector<VertexT> v) : _id(0), _vertices(v), _dirty(true) {};
+  Mesh(Vector<VertexT> v, Vector<GLuint> i) : _id(0), _vertices(v), _indices(i), _dirty(true) {};
+  Mesh(Vector<VertexT> v, ShaderProgram* s) : _id(0), _vertices(v), _shader(s), _dirty(true) {};
+  Mesh(Vector<VertexT> v, Vector<GLuint> i, ShaderProgram* s) : _id(0), _vertices(v), _indices(i), _shader(s), _dirty(true) {};
 
   unsigned int ID() { return _id; };
   void SetID(unsigned int id) { _id = id; };
@@ -30,12 +31,12 @@ public:
   bool MarkForDeletion() { _pendingDelete = true; };
 
   unsigned int VertexCount() { return _vertices.size(); };
-  std::vector<VertexT> GetVertices() { return _vertices; };
-  void SetVertices(std::vector<VertexT> v) { _vertices = v; _dirty = true; };
+  Vector<VertexT> GetVertices() { return _vertices; };
+  void SetVertices(Vector<VertexT> v) { _vertices = v; _dirty = true; };
 
   unsigned int IndexCount() { return _indices.size(); };
-  std::vector<GLuint> GetIndices() { return _indices; };
-  void SetIndices(std::vector<GLuint> v) { _indices = v; _dirty = true; };
+  Vector<GLuint> GetIndices() { return _indices; };
+  void SetIndices(Vector<GLuint> v) { _indices = v; _dirty = true; };
 
   ShaderProgram* GetShader() { return _shader; };
   void SetShader(ShaderProgram* s) {
@@ -44,8 +45,8 @@ public:
       _material->SetShader(s);
   };
 
-  std::shared_ptr<Material> GetMaterial() { return _material; };
-  void SetMaterial(std::shared_ptr<Material> m) {
+  SharedPtr<Material> GetMaterial() { return _material; };
+  void SetMaterial(SharedPtr<Material> m) {
     _material = m;
     if (_shader != nullptr)
       _material->SetShader(_shader);
@@ -66,10 +67,10 @@ private:
   bool _pendingDelete = false; // True if this mesh should be removed from the renderer (and corresponding VBO)
   int _vtx_offset = 0; // offset of first vertex of this mesh in the VBO it's drawn from
   int _idx_offset = 0; // offset of first index of this mesh in the index buffer it's drawn from
-  std::vector<VertexT> _vertices;
-  std::vector<GLuint> _indices;
+  Vector<VertexT> _vertices;
+  Vector<GLuint> _indices;
   ShaderProgram* _shader = nullptr;
-  std::shared_ptr<Material> _material;
+  SharedPtr<Material> _material;
   glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
 };
 

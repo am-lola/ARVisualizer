@@ -3,8 +3,6 @@
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#include <stdlib.h>
 
 namespace ar
 {
@@ -102,7 +100,7 @@ void ARVisualizer::SetCameraIntrinsics(double camera_matrix[3][3])
 mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
 {
   if (!IsRunning()) { return 0; }
-  std::vector<glm::vec3> positions = {
+  Vector<glm::vec3> positions = {
     { vertexPositions[0][0], vertexPositions[0][1], vertexPositions[0][2] },
     { vertexPositions[1][0], vertexPositions[1][1], vertexPositions[1][2] },
     { vertexPositions[2][0], vertexPositions[2][1], vertexPositions[2][2] }
