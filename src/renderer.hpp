@@ -60,7 +60,7 @@ public:
   // Updates camera parameters with the given values
   void SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up);
 
-  unsigned int Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material);
+  unsigned int Add3DMesh(Mesh3D mesh, SharedPtr<Material> material);
 
   void RemoveMesh(unsigned int handle);
 
@@ -128,25 +128,25 @@ private:
   bool _useCameraIntrinsics = false;
 
     /// TODO: move this to its own class
-  std::unique_ptr<unsigned char[]> _currentVideoFrame;
+  UniquePtr<unsigned char[]> _currentVideoFrame;
   int _videoWidth, _videoHeight;
   ShaderProgram _videoShader;
   std::atomic_bool _newVideoFrame {false};
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
-  std::vector<TexturedQuad> _2DMeshes;
-  std::unique_ptr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
+  Vector<TexturedQuad> _2DMeshes;
+  UniquePtr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
 
-  std::vector<Mesh3D> _3DMeshes;
-  std::vector<Mesh3D> _new3DMeshes; // TODO: This is a temporary workaround and should be removed later
-  std::unique_ptr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
+  Vector<Mesh3D> _3DMeshes;
+  Vector<Mesh3D> _new3DMeshes; // TODO: This is a temporary workaround and should be removed later
+  UniquePtr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
 
   PointCloud<VertexP4> _pointCloud;
   ShaderProgram _pointCloudShader;
 
   ShaderProgram _voxelShader;
-  std::unique_ptr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
+  UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
 
   unsigned int GenerateMeshHandle(Mesh3D mesh);
 

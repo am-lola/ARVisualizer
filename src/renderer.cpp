@@ -105,8 +105,6 @@ void Renderer::Stop()
 
 bool Renderer::IsRunning()
 {
-  // TODO: Is this necessary?
-  std::lock_guard<std::mutex> guard(_mutex);
   return _running;
 }
 
@@ -117,14 +115,14 @@ void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
     throw std::runtime_error("Renderer was not started before being sent data!");
   }
 
-  std::lock_guard<std::mutex> guard(_mutex);
+  MutexLockGuard guard(_mutex);
 
   // if the incoming image is a different size from the last frame we saw,
   // create a new array to match the new frame size
   if (width != _videoWidth || height != _videoHeight)
   {
     _currentVideoFrame.reset();
-    _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[width * height * 3]());
+    _currentVideoFrame = UniquePtr<unsigned char[]>(new unsigned char[width * height * 3]());
     _videoWidth = width;
     _videoHeight = height;
   }
@@ -143,9 +141,9 @@ void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up
   _camera.SetForwardAndUp(glm::normalize(forward), glm::normalize(up));
 }
 
-unsigned int Renderer::Add3DMesh(Mesh3D mesh, std::shared_ptr<Material> material)
+unsigned int Renderer::Add3DMesh(Mesh3D mesh, SharedPtr<Material> material)
 {
-  std::lock_guard<std::mutex> guard(_mutex);
+  MutexLockGuard guard(_mutex);
   unsigned int handle = GenerateMeshHandle(mesh);
   mesh.SetMaterial(material);
   mesh.SetShader(&_defaultShader);
@@ -222,15 +220,15 @@ void Renderer::UpdateProjection()
 
 void Renderer::init()
 {
-  std::lock_guard<std::mutex> guard(_mutex);
+  MutexLockGuard guard(_mutex);
 
   // setup OpenGL context and open a window for rendering
   init_GL();
 
   // init buffers
-  _2DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex2D> >(new VertexBuffer<Vertex2D>());
-  _3DMeshBuffer = std::unique_ptr<VertexBuffer<Vertex3D> >(new VertexBuffer<Vertex3D>());
-  _voxelInstancedVertexBuffer = std::unique_ptr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S> >(new InstancedVertexBuffer<VertexP3N3, VertexP3C4S>());
+  _2DMeshBuffer = UniquePtr<VertexBuffer<Vertex2D>>(new VertexBuffer<Vertex2D>());
+  _3DMeshBuffer = UniquePtr<VertexBuffer<Vertex3D>>(new VertexBuffer<Vertex3D>());
+  _voxelInstancedVertexBuffer = UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>>(new InstancedVertexBuffer<VertexP3N3, VertexP3C4S>());
   _pointCloud.InitVertexBuffer();
 
   // load shaders
@@ -269,7 +267,7 @@ void Renderer::init_geometry()
 {
   // prepare video pane
   // TODO: Get this from MeshFactory
-  std::vector<Vertex2D> videoVertices = {
+  Vector<Vertex2D> videoVertices = {
     //   Position        UV Coords
      { {-1.0f, -1.0f}, {0.0f, 1.0f} },
      { { 1.0f, -1.0f}, {1.0f, 1.0f} },
@@ -277,7 +275,7 @@ void Renderer::init_geometry()
      { { 1.0f,  1.0f}, {1.0f, 0.0f} }
   };
 
-  std::vector<GLuint> videoIndices = {
+  Vector<GLuint> videoIndices = {
       0, 1, 3, // first triangle
       0, 3, 2  // second triangle
   };
@@ -332,7 +330,7 @@ void Renderer::init_textures()
 {
     // initialize video texture to be the same size as our window
     _videoWidth = _windowWidth; _videoHeight = _windowHeight;
-    _currentVideoFrame = std::unique_ptr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]());
+    _currentVideoFrame = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]());
     for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++)
     {
       _currentVideoFrame[i] = 50;
@@ -444,7 +442,7 @@ void Renderer::update()
   // if we've received a new video frame, send it to the GPU
   if (_newVideoFrame)
   {
-    std::lock_guard<std::mutex> guard(_mutex);
+    MutexLockGuard guard(_mutex);
     bufferTexture(_videoWidth, _videoHeight, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
     _newVideoFrame = false;
   }

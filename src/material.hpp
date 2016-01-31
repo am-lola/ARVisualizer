@@ -24,7 +24,7 @@ namespace ar
 
   protected:
     ShaderProgram* _shader;
-    std::vector<std::string> _uniformNames; // used to ensure shader can support this material
+    Vector<std::string> _uniformNames; // used to ensure shader can support this material
 
     // checks that all uniforms this material require are in the given shader
     void Validate() {

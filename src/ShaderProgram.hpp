@@ -7,7 +7,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
+#include "common.hpp"
 #include "loadShaders.hpp"
 
 namespace ar
@@ -37,7 +37,7 @@ class ShaderProgram
       GLint uniformCount; // number of active uniforms in the linked program
       glGetProgramiv(programId, GL_ACTIVE_UNIFORMS, &uniformCount);
 
-      std::vector<GLchar> nameData(256);
+      Vector<GLchar> nameData(256);
       for(int i = 0; i < uniformCount; i++)
       {
         GLint arraySize = 0;

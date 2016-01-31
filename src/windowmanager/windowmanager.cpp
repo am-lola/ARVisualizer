@@ -144,7 +144,7 @@ void WindowManager::mgrCreateRenderer(CreateRendererParams* params)
   // store pointer to new renderer for requesting thread to pick up
   *(params->resultLocation) = newRenderer;
 
-  std::lock_guard<std::mutex> cmdLock(_commandLock);
+  MutexLockGuard cmdLock(_commandLock);
   _renderers.push_back(newRenderer); // keep track of Renderers we create
 }
 

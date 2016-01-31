@@ -53,7 +53,7 @@ private:
   std::thread _mgrThread;
 
   // Renderers. Every created window is given to a Renderer for drawing.
-  std::vector<Renderer*> _renderers;
+  Vector<Renderer*> _renderers;
 
   // Queue of requests for the window manager thread to handle
   std::queue<IWMCommand*> _commandQueue;
