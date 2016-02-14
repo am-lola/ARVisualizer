@@ -10,6 +10,7 @@ namespace ar
 ARVisualizer::ARVisualizer()
 {
   _renderer = nullptr;
+  _nextUIElementHandle = 0;
 }
 
 ARVisualizer::~ARVisualizer()
@@ -23,6 +24,10 @@ ARVisualizer::~ARVisualizer()
 void ARVisualizer::Start(int width, int height)
 {
   _renderer = WindowManager::Instance().NewRenderer(width, height, "AR visualizer");
+  _renderer->_renderGUIDelegate += [this]()
+  {
+    this->renderExternGUI();
+  };
 }
 
 void ARVisualizer::Start()
@@ -135,7 +140,7 @@ mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], doubl
   return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
 }
 
-mesh_handle ARVisualizer::AddEllipsoid(float center[3], float* transformation, double radius, Color color)
+mesh_handle ARVisualizer::AddEllipsoid(float* center, float* transformation, double radius, Color color)
 {
   if (!IsRunning()) { return 0; }
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
@@ -186,4 +191,243 @@ void ARVisualizer::DrawVoxels(const ARVisualizer::Voxel* voxels, unsigned long n
   if (!IsRunning()) { return; }
   _renderer->DrawVoxels(voxels, numVoxels);
 }
+
+
+void ARVisualizer::renderExternGUI()
+{
+  if (!ImGui::Begin("Extern"))
+  {
+    ImGui::End();
+    return;
+  }
+
+  ImGui::PushItemWidth(-100);
+
+  for (auto& kv : this->_uiElements)
+  {
+    auto& element = kv.second;
+    switch (element._type)
+    {
+      case UIElement::Button:
+      {
+        auto& button = _buttons[element._index];
+        const bool pressed = ImGui::Button(button._text.c_str());
+        button._pressed = button._pressed || pressed;
+        break;
+      }
+
+      case UIElement::SliderFloat:
+      {
+        auto& slider = _floatSliders[element._index];
+        switch (slider._numValues)
+        {
+          case 1:
+            ImGui::SliderFloat(slider._text.c_str(), &slider._values[0], slider._min, slider._max);
+            break;
+          case 2:
+            ImGui::SliderFloat2(slider._text.c_str(), slider._values, slider._min, slider._max);
+            break;
+          case 3:
+            ImGui::SliderFloat3(slider._text.c_str(), slider._values, slider._min, slider._max);
+            break;
+          case 4:
+            ImGui::SliderFloat4(slider._text.c_str(), slider._values, slider._min, slider._max);
+            break;
+        }
+        break;
+      }
+
+      case UIElement::SliderInt:
+      {
+        auto& slider = _intSliders[element._index];
+        switch (slider._numValues)
+        {
+          case 1:
+            ImGui::SliderInt(slider._text.c_str(), &slider._values[0], slider._min, slider._max);
+            break;
+          case 2:
+            ImGui::SliderInt2(slider._text.c_str(), slider._values, slider._min, slider._max);
+            break;
+          case 3:
+            ImGui::SliderInt3(slider._text.c_str(), slider._values, slider._min, slider._max);
+            break;
+          case 4:
+            ImGui::SliderInt4(slider._text.c_str(), slider._values, slider._min, slider._max);
+            break;
+        }
+        break;
+      }
+
+      case UIElement::SliderAngle:
+      {
+        auto& slider = _floatSliders[element._index];
+        ImGui::SliderAngle(slider._text.c_str(), &slider._values[0], slider._min, slider._max);
+        break;
+      }
+
+      case UIElement::CheckBox:
+      {
+        auto& checkBox = _checkBoxes[element._index];
+        ImGui::Checkbox(checkBox._text.c_str(), &checkBox._checked);
+        break;
+      }
+
+      case UIElement::FloatRange:
+      {
+        auto& floatRange = _floatRanges[element._index];
+        floatRange._dirty = ImGui::DragFloatRange2(floatRange._text.c_str(), &floatRange._lowerValue, &floatRange._upperValue,
+                                                   floatRange._speed, floatRange._min, floatRange._max);
+        break;
+      }
+    }
+  }
+
+  ImGui::PopItemWidth();
+
+  ImGui::End();
+}
+
+ui_element_handle ARVisualizer::AddButton(const char* text)
+{
+  _buttons.push_back(Button { text, false });
+  auto idx = _buttons.size() - 1;
+
+  addUIElement(UIElement::Button, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderFloat(const char* text, float min, float max, float value)
+{
+  _floatSliders.emplace_back(text, min, max, &value, 1);
+  const auto idx = _floatSliders.size() - 1;
+  addUIElement(UIElement::SliderFloat, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderFloat2(const char* text, float min, float max, const float* values)
+{
+  _floatSliders.emplace_back(text, min, max, values, 2);
+  const auto idx = _floatSliders.size() - 1;
+  addUIElement(UIElement::SliderFloat, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderFloat3(const char* text, float min, float max, const float* values)
+{
+  _floatSliders.emplace_back(text, min, max, values, 3);
+  const auto idx = _floatSliders.size() - 1;
+  addUIElement(UIElement::SliderFloat, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderFloat4(const char* text, float min, float max, const float* values)
+{
+  _floatSliders.emplace_back(text, min, max, values, 4);
+  const auto idx = _floatSliders.size() - 1;
+  addUIElement(UIElement::SliderFloat, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderAngle(const char* text, float minDegree, float maxDegree, float valueRadians)
+{
+  _floatSliders.emplace_back(text, minDegree, maxDegree, &valueRadians, 1);
+  const auto idx = _floatSliders.size() - 1;
+  addUIElement(UIElement::SliderAngle, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderInt(const char* text, int min, int max, int value)
+{
+  _intSliders.emplace_back(text, min, max, &value, 1);
+  const auto idx = _intSliders.size() - 1;
+  addUIElement(UIElement::SliderInt, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderInt2(const char* text, int min, int max, const int* values)
+{
+  _intSliders.emplace_back(text, min, max, values, 2);
+  const auto idx = _intSliders.size() - 1;
+  addUIElement(UIElement::SliderInt, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderInt3(const char* text, int min, int max, const int* values)
+{
+  _intSliders.emplace_back(text, min, max, values, 3);
+  const auto idx = _intSliders.size() - 1;
+  addUIElement(UIElement::SliderInt, idx);
+}
+
+ui_element_handle ARVisualizer::AddSliderInt4(const char* text, int min, int max, const int* values)
+{
+  _intSliders.emplace_back(text, min, max, values, 4);
+  const auto idx = _intSliders.size() - 1;
+  addUIElement(UIElement::SliderInt, idx);
+}
+
+ui_element_handle ARVisualizer::AddCheckBox(const char* text, bool checked)
+{
+  _checkBoxes.push_back(CheckBox { text, checked });
+  const auto idx = _checkBoxes.size() - 1;
+  addUIElement(UIElement::CheckBox, idx);
+}
+
+ui_element_handle ARVisualizer::AddFloatRange(const char* text, float speed, float min, float max, float lower, float upper)
+{
+  _floatRanges.push_back(FloatRange { text, speed, min, max, lower, upper, false });
+  const auto idx = _floatRanges.size() - 1;
+  addUIElement(UIElement::FloatRange, idx);
+}
+
+bool ARVisualizer::GetButtonState(ui_element_handle handle)
+{
+  auto& button = _buttons[_uiElements[handle]._index];
+  const bool pressed = button._pressed;
+  button._pressed = false;
+  return pressed;
+}
+
+float ARVisualizer::GetSliderFloatValue(ui_element_handle handle) const
+{
+  const auto& slider = _floatSliders[_uiElements.at(handle)._index];
+  return slider._values[0];
+}
+
+void ARVisualizer::GetSliderFloatValues(ui_element_handle handle, float* values) const
+{
+  const auto& slider = _floatSliders[_uiElements.at(handle)._index];
+  for (int i = 0; i < slider._numValues; i++)
+    values[i] = slider._values[i];
+}
+
+int ARVisualizer::GetSliderIntValue(ui_element_handle handle) const
+{
+  const auto& slider = _intSliders[_uiElements.at(handle)._index];
+  return slider._values[0];
+}
+
+void ARVisualizer::GetSliderIntValues(ui_element_handle handle, int* values) const
+{
+  const auto& slider = _intSliders[_uiElements.at(handle)._index];
+  for (int i = 0; i < slider._numValues; i++)
+    values[i] = slider._values[i];
+}
+
+bool ARVisualizer::GetCheckBoxState(ui_element_handle handle) const
+{
+  const auto& checkBox = _checkBoxes[_uiElements.at(handle)._index];
+  return checkBox._checked;
+}
+
+bool ARVisualizer::GetFloatRangeValues(ui_element_handle handle, float& lower, float& upper) const
+{
+  const auto& floatRange = _floatRanges[_uiElements.at(handle)._index];
+  lower = floatRange._lowerValue;
+  upper = floatRange._upperValue;
+  return floatRange._dirty;
+}
+
+
+
+ui_element_handle ARVisualizer::addUIElement(ARVisualizer::UIElement::Type type, size_t index)
+{
+  _uiElements[_nextUIElementHandle] = UIElement(type, index);
+
+  _nextUIElementHandle++;
+  return _nextUIElementHandle - 1;
+}
+
 } // namespace ar

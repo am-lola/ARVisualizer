@@ -632,6 +632,9 @@ void Renderer::renderGUI()
   _imguiRenderer.NewFrame();
   _camera.RenderGUI();
   _pointCloud.RenderGUI();
+
+  _renderGUIDelegate();
+
   ImGui::ShowTestWindow();
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
