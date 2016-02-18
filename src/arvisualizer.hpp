@@ -2,8 +2,7 @@
 #define _ARVISUALIZER_H
 
 #include "color.hpp"
-#include <map>
-#include <vector>
+#include "ui.hpp"
 
 namespace ar
 {
@@ -17,6 +16,7 @@ namespace ar
 #define UVSPHERE_RESOLUTION 16
 
 class Renderer;
+class UserInterface;
 
 typedef unsigned int mesh_handle;
 typedef unsigned int ui_element_handle;
@@ -93,111 +93,13 @@ public:
 
   void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
 
-  ui_element_handle AddButton(const char* text);
-  ui_element_handle AddSliderFloat(const char* text, float min, float max, float value = 0.0f);
-  ui_element_handle AddSliderFloat2(const char* text, float min, float max, const float* values = NULL);
-  ui_element_handle AddSliderFloat3(const char* text, float min, float max, const float* values = NULL);
-  ui_element_handle AddSliderFloat4(const char* text, float min, float max, const float* values = NULL);
-  ui_element_handle AddSliderAngle(const char* text, float minDegree, float maxDegree, float valueRadians = 0.0f);
-  ui_element_handle AddSliderInt(const char* text, int min, int max, int value = 0);
-  ui_element_handle AddSliderInt2(const char* text, int min, int max, const int* values = NULL);
-  ui_element_handle AddSliderInt3(const char* text, int min, int max, const int* values = NULL);
-  ui_element_handle AddSliderInt4(const char* text, int min, int max, const int* values = NULL);
-  ui_element_handle AddCheckBox(const char* text, bool checked = false);
-  ui_element_handle AddFloatRange(const char* text, float speed = 1.0f, float min = 0.0f, float max = 0.0f, float lower = 0.0f, float upper = 0.0f);
-
-  bool GetButtonState(ui_element_handle handle);
-  float GetSliderFloatValue(ui_element_handle handle) const;
-  void GetSliderFloatValues(ui_element_handle handle, float* values) const;
-  int GetSliderIntValue(ui_element_handle handle) const;
-  void GetSliderIntValues(ui_element_handle handle, int* values) const;
-  bool GetCheckBoxState(ui_element_handle handle) const;
-  bool GetFloatRangeValues(ui_element_handle handle, float& lower, float& upper) const;
+  IUIWindow* AddUIWindow(const char* name);
 
 private:
   Renderer* _renderer;
-
-  // All of this should be separated and hidden from this interface
-  struct UIElement
-  {
-    enum Type
-    {
-      Button,
-      SliderFloat,
-      SliderInt,
-      SliderAngle,
-      CheckBox,
-      FloatRange,
-    };
-
-    UIElement() { }
-
-    UIElement(const Type& type, size_t index)
-      : _type(type), _index(index)
-    { }
-
-    Type _type;
-    size_t _index;
-  };
-
-  struct Button
-  {
-    std::string _text;
-    bool _pressed;
-  };
-
-  template <typename T>
-  struct Slider
-  {
-    Slider(const std::string& text, T min, T max, const T* values, int numValues)
-      : _text(text), _min(min), _max(max), _numValues(numValues)
-    {
-      for (int i = 0; i < numValues; i++)
-        _values[i] = 0;
-
-      if (values != NULL)
-      {
-        for (int i = 0; i < numValues; i++)
-          _values[i] = values[i];
-      }
-    }
-
-    std::string _text;
-    T _min;
-    T _max;
-
-    T _values[4];
-    int _numValues;
-  };
-
-  struct CheckBox
-  {
-    std::string _text;
-    bool _checked;
-  };
-
-  struct FloatRange
-  {
-    std::string _text;
-    float _speed;
-    float _min;
-    float _max;
-    float _lowerValue;
-    float _upperValue;
-    bool _dirty;
-  };
+  UserInterface* _ui;
 
   void renderExternGUI();
-  ui_element_handle addUIElement(UIElement::Type type, size_t index);
-
-  std::vector<Button> _buttons;
-  std::vector<Slider<int> > _intSliders;
-  std::vector<Slider<float> > _floatSliders;
-  std::vector<CheckBox> _checkBoxes;
-  std::vector<FloatRange> _floatRanges;
-  std::map<ui_element_handle, UIElement> _uiElements;
-
-  ui_element_handle _nextUIElementHandle;
 };
 
 } // namespace ar

@@ -44,6 +44,7 @@ if (ARVIS_BUILD_LIBRARY)
         src/windowmanager/windowmanager.*pp
         src/windowmanager/windowevents.*pp
         src/windowmanager/glfwwindowevents.*pp
+        src/ui/ui.*pp
         extern/imgui/imgui.cpp
         extern/imgui/imgui_draw.cpp
         extern/imgui/imgui_demo.cpp
@@ -75,6 +76,7 @@ if (ARVIS_BUILD_LIBRARY)
     install(FILES
       src/arvisualizer.hpp
       src/color.hpp
+      src/ui.hpp
       DESTINATION ${include_install_dir}
     )
     install(FILES
