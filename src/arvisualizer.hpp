@@ -4,6 +4,7 @@
 #include "color.hpp"
 #include "triangle.hpp"
 #include "quad.hpp"
+#include "sphere.hpp"
 
 namespace ar
 {
@@ -61,7 +62,7 @@ public:
 
   mesh_handle Add(Quad quad);
 
-  mesh_handle AddSphere(double center[3], double radius, Color color);
+  mesh_handle Add(Sphere sphere);
 
   mesh_handle AddCapsule(double center1[3], double center2[3], double radius, Color color);
 

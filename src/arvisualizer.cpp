@@ -118,12 +118,12 @@ mesh_handle ARVisualizer::Add(Quad quad)
   return _renderer->Add3DMesh(MeshFactory::MakeQuad<Vertex3D>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
 }
 
-mesh_handle ARVisualizer::AddSphere(double center[3], double radius, Color color)
+mesh_handle ARVisualizer::Add(Sphere sphere)
 {
   if (!IsRunning()) { return 0; }
-  glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
+  glm::vec3 vCenter = glm::vec3( sphere.center[0], sphere.center[1], sphere.center[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeUVSphere<Vertex3D>(vCenter, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
+  return _renderer->Add3DMesh(MeshFactory::MakeUVSphere<Vertex3D>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
 }
 
 mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, Color color)
