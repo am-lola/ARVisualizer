@@ -109,25 +109,13 @@ mesh_handle ARVisualizer::Add(Triangle t)
   return _renderer->Add3DMesh(MeshFactory::MakeTriangle<Vertex3D>(positions), std::make_shared<FlatColorMaterial>(t.color));
 }
 
-mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
+mesh_handle ARVisualizer::Add(Quad quad)
 {
   if (!IsRunning()) { return 0; }
-  Vector<glm::vec3> positions = {
-    { vertexPositions[0][0], vertexPositions[0][1], vertexPositions[0][2] },
-    { vertexPositions[1][0], vertexPositions[1][1], vertexPositions[1][2] },
-    { vertexPositions[2][0], vertexPositions[2][1], vertexPositions[2][2] }
-  };
+  glm::vec3 vCenter = glm::vec3( quad.center[0], quad.center[1], quad.center[2] );
+  glm::vec3 vNormal = glm::vec3( quad.normal[0], quad.normal[1], quad.normal[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeTriangle<Vertex3D>(positions), std::make_shared<FlatColorMaterial>(color));
-}
-
-mesh_handle ARVisualizer::AddQuad(double center[3], double normal[3], double width, double height, Color color)
-{
-  if (!IsRunning()) { return 0; }
-  glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
-  glm::vec3 vNormal = glm::vec3( normal[0], normal[1], normal[2] );
-
-  return _renderer->Add3DMesh(MeshFactory::MakeQuad<Vertex3D>(vCenter, vNormal, width, height), std::make_shared<FlatColorMaterial>(color));
+  return _renderer->Add3DMesh(MeshFactory::MakeQuad<Vertex3D>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
 }
 
 mesh_handle ARVisualizer::AddSphere(double center[3], double radius, Color color)

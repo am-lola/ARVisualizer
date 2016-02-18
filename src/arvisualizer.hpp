@@ -3,6 +3,7 @@
 
 #include "color.hpp"
 #include "triangle.hpp"
+#include "quad.hpp"
 
 namespace ar
 {
@@ -58,9 +59,7 @@ public:
 
   mesh_handle Add(Triangle t);
 
-  mesh_handle AddTriangle(double vertexPositions[3][3], Color color);
-
-  mesh_handle AddQuad(double center[3], double normal[3], double width, double height, Color color);
+  mesh_handle Add(Quad quad);
 
   mesh_handle AddSphere(double center[3], double radius, Color color);
 
