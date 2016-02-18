@@ -55,6 +55,12 @@ public:
     _dirty = true;
   }
 
+  void SetVertices(Vector<VertexT> vertices)
+  {
+    _vertices = std::move(vertices); // steal vertices from caller
+    _dirty = true;
+  }
+
   // sends all currently-held vertex data to GPU
   // Must ONLY be called from the thread owning the OpenGL Context!
   void BufferData()

@@ -74,8 +74,8 @@ public:
   void Update(mesh_handle handle, Quad quad);
   void Update(mesh_handle handle, Sphere sphere);
   void Update(mesh_handle handle, Capsule capsule);
-  void Update(mesh_handle handle, PointCloudData pointcloud);
   void Update(mesh_handle handle, Ellipsoid ellipsoid);
+  void Update(mesh_handle handle, PointCloudData pointcloud);
 
   // Removes an object from the scene
   void Remove(mesh_handle handle);

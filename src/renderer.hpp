@@ -64,6 +64,8 @@ public:
 
   unsigned int AddPointCloud(const void* pointData, size_t numPoints);
 
+  void UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints);
+
   void Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material);
 
   void RemoveMesh(unsigned int handle);
@@ -144,7 +146,7 @@ private:
   Vector<Mesh3D> _new3DMeshes; // TODO: This is a temporary workaround and should be removed later
   UniquePtr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
 
-  PointCloud<VertexP4> _pointCloud;
+  Vector<PointCloud<VertexP4>> _pointClouds;
   ShaderProgram _pointCloudShader;
 
   ShaderProgram _voxelShader;

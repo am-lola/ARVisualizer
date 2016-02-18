@@ -164,10 +164,30 @@ unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints)
 
   unsigned int handle = GenerateMeshHandle();
   const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
-  _pointCloud.SetPoints(verts, numPoints);
-  _pointCloud.SetID(handle);
+
+  PointCloud<VertexP4> pointcloud;
+
+  pointcloud.SetPoints(verts, numPoints);
+  pointcloud.SetID(handle);
+  pointcloud.SetShader(&_pointCloudShader);
+
+  _pointClouds.push_back(std::move(pointcloud));
 
   return handle;
+}
+
+void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints)
+{
+  const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
+  for (auto& cloud : _pointClouds)
+  {
+    if (cloud.ID() == handle)
+    {
+      MutexLockGuard guard(_mutex);
+      cloud.SetPoints(verts, numPoints);
+      break;
+    }
+  }
 }
 
 void Renderer::Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material)
@@ -255,15 +275,12 @@ void Renderer::init()
   _2DMeshBuffer = UniquePtr<VertexBuffer<Vertex2D>>(new VertexBuffer<Vertex2D>());
   _3DMeshBuffer = UniquePtr<VertexBuffer<Vertex3D>>(new VertexBuffer<Vertex3D>());
   _voxelInstancedVertexBuffer = UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>>(new InstancedVertexBuffer<VertexP3N3, VertexP3C4S>());
-  _pointCloud.InitVertexBuffer();
 
   // load shaders
   _defaultShader.loadAndLink(ShaderSources::sh_simpleNormal_vert, ShaderSources::sh_simpleLit_frag);
   _videoShader.loadAndLink(ShaderSources::sh_2D_passthru_vert, ShaderSources::sh_simpleTexture_frag);
   _pointCloudShader.loadAndLink(ShaderSources::sh_pointCloud_vert, ShaderSources::sh_flatShaded_frag);
   _voxelShader.loadAndLink(ShaderSources::sh_voxel_vert, ShaderSources::sh_voxel_frag);
-
-  _pointCloud.SetShader(&_pointCloudShader);
 
   // setup default goemetry needed for rendering and send it to OpenGL
   init_geometry();
@@ -544,9 +561,17 @@ void Renderer::update()
     _3DMeshBuffer->BufferData();
   }
 
-  if (_pointCloud.GetVertexBuffer()->Dirty())
+  for (auto& cloud : _pointClouds)
   {
-    _pointCloud.GetVertexBuffer()->BufferData();
+    if (cloud.Dirty())
+    {
+      cloud.UpdateBuffer();
+    }
+
+    if (cloud.GetVertexBuffer()->Dirty())
+    {
+      cloud.GetVertexBuffer()->BufferData();
+    }
   }
 
   _voxelInstancedVertexBuffer->BufferData();
@@ -579,25 +604,28 @@ void Renderer::renderOneFrame()
   * Second pass:
   *   render point cloud
   *************/
-  if (_pointCloud.ShouldDraw())
+  enableRenderPass(Blend_Add);
+  for (auto& cloud : _pointClouds)
   {
-    enableRenderPass(Blend_Add);
-    const auto& shader = _pointCloud.GetShader();
-    shader->enable();
+    if (cloud.ShouldDraw())
+    {
+      const auto& shader = cloud.GetShader();
+      shader->enable();
 
-    glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * _pointCloud.GetTransform();
-    glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
-    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &_pointCloud.GetTransform()[0][0]);
-    glUniform1f(shader->getUniform("fadeDepth"), _pointCloud._fadeDepth);
+      glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * cloud.GetTransform();
+      glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &cloud.GetTransform()[0][0]);
+      glUniform1f(shader->getUniform("fadeDepth"), cloud._fadeDepth);
 
 
-    GLfloat storedPointSize;
-    glGetFloatv(GL_POINT_SIZE, &storedPointSize);
-    glPointSize(_pointCloud._pointSize);
+      GLfloat storedPointSize;
+      glGetFloatv(GL_POINT_SIZE, &storedPointSize);
+      glPointSize(cloud._pointSize);
 
-    _pointCloud.GetVertexBuffer()->Draw();
+      cloud.GetVertexBuffer()->Draw();
 
-    glPointSize(storedPointSize);
+      glPointSize(storedPointSize);
+    }
   }
 
   if (_voxelInstancedVertexBuffer->InstanceCount() > 0)
@@ -666,8 +694,12 @@ void Renderer::renderGUI()
 
   _imguiRenderer.NewFrame();
   _camera.RenderGUI();
-  _pointCloud.RenderGUI();
-  ImGui::ShowTestWindow();
+
+  for (auto& cloud : _pointClouds)
+  {
+    cloud.RenderGUI();
+  }
+
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
 }

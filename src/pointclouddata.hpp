@@ -15,6 +15,10 @@ namespace ar
     unsigned long numPoints;  // Number of points in the array.
     PointCloudDataType type;  // Format points are stored in.
 
+    PointCloudData() : pointData(0), numPoints(0), type(PCL_PointXYZ) {}
+
+    PointCloudData(PointCloudDataType dataType) : pointData(0), numPoints(0), type(dataType) {}
+
     // Creates a capsule. Centers are expected to be ordered: x, y, z
     PointCloudData(const void* data, unsigned long count, PointCloudDataType dataType)
     {

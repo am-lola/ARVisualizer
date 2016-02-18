@@ -135,21 +135,6 @@ mesh_handle ARVisualizer::Add(Capsule capsule)
   return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
 }
 
-mesh_handle ARVisualizer::Add(PointCloudData pointcloud)
-{
-  if (!IsRunning()) { return 0; }
-
-  switch (pointcloud.type)
-  {
-    case PCL_PointXYZ:
-      break;
-    case PCL_PointXYZRGBA:
-      throw std::runtime_error("PCL_PointXYZRGBA is not supported yet.");
-  }
-
-  return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints);
-}
-
 mesh_handle ARVisualizer::Add(Ellipsoid ellipsoid)
 {
   if (!IsRunning()) { return 0; }
@@ -169,6 +154,21 @@ mesh_handle ARVisualizer::Add(Ellipsoid ellipsoid)
 
   mesh.SetTransform(glm::make_mat4(transform));
   return _renderer->Add3DMesh(mesh, std::make_shared<FlatColorMaterial>(ellipsoid.color));
+}
+
+mesh_handle ARVisualizer::Add(PointCloudData pointcloud)
+{
+  if (!IsRunning()) { return 0; }
+
+  switch (pointcloud.type)
+  {
+    case PCL_PointXYZ:
+      break;
+    case PCL_PointXYZRGBA:
+      throw std::runtime_error("PCL_PointXYZRGBA is not supported yet.");
+  }
+
+  return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints);
 }
 
 void ARVisualizer::Update(mesh_handle handle, Triangle t)
@@ -228,6 +228,11 @@ void ARVisualizer::Update(mesh_handle handle, Ellipsoid ellipsoid)
 
   mesh.SetTransform(glm::make_mat4(transform));
   return _renderer->Update(handle, mesh, std::make_shared<FlatColorMaterial>(ellipsoid.color));
+}
+
+void ARVisualizer::Update(mesh_handle handle, PointCloudData pointcloud)
+{
+  return _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints);
 }
 
 void ARVisualizer::Remove(mesh_handle handle)

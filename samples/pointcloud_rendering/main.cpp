@@ -1,10 +1,11 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
-
 #include "arvisualizer.hpp"
 
 ar::ARVisualizer* visualizer;
+ar::PointCloudData pointCloud(ar::PCL_PointXYZ);
+ar::mesh_handle cloud_handle;
 pcl::Grabber* interface;
 
 typedef pcl::PointXYZ PointT;
@@ -15,8 +16,9 @@ void cloud_cb (const pcl::PointCloud<PointT>::ConstPtr& cloud)
   if (visualizer && visualizer->IsRunning())
   {
     const PointT* data = &cloud->points[0];
-    ar::PointCloudData pointCloud = ar::PointCloudData(reinterpret_cast<const void*>(data), cloud->size(), ar::PCL_PointXYZ);
-    visualizer->Add(pointCloud);
+    pointCloud.pointData = reinterpret_cast<const void*>(data);
+    pointCloud.numPoints = cloud->size();
+    visualizer->Update(cloud_handle, pointCloud); // give the visualizer the new points
   }
 }
 
@@ -36,6 +38,9 @@ int main(void)
 
   // start the visualizer
   visualizer->Start(1024, 768);
+
+  // add an empty point cloud to visualizer, which we will upate each frame
+  cloud_handle = visualizer->Add(pointCloud);
 
   std::cout << "Press enter to exit..." << std::endl;
   std::cin.get();
