@@ -34,20 +34,23 @@ int main(void)
   double quadWidth2 = 0.5;
   double quadHeight2 = 0.5;
 
+
    // Triangles are specified by three points in space
-  double triVertices1[3][3] = {
-    { 0.0, 0.5, 3.0 },
-    { 0.5, 0.25, 2.0 },
-    { 0.0, 0.0, 1.0 }
+  float triVertices1[9] = {
+      0.0, 0.5,  3.0,
+      0.5, 0.25, 2.0,
+      0.0, 0.0,  1.0
   };
-  ar::Color triColor1 = ar::Color( 0.0, 0.5, 0.25, 0.75 );
+
+  ar::Triangle tri1 = ar::Triangle(triVertices1, ar::Color( 0.0, 0.5, 0.25, 0.75 ));
 
   double triVertices2[3][3] = {
     { -0.5, 0.0, 1.0 },
     { -0.5, 0.0, 2.0 },
     { 0.5, -0.5, 2.0 }
   };
-  ar::Color triColor2 = ar::Color( 1.0, 0.5, 0.25, 0.25 );
+
+  ar::Triangle tri2 = ar::Triangle(triVertices2[0], triVertices2[1], triVertices2[2], ar::Color( 1.0, 0.5, 0.25, 0.25 ));
 
    // A sphere is specified with just a position and a radius
   double sphereCenter[3] = { 0.0, 0.0, 4.0 };
@@ -65,9 +68,8 @@ int main(void)
   visualizer->AddSphere(sphereCenter, sphereRadius, sphereColor);
   visualizer->AddQuad(quadCenter1, quadNormal1, quadWidth1, quadHeight1, quadColor1);
   visualizer->AddQuad(quadCenter2, quadNormal2, quadWidth2, quadHeight2, quadColor2);
-  visualizer->AddTriangle(triVertices1, triColor1);
-  visualizer->AddTriangle(triVertices2, triColor2);
-
+  visualizer->Add(tri1);
+  visualizer->Add(tri2);
   // Keep rendering until the user wants to quit
   std::cout << "Press enter to exit..." << std::endl;
   std::cin.get();

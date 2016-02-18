@@ -2,6 +2,7 @@
 #define _ARVISUALIZER_H
 
 #include "color.hpp"
+#include "triangle.hpp"
 
 namespace ar
 {
@@ -54,6 +55,8 @@ public:
 
   // Updates the projection based on the given camera matrix
   void SetCameraIntrinsics(double camera_matrix[3][3]);
+
+  mesh_handle Add(Triangle t);
 
   mesh_handle AddTriangle(double vertexPositions[3][3], Color color);
 

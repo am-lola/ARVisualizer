@@ -97,6 +97,18 @@ void ARVisualizer::SetCameraIntrinsics(double camera_matrix[3][3])
   _renderer->SetCameraIntrinsics(camera_matrix);
 }
 
+mesh_handle ARVisualizer::Add(Triangle t)
+{
+  if (!IsRunning()) { return 0; }
+  Vector<glm::vec3> positions = {
+    { t.p1[0], t.p1[1], t.p1[2] },
+    { t.p2[0], t.p2[1], t.p2[2] },
+    { t.p3[0], t.p3[1], t.p3[2] }
+  };
+
+  return _renderer->Add3DMesh(MeshFactory::MakeTriangle<Vertex3D>(positions), std::make_shared<FlatColorMaterial>(t.color));
+}
+
 mesh_handle ARVisualizer::AddTriangle(double vertexPositions[3][3], Color color)
 {
   if (!IsRunning()) { return 0; }
