@@ -219,6 +219,13 @@ void Renderer::RemoveMesh(unsigned int handle)
       m.MarkForDeletion();
     }
   }
+  for (auto& c : _pointClouds)
+  {
+    if (c.ID() == handle)
+    {
+      c.MarkForDeletion();
+    }
+  }
 }
 
 void Renderer::RemoveAllMeshes()
@@ -230,6 +237,10 @@ void Renderer::RemoveAllMeshes()
   for (auto& m : _new3DMeshes)
   {
     m.MarkForDeletion();
+  }
+  for (auto& c : _pointClouds)
+  {
+    c.MarkForDeletion();
   }
 }
 
@@ -517,6 +528,18 @@ void Renderer::update()
       it = _3DMeshes.erase(it);
       _3DMeshBuffer->ClearAll();
       mustRegenerateVBO_3D = true;
+    }
+    else
+    {
+      ++it;
+    }
+  }
+
+  for (auto it = _pointClouds.begin(); it != _pointClouds.end(); )
+  {
+    if (it->PendingDelete())
+    {
+      it = _pointClouds.erase(it);
     }
     else
     {

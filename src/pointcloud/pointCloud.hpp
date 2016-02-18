@@ -38,6 +38,9 @@ public:
 
   bool Dirty() { return _dirty; }
 
+  bool PendingDelete() { return _pendingDelete; };
+  bool MarkForDeletion() { _pendingDelete = true; };
+
   ShaderProgram* GetShader() { return _shaderProgram; }
   void SetShader(ShaderProgram* s)
   {
@@ -142,6 +145,8 @@ public:
 private:
   unsigned int _id;
   bool _dirty = false;
+  bool _pendingDelete = false;
+
   std::string _name;
   Vector<VertexType> _newPoints;
   size_t _numPoints = 0;
