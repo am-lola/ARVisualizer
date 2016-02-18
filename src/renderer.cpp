@@ -170,6 +170,17 @@ unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints)
   return handle;
 }
 
+void Renderer::Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material)
+{
+  MutexLockGuard guard(_mutex);
+  RemoveMesh(handle);
+
+  mesh.SetMaterial(material);
+  mesh.SetShader(&_defaultShader);
+  mesh.SetID(handle);
+  _new3DMeshes.push_back(mesh);
+}
+
 void Renderer::RemoveMesh(unsigned int handle)
 {
   if (handle == 0) { return; } // zero is reserved as a non-unique default ID
@@ -179,7 +190,6 @@ void Renderer::RemoveMesh(unsigned int handle)
     if (m.ID() == handle)
     {
       m.MarkForDeletion();
-      break;
     }
   }
   for (auto& m : _new3DMeshes)
@@ -187,7 +197,6 @@ void Renderer::RemoveMesh(unsigned int handle)
     if (m.ID() == handle)
     {
       m.MarkForDeletion();
-      break;
     }
   }
 }
@@ -470,30 +479,36 @@ void Renderer::update()
   // mesh, but we'd still have to go through all the other meshes to update their offsets
   // and re-send the modified buffer to the GPU, so the gains may not be terribly meaningful.
   bool mustRegenerateVBO_2D = false;
-  for (int i = 0; i < _2DMeshes.size(); i++)
+  for (auto it = _2DMeshes.begin(); it != _2DMeshes.end(); )
   {
-    if (_2DMeshes[i].PendingDelete())
+    if (it->PendingDelete())
     {
-      _2DMeshes.erase(_2DMeshes.begin() + i); // remove mesh
+      it = _2DMeshes.erase(it);
       _2DMeshBuffer->ClearAll();   // empty vertex buffer so it can be rebuilt
       mustRegenerateVBO_2D = true;
     }
+    else
+    {
+      ++it;
+    }
   }
   bool mustRegenerateVBO_3D = false;
-  for (int i = 0; i < _3DMeshes.size(); i++)
+  for (auto it = _3DMeshes.begin(); it != _3DMeshes.end(); )
   {
-    if (_3DMeshes[i].PendingDelete())
+    if (it->PendingDelete())
     {
-      _3DMeshes.erase(_3DMeshes.begin() + i);
+      it = _3DMeshes.erase(it);
       _3DMeshBuffer->ClearAll();
       mustRegenerateVBO_3D = true;
     }
+    else
+    {
+      ++it;
+    }
   }
 
-  // if we have any new mesh data, and nobody else is using it right now,
-  // update buffers and send it to the GPU
-  if (!_mutex.try_lock())
-    return;
+  // if we have any new mesh data, update buffers and send it to the GPU
+  _mutex.lock();
 
   for (auto& m : _2DMeshes)
   {
@@ -510,21 +525,24 @@ void Renderer::update()
   }
   for (auto& m : _new3DMeshes)
   {
+    if (!m.PendingDelete()) // if a mesh was already deleted, don't bother adding it
+      _3DMeshes.push_back(m);
+  }
+  _new3DMeshes.clear(); // empty new list since we've extracted all new meshes
+  for (auto& m : _3DMeshes)
+  {
     if (m.Dirty() || mustRegenerateVBO_3D)
     {
       m.SetVertexOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
       m.SetIndexOffset(_3DMeshBuffer->AddIndices(m.GetIndices()));
       m.ClearDirty();
-      _3DMeshes.push_back(m);
     }
   }
-  _new3DMeshes.clear(); // empty new list since we've extracted all new meshes
 
   if (_3DMeshBuffer->Dirty())
   {
     _3DMeshBuffer->BufferData();
   }
-
 
   if (_pointCloud.GetVertexBuffer()->Dirty())
   {

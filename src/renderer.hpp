@@ -64,6 +64,8 @@ public:
 
   unsigned int AddPointCloud(const void* pointData, size_t numPoints);
 
+  void Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material);
+
   void RemoveMesh(unsigned int handle);
 
   void RemoveAllMeshes();

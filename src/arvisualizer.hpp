@@ -61,20 +61,26 @@ public:
   // Updates the projection based on the given camera matrix
   void SetCameraIntrinsics(double camera_matrix[3][3]);
 
-  mesh_handle Add(Triangle t);
-
+  // Adds an object to the scene
+  mesh_handle Add(Triangle triangle);
   mesh_handle Add(Quad quad);
-
   mesh_handle Add(Sphere sphere);
-
   mesh_handle Add(Capsule capsule);
-
   mesh_handle Add(PointCloudData pointcloud);
-
   mesh_handle Add(Ellipsoid ellipsoid);
 
+  // Updates an existing scene object
+  void Update(mesh_handle handle, Triangle triangle);
+  void Update(mesh_handle handle, Quad quad);
+  void Update(mesh_handle handle, Sphere sphere);
+  void Update(mesh_handle handle, Capsule capsule);
+  void Update(mesh_handle handle, PointCloudData pointcloud);
+  void Update(mesh_handle handle, Ellipsoid ellipsoid);
+
+  // Removes an object from the scene
   void Remove(mesh_handle handle);
 
+  // Removes all objects
   void RemoveAll();
 
   struct Voxel
