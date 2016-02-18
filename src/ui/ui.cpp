@@ -480,6 +480,8 @@ ui_element_handle UIWindow::AddDragInt4(const char* label, int min, int max, flo
 
 ui_element_handle UIWindow::AddCheckBox(const char* label, bool checked)
 {
+  MutexLockGuard lockGuard(_mutex);
+
   UICheckBox* checkBox = new UICheckBox();
   checkBox->_label = label;
   checkBox->_checked = checked;
@@ -489,6 +491,8 @@ ui_element_handle UIWindow::AddCheckBox(const char* label, bool checked)
 
 ui_element_handle UIWindow::AddFloatRange(const char* label, float speed, float min, float max, float lower, float upper)
 {
+  MutexLockGuard lockGuard(_mutex);
+
   UIFloatRange* floatRange = new UIFloatRange();
   floatRange->_label = label;
   floatRange->_speed = speed;
@@ -502,6 +506,8 @@ ui_element_handle UIWindow::AddFloatRange(const char* label, float speed, float 
 
 ui_element_handle UIWindow::AddInputText(const char* label)
 {
+  MutexLockGuard lockGuard(_mutex);
+
   UIInputText* inputText = new UIInputText();
   inputText->_label = label;
   _elements.emplace_back(inputText);
@@ -510,6 +516,8 @@ ui_element_handle UIWindow::AddInputText(const char* label)
 
 ui_element_handle UIWindow::AddText(const char* fmt, ...)
 {
+  MutexLockGuard lockGuard(_mutex);
+
   UIText* uiText = new UIText();
 
   va_list args;
@@ -527,6 +535,8 @@ ui_element_handle UIWindow::AddText(const char* fmt, ...)
 
 void UIWindow::UpdateText(ui_element_handle handle, const char* fmt, ...)
 {
+  MutexLockGuard lockGuard(_mutex);
+
   UIText* uiText = dynamic_cast<UIText*>(_elements[handle]._element.get());
 
   va_list args;
@@ -541,6 +551,8 @@ void UIWindow::UpdateText(ui_element_handle handle, const char* fmt, ...)
 
 void UIWindow::SameLine()
 {
+  MutexLockGuard lockGuard(_mutex);
+
   _elements.emplace_back(new UISameLine());
 }
 

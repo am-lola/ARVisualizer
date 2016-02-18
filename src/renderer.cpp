@@ -450,9 +450,6 @@ void Renderer::update()
     _newVideoFrame = false;
   }
 
-
-  MutexLockGuard guard(_mutex);
-
   // if one or more meshes was marked for deletion, delete it and regenerate VBO/VEOs
   // The implementation here causes us to trash and rebuild any VertexBuffer which contained
   // a deleted mesh. It may be faster to just delete the range of vertices covered by that
@@ -481,8 +478,8 @@ void Renderer::update()
 
   // if we have any new mesh data, and nobody else is using it right now,
   // update buffers and send it to the GPU
-  //if (!_mutex.try_lock())
-  //  return;
+  if (!_mutex.try_lock())
+    return;
 
   for (auto& m : _2DMeshes)
   {
@@ -522,7 +519,7 @@ void Renderer::update()
 
   _voxelInstancedVertexBuffer->BufferData();
 
-  //_mutex.unlock();
+  _mutex.unlock();
 }
 
 void Renderer::renderOneFrame()
