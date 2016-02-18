@@ -126,13 +126,13 @@ mesh_handle ARVisualizer::Add(Sphere sphere)
   return _renderer->Add3DMesh(MeshFactory::MakeUVSphere<Vertex3D>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
 }
 
-mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], double radius, Color color)
+mesh_handle ARVisualizer::Add(Capsule capsule)
 {
   if (!IsRunning()) { return 0; }
-  glm::vec3 vCenter1 = glm::vec3( center1[0], center1[1], center1[2] );
-  glm::vec3 vCenter2 = glm::vec3( center2[0], center2[1], center2[2] );
+  glm::vec3 vCenter1 = glm::vec3( capsule.center1[0], capsule.center1[1], capsule.center1[2] );
+  glm::vec3 vCenter2 = glm::vec3( capsule.center2[0], capsule.center2[1], capsule.center2[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
+  return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
 }
 
 mesh_handle ARVisualizer::AddEllipsoid(float center[3], float* transformation, double radius, Color color)

@@ -5,6 +5,7 @@
 #include "triangle.hpp"
 #include "quad.hpp"
 #include "sphere.hpp"
+#include "capsule.hpp"
 
 namespace ar
 {
@@ -64,7 +65,7 @@ public:
 
   mesh_handle Add(Sphere sphere);
 
-  mesh_handle AddCapsule(double center1[3], double center2[3], double radius, Color color);
+  mesh_handle Add(Capsule capsule);
 
   //    Transformation: Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
   mesh_handle AddEllipsoid(float center[3], float* transformation, double radius, Color color);

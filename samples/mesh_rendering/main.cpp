@@ -56,18 +56,19 @@ int main(void)
   ar::Sphere sphere = ar::Sphere(sphereCenter, 2.0, ar::Color( 0.6, 0.35, 0.2, 0.7 ));
 
    // Capsules need two positions (one for each end) and a radius
-  double capsuleCenter1[3] = { 2.5, 2.0, 6.0 };
-  double capsuleCenter2[3] = { 2.0,-1.0, 5.0 };
-  double capsuleRadius = 1.0;
-  ar::Color capsuleColor = ar::Color( 0.1, 0.8, 0.3, 1.0 );
+  float capsuleCenter1[3] = { 2.5, 2.0, 6.0 };
+  float capsuleCenter2[3] = { 2.0,-1.0, 5.0 };
+
+  ar::Capsule capsule = ar::Capsule(capsuleCenter1, capsuleCenter2, 1.0, ar::Color( 0.1, 0.8, 0.3, 1.0 ));
 
   // tell the visualizer about our fancy new shapes
-  visualizer->AddCapsule(capsuleCenter1, capsuleCenter2, capsuleRadius, capsuleColor);
+  visualizer->Add(capsule);
   visualizer->Add(sphere);
   visualizer->Add(quad1);
   visualizer->Add(quad2);
   visualizer->Add(tri1);
   visualizer->Add(tri2);
+
   // Keep rendering until the user wants to quit
   std::cout << "Press enter to exit..." << std::endl;
   std::cin.get();
