@@ -6,6 +6,7 @@
 #include "quad.hpp"
 #include "sphere.hpp"
 #include "capsule.hpp"
+#include "pointclouddata.hpp"
 
 namespace ar
 {
@@ -67,23 +68,14 @@ public:
 
   mesh_handle Add(Capsule capsule);
 
+  mesh_handle Add(PointCloudData pointcloud);
+
   //    Transformation: Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
   mesh_handle AddEllipsoid(float center[3], float* transformation, double radius, Color color);
 
   void Remove(mesh_handle handle);
 
   void RemoveAll();
-
-  enum PointCloudDataType
-  {
-    PCL_PointXYZ,
-    PCL_PointXYZRGBA
-  };
-
-  // Draw a point cloud
-  //    Points: Points xyzw (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats).
-  //    NumPoints: Number of points in the array.
-  void DrawPointCloud(const void* pointData, unsigned long numPoints, PointCloudDataType dataType);
 
   struct Voxel
   {

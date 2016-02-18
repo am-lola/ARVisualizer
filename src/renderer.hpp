@@ -62,11 +62,11 @@ public:
 
   unsigned int Add3DMesh(Mesh3D mesh, SharedPtr<Material> material);
 
+  unsigned int AddPointCloud(const void* pointData, size_t numPoints);
+
   void RemoveMesh(unsigned int handle);
 
   void RemoveAllMeshes();
-
-  void DrawPointCloud(const void* pointData, size_t numPoints);
 
   void DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels);
 
@@ -148,7 +148,7 @@ private:
   ShaderProgram _voxelShader;
   UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
 
-  unsigned int GenerateMeshHandle(Mesh3D mesh);
+  unsigned int GenerateMeshHandle();
 
   // Regenerates projection matrix
   void UpdateProjection();

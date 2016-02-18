@@ -135,6 +135,21 @@ mesh_handle ARVisualizer::Add(Capsule capsule)
   return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
 }
 
+mesh_handle ARVisualizer::Add(PointCloudData pointcloud)
+{
+  if (!IsRunning()) { return 0; }
+
+  switch (pointcloud.type)
+  {
+    case PCL_PointXYZ:
+      break;
+    case PCL_PointXYZRGBA:
+      throw std::runtime_error("PCL_PointXYZRGBA is not supported yet.");
+  }
+
+  return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints);
+}
+
 mesh_handle ARVisualizer::AddEllipsoid(float center[3], float* transformation, double radius, Color color)
 {
   if (!IsRunning()) { return 0; }
@@ -164,21 +179,6 @@ void ARVisualizer::RemoveAll()
 {
   if (!IsRunning()) { return; }
   _renderer->RemoveAllMeshes();
-}
-
-void ARVisualizer::DrawPointCloud(const void* pointData, unsigned long numPoints, PointCloudDataType dataType)
-{
-  if (!IsRunning()) { return; }
-
-  switch (dataType)
-  {
-    case PCL_PointXYZ:
-      break;
-    case PCL_PointXYZRGBA:
-      throw std::runtime_error("PCL_PointXYZRGBA is not supported yet.");
-  }
-
-  _renderer->DrawPointCloud(pointData, numPoints);
 }
 
 void ARVisualizer::DrawVoxels(const ARVisualizer::Voxel* voxels, unsigned long numVoxels)

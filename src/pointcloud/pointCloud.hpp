@@ -33,6 +33,9 @@ public:
     _vertexBuffer = UniquePtr<VertexBufferType>(new VertexBufferType());
   }
 
+  unsigned int GetID() { return _id; }
+  void SetID(unsigned int id) { _id = id; }
+
   ShaderProgram* GetShader() { return _shaderProgram; }
   void SetShader(ShaderProgram* s)
   {
@@ -123,6 +126,7 @@ public:
   float _pointSize = 1.0f;
 
 private:
+  unsigned int _id;
   size_t _numPoints = 0;
   ShaderProgram* _shaderProgram;
 

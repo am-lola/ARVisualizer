@@ -15,7 +15,8 @@ void cloud_cb (const pcl::PointCloud<PointT>::ConstPtr& cloud)
   if (visualizer && visualizer->IsRunning())
   {
     const PointT* data = &cloud->points[0];
-    visualizer->DrawPointCloud(reinterpret_cast<const void*>(data), cloud->size(), ar::ARVisualizer::PCL_PointXYZ);
+    ar::PointCloudData pointCloud = ar::PointCloudData(reinterpret_cast<const void*>(data), cloud->size(), ar::PCL_PointXYZ);
+    visualizer->Add(pointCloud);
   }
 }
 

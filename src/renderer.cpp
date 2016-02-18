@@ -144,12 +144,29 @@ void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up
 unsigned int Renderer::Add3DMesh(Mesh3D mesh, SharedPtr<Material> material)
 {
   MutexLockGuard guard(_mutex);
-  unsigned int handle = GenerateMeshHandle(mesh);
+  unsigned int handle = GenerateMeshHandle();
   mesh.SetMaterial(material);
   mesh.SetShader(&_defaultShader);
   mesh.SetID(handle);
 
   _new3DMeshes.push_back(mesh);
+  return handle;
+}
+
+unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints)
+{
+  if (!_running)
+  {
+    throw std::runtime_error("Renderer was not started before being sent data!");
+  }
+
+  MutexLockGuard guard(_mutex);
+
+  unsigned int handle = GenerateMeshHandle();
+  const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
+  _pointCloud.SetPoints(verts, numPoints);
+  _pointCloud.SetID(handle);
+
   return handle;
 }
 
@@ -190,7 +207,7 @@ void Renderer::RemoveAllMeshes()
 /// TODO: make this more robust
 /// Each mesh should get a unique ID we can use later to find it, even if
 /// the renderer has resorted the vector containing it.
-unsigned int Renderer::GenerateMeshHandle(Mesh3D mesh)
+unsigned int Renderer::GenerateMeshHandle()
 {
   static unsigned int nextID = 0;
   return ++nextID;
@@ -653,19 +670,6 @@ void Renderer::shutdown()
   _imguiRenderer.Shutdown();
 
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
-}
-
-void Renderer::DrawPointCloud(const void* pointData, size_t numPoints)
-{
-  if (!_running)
-  {
-    throw std::runtime_error("Renderer was not started before being sent data!");
-  }
-
-  MutexLockGuard guard(_mutex);
-
-  const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
-  _pointCloud.SetPoints(verts, numPoints);
 }
 
 void Renderer::DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels)
