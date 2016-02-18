@@ -150,23 +150,25 @@ mesh_handle ARVisualizer::Add(PointCloudData pointcloud)
   return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints);
 }
 
-mesh_handle ARVisualizer::AddEllipsoid(float center[3], float* transformation, double radius, Color color)
+mesh_handle ARVisualizer::Add(Ellipsoid ellipsoid)
 {
   if (!IsRunning()) { return 0; }
-  glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
+  glm::vec3 vCenter = glm::vec3( ellipsoid.center[0], ellipsoid.center[1], ellipsoid.center[2] );
 
-  Mesh<Vertex3D> mesh = MeshFactory::MakeUVSphere<Vertex3D>(vCenter, radius, UVSPHERE_RESOLUTION);
+  Mesh<Vertex3D> mesh = MeshFactory::MakeUVSphere<Vertex3D>(vCenter, ellipsoid.radius, UVSPHERE_RESOLUTION);
+
+  float* t = ellipsoid.transform;
 
   float transform[16]
-    {
-      transformation[6],transformation[7],transformation[8], 0,
-      transformation[3],transformation[4],transformation[5], 0,
-      transformation[0],transformation[1],transformation[2], 0,
-      center[0], center[1], center[2], 1,
-    };
+  {
+    t[6],                t[7],                t[8],                0,
+    t[3],                t[4],                t[5],                0,
+    t[0],                t[1],                t[2],                0,
+    ellipsoid.center[0], ellipsoid.center[1], ellipsoid.center[2], 1,
+  };
 
   mesh.SetTransform(glm::make_mat4(transform));
-  return _renderer->Add3DMesh(mesh, std::make_shared<FlatColorMaterial>(color));
+  return _renderer->Add3DMesh(mesh, std::make_shared<FlatColorMaterial>(ellipsoid.color));
 }
 
 void ARVisualizer::Remove(mesh_handle handle)

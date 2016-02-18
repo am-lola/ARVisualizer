@@ -6,6 +6,7 @@
 #include "quad.hpp"
 #include "sphere.hpp"
 #include "capsule.hpp"
+#include "ellipsoid.hpp"
 #include "pointclouddata.hpp"
 
 namespace ar
@@ -70,8 +71,7 @@ public:
 
   mesh_handle Add(PointCloudData pointcloud);
 
-  //    Transformation: Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
-  mesh_handle AddEllipsoid(float center[3], float* transformation, double radius, Color color);
+  mesh_handle Add(Ellipsoid ellipsoid);
 
   void Remove(mesh_handle handle);
 
