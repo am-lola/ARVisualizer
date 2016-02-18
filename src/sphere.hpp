@@ -12,7 +12,7 @@ namespace ar
     float radius;
     Color color;
 
-    // Creates a quad. Center & normal are expected to be ordered: x, y, z
+    // Creates a sphere. Center is expected to be ordered: x, y, z
     Sphere(float* center, float radius) : color()
     {
       for (int i = 0; i < 3; i++)
@@ -23,7 +23,7 @@ namespace ar
       this->radius = radius;
     }
 
-    // Creates a quad. Center & normal are expected to be ordered: x, y, z
+    // Creates a sphere. Center is expected to be ordered: x, y, z
     Sphere(float* center, float radius, Color color)
     {
       for (int i = 0; i < 3; i++)
