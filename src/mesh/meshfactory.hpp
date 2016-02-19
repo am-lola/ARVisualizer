@@ -14,63 +14,70 @@ class MeshFactory
 public:
 
   // 2D triangles
-  template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(Vector<glm::vec2> vertexPositions);
+  template <typename MeshT>
+  static MeshT MakeTriangle(Vector<glm::vec2> vertexPositions);
 
   // 3D triangles
-  template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(Vector<glm::vec3> vertexPositions);
+  template <typename MeshT>
+  static MeshT MakeTriangle(Vector<glm::vec3> vertexPositions);
 
   // 3D triangles with per-vertex colors
-  template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(Vector<glm::vec3> vertexPositions, Vector<Color> vertexColors);
+  template <typename MeshT>
+  static MeshT MakeTriangle(Vector<glm::vec3> vertexPositions, Vector<Color> vertexColors);
 
   // 3D colored triangles (constant color)
-  template <typename VertexT>
-  static Mesh<VertexT> MakeTriangle(Vector<glm::vec3> vertexPositions, Color vertexColors);
+  template <typename MeshT>
+  static MeshT MakeTriangle(Vector<glm::vec3> vertexPositions, Color vertexColors);
 
 
   // 2D quads
-  template <typename VertexT>
-  static Mesh<VertexT> MakeQuad(glm::vec2 center, double width, double height);
+  template <typename MeshT>
+  static MeshT MakeQuad(glm::vec2 center, double width, double height);
 
   // 3D quads
-  template <typename VertexT>
-  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height);
+  template <typename MeshT>
+  static MeshT MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height);
 
   // 3D quads with per-vertex colors
-  template <typename VertexT>
-  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Vector<Color> vertexColors);
+  template <typename MeshT>
+  static MeshT MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Vector<Color> vertexColors);
 
   // 3D quads with constant color
-  template <typename VertexT>
-  static Mesh<VertexT> MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Color vertexColors);
+  template <typename MeshT>
+  static MeshT MakeQuad(glm::vec3 center, glm::vec3 normal, double width, double height, Color vertexColors);
 
+  // 3D boxes
+  template <typename MeshT>
+  static MeshT MakeBox(glm::vec3 center, double xLength, double yLength, double zLength);
+
+  // 3D cubes
+  template <typename MeshT>
+  static MeshT MakeCube(glm::vec3 center, double size);
 
   // Basic Icosphere
-  template <typename VertexT>
-  static Mesh<VertexT> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions);
+  template <typename MeshT>
+  static MeshT MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions);
 
   // Icosphere with constant color
-  template <typename VertexT>
-  static Mesh<VertexT> MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, Color color);
+  template <typename MeshT>
+  static MeshT MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, Color color);
 
 
   // Basic UVSphere
-  template <typename VertexT>
-  static Mesh<VertexT> MakeUVSphere(glm::vec3 center, double radius, int resolution);
+  template <typename MeshT>
+  static MeshT MakeUVSphere(glm::vec3 center, double radius, int resolution);
 
   // UVSphere with constant color
-  template <typename VertexT>
-  static Mesh<VertexT> MakeUVSphere(glm::vec3 center, double radius, Color color, int resolution);
+  template <typename MeshT>
+  static MeshT MakeUVSphere(glm::vec3 center, double radius, Color color, int resolution);
 
   // Basic Capsule
-  template <typename VertexT>
-  static Mesh<VertexT> MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, int resolution);
+  template <typename MeshT>
+  static MeshT MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, int resolution);
 
   // Capsule with constant color
-  template <typename VertexT>
-  static Mesh<VertexT> MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution);
+  template <typename MeshT>
+  static MeshT MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution);
 
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset
@@ -87,6 +94,9 @@ protected:
 
   // Creates a capsule at the origin with the given dimensions & returns the positions & indices in the given vectors
   static void MakeCapsuleMesh(double length, double radius, unsigned int resolution, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices);
+
+  // Creates a box at the origin with the given dimensions & returns the positions & indices in the given vectors
+  static void MakeBoxMesh(double xLength, double yLength, double zLength, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices);
 };
 
 } // namespace ar

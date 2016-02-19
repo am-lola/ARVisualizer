@@ -319,65 +319,13 @@ void Renderer::init_GL()
 
 void Renderer::init_geometry()
 {
-  // prepare video pane
-  // TODO: Get this from MeshFactory
-  Vector<Vertex2D> videoVertices = {
-    //   Position        UV Coords
-     { {-1.0f, -1.0f}, {0.0f, 1.0f} },
-     { { 1.0f, -1.0f}, {1.0f, 1.0f} },
-     { {-1.0f,  1.0f}, {0.0f, 0.0f} },
-     { { 1.0f,  1.0f}, {1.0f, 0.0f} }
-  };
+  Mesh2D videoPane = MeshFactory::MakeQuad<Mesh2D>(glm::vec2(0, 0), 2.0, 2.0); // vertices range from -1..1
+  videoPane.SetShader(&_videoShader);
+  _2DMeshes.push_back(videoPane); //TexturedQuad(videoVertices, videoIndices, &_videoShader));
 
-  Vector<GLuint> videoIndices = {
-      0, 1, 3, // first triangle
-      0, 3, 2  // second triangle
-  };
-
-  _2DMeshes.push_back(TexturedQuad(videoVertices, videoIndices, &_videoShader));
-
-  // create a flat shaded cube for the voxel buffer
-  // TODO: Move this to MeshFactory
-  Vector<Vertex3D> cube
-    {
-      { -1, -1,  1 }, {  1, -1,  1 }, {  1,  1,  1 }, { -1,  1,  1 },
-      { -1, -1, -1 }, { -1,  1, -1 }, {  1,  1, -1 }, {  1, -1, -1 },
-      { -1,  1, -1 }, { -1,  1,  1 }, {  1,  1,  1 }, {  1,  1, -1 },
-      { -1, -1, -1 }, {  1, -1, -1 }, {  1, -1,  1 }, { -1, -1,  1 },
-      {  1, -1, -1 }, {  1,  1, -1 }, {  1,  1,  1 }, {  1, -1,  1 },
-      { -1, -1, -1 }, { -1, -1,  1 }, { -1,  1,  1 }, { -1,  1, -1 },
-    };
-
-  const Vector<glm::vec3> faceNormals
-    {
-      {  0,  0,  1 },
-      {  0,  0, -1 },
-      {  0,  1,  0 },
-      {  0, -1,  0 },
-      {  1,  0,  0 },
-      { -1,  0,  0 },
-    };
-
-  const Vector<GLuint> indices
-    {
-      0,  1,  2,      0,  2,  3,
-      4,  5,  6,      4,  6,  7,
-      8,  9,  10,     8,  10, 11,
-      12, 13, 14,     12, 14, 15,
-      16, 17, 18,     16, 18, 19,
-      20, 21, 22,     20, 22, 23,
-    };
-
-  // Set vertex normals
-  for (size_t i = 0; i < cube.size(); i++)
-  {
-    cube[i].normal[0] = faceNormals[i / 4].x;
-    cube[i].normal[1] = faceNormals[i / 4].y;
-    cube[i].normal[2] = faceNormals[i / 4].z;
-  }
-
-  _voxelInstancedVertexBuffer->SetVertices(cube);
-  _voxelInstancedVertexBuffer->SetIndices(indices);
+  auto voxel_base_mesh = MeshFactory::MakeCube<Mesh3D>(glm::vec3(0, 0, 0), 1.0);
+  _voxelInstancedVertexBuffer->SetVertices(voxel_base_mesh.GetVertices());
+  _voxelInstancedVertexBuffer->SetIndices(voxel_base_mesh.GetIndices());
 }
 
 void Renderer::init_textures()
@@ -745,7 +693,7 @@ void Renderer::shutdown()
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 
-void Renderer::DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels)
+void Renderer::DrawVoxels(const Voxel* voxels, size_t numVoxels)
 {
   if (!_running)
   {

@@ -26,8 +26,9 @@
 #include "windowmanager/glfwwindowevents.hpp"
 #include "imguiRenderer.hpp"
 #include "camera.hpp"
-#include "arvisualizer.hpp"
+#include "voxel.hpp"
 #include "instancedVertexBuffer.hpp"
+
 namespace ar
 {
 
@@ -35,7 +36,7 @@ namespace ar
 typedef VertexP3N3 Vertex3D;
 typedef VertexP2T2 Vertex2D;
 typedef Mesh<Vertex3D> Mesh3D;
-typedef TexturedQuad Mesh2D;
+typedef TexturedMesh<VertexP2T2> Mesh2D;
 
 
 class Renderer
@@ -72,7 +73,7 @@ public:
 
   void RemoveAllMeshes();
 
-  void DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels);
+  void DrawVoxels(const Voxel* voxels, size_t numVoxels);
 
   // Gets the View matrix
   glm::mat4 GetViewMatrix() const
@@ -139,7 +140,7 @@ private:
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
-  Vector<TexturedQuad> _2DMeshes;
+  Vector<Mesh2D> _2DMeshes;
   UniquePtr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
 
   Vector<Mesh3D> _3DMeshes;

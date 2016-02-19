@@ -4,10 +4,12 @@
 #include "color.hpp"
 #include "triangle.hpp"
 #include "quad.hpp"
+#include "box.hpp"
 #include "sphere.hpp"
 #include "capsule.hpp"
 #include "ellipsoid.hpp"
 #include "pointclouddata.hpp"
+#include "voxel.hpp"
 
 namespace ar
 {
@@ -64,10 +66,12 @@ public:
   // Adds an object to the scene
   mesh_handle Add(Triangle triangle);
   mesh_handle Add(Quad quad);
+  mesh_handle Add(Box box);
+  mesh_handle Add(Cube cube);
   mesh_handle Add(Sphere sphere);
   mesh_handle Add(Capsule capsule);
-  mesh_handle Add(PointCloudData pointcloud);
   mesh_handle Add(Ellipsoid ellipsoid);
+  mesh_handle Add(PointCloudData pointcloud);
 
   // Updates an existing scene object
   void Update(mesh_handle handle, Triangle triangle);
@@ -82,13 +86,6 @@ public:
 
   // Removes all objects
   void RemoveAll();
-
-  struct Voxel
-  {
-    float center[3];
-    float color[4];
-    float size;
-  };
 
   void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
 

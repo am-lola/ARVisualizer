@@ -74,10 +74,11 @@ private:
   glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
 };
 
-class TexturedQuad : public Mesh<VertexP2T2>
+template <typename VertexT>
+class TexturedMesh : public Mesh<VertexT>
 {
 public:
-  using Mesh::Mesh;
+  using Mesh<VertexT>::Mesh;
 
   GLuint GetTexture() { return _texture; };
   void SetTexture(GLuint tex) { _texture = tex; };

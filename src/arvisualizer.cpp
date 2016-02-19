@@ -106,7 +106,7 @@ mesh_handle ARVisualizer::Add(Triangle t)
     { t.p3[0], t.p3[1], t.p3[2] }
   };
 
-  return _renderer->Add3DMesh(MeshFactory::MakeTriangle<Vertex3D>(positions), std::make_shared<FlatColorMaterial>(t.color));
+  return _renderer->Add3DMesh(MeshFactory::MakeTriangle<Mesh<Vertex3D>>(positions), std::make_shared<FlatColorMaterial>(t.color));
 }
 
 mesh_handle ARVisualizer::Add(Quad quad)
@@ -115,7 +115,23 @@ mesh_handle ARVisualizer::Add(Quad quad)
   glm::vec3 vCenter = glm::vec3( quad.center[0], quad.center[1], quad.center[2] );
   glm::vec3 vNormal = glm::vec3( quad.normal[0], quad.normal[1], quad.normal[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeQuad<Vertex3D>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
+  return _renderer->Add3DMesh(MeshFactory::MakeQuad<Mesh<Vertex3D>>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
+}
+
+mesh_handle ARVisualizer::Add(Box box)
+{
+  if (!IsRunning()) { return 0; }
+  glm::vec3 vCenter = glm::vec3( box.center[0], box.center[1], box.center[2] );
+
+  return _renderer->Add3DMesh(MeshFactory::MakeBox<Mesh<Vertex3D>>(vCenter, box.sizeX, box.sizeY, box.sizeZ), std::make_shared<FlatColorMaterial>(box.color));
+}
+
+mesh_handle ARVisualizer::Add(Cube cube)
+{
+  if (!IsRunning()) { return 0; }
+  glm::vec3 vCenter = glm::vec3( cube.center[0], cube.center[1], cube.center[2] );
+
+  return _renderer->Add3DMesh(MeshFactory::MakeCube<Mesh<Vertex3D>>(vCenter, cube.size), std::make_shared<FlatColorMaterial>(cube.color));
 }
 
 mesh_handle ARVisualizer::Add(Sphere sphere)
@@ -123,7 +139,7 @@ mesh_handle ARVisualizer::Add(Sphere sphere)
   if (!IsRunning()) { return 0; }
   glm::vec3 vCenter = glm::vec3( sphere.center[0], sphere.center[1], sphere.center[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeUVSphere<Vertex3D>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
+  return _renderer->Add3DMesh(MeshFactory::MakeUVSphere<Mesh<Vertex3D>>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
 }
 
 mesh_handle ARVisualizer::Add(Capsule capsule)
@@ -132,7 +148,7 @@ mesh_handle ARVisualizer::Add(Capsule capsule)
   glm::vec3 vCenter1 = glm::vec3( capsule.center1[0], capsule.center1[1], capsule.center1[2] );
   glm::vec3 vCenter2 = glm::vec3( capsule.center2[0], capsule.center2[1], capsule.center2[2] );
 
-  return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
+  return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Mesh<Vertex3D>>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
 }
 
 mesh_handle ARVisualizer::Add(Ellipsoid ellipsoid)
@@ -140,7 +156,7 @@ mesh_handle ARVisualizer::Add(Ellipsoid ellipsoid)
   if (!IsRunning()) { return 0; }
   glm::vec3 vCenter = glm::vec3( ellipsoid.center[0], ellipsoid.center[1], ellipsoid.center[2] );
 
-  Mesh<Vertex3D> mesh = MeshFactory::MakeUVSphere<Vertex3D>(vCenter, ellipsoid.radius, UVSPHERE_RESOLUTION);
+  Mesh<Vertex3D> mesh = MeshFactory::MakeUVSphere<Mesh<Vertex3D>>(vCenter, ellipsoid.radius, UVSPHERE_RESOLUTION);
 
   float* t = ellipsoid.transform;
 
@@ -180,7 +196,7 @@ void ARVisualizer::Update(mesh_handle handle, Triangle t)
     { t.p3[0], t.p3[1], t.p3[2] }
   };
 
-  return _renderer->Update(handle, MeshFactory::MakeTriangle<Vertex3D>(positions), std::make_shared<FlatColorMaterial>(t.color));
+  return _renderer->Update(handle, MeshFactory::MakeTriangle<Mesh<Vertex3D>>(positions), std::make_shared<FlatColorMaterial>(t.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Quad quad)
@@ -189,7 +205,7 @@ void ARVisualizer::Update(mesh_handle handle, Quad quad)
   glm::vec3 vCenter = glm::vec3( quad.center[0], quad.center[1], quad.center[2] );
   glm::vec3 vNormal = glm::vec3( quad.normal[0], quad.normal[1], quad.normal[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeQuad<Vertex3D>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
+  return _renderer->Update(handle, MeshFactory::MakeQuad<Mesh<Vertex3D>>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Sphere sphere)
@@ -197,7 +213,7 @@ void ARVisualizer::Update(mesh_handle handle, Sphere sphere)
   if (!IsRunning()) { return; }
   glm::vec3 vCenter = glm::vec3( sphere.center[0], sphere.center[1], sphere.center[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeUVSphere<Vertex3D>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
+  return _renderer->Update(handle, MeshFactory::MakeUVSphere<Mesh<Vertex3D>>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Capsule capsule)
@@ -206,7 +222,7 @@ void ARVisualizer::Update(mesh_handle handle, Capsule capsule)
   glm::vec3 vCenter1 = glm::vec3( capsule.center1[0], capsule.center1[1], capsule.center1[2] );
   glm::vec3 vCenter2 = glm::vec3( capsule.center2[0], capsule.center2[1], capsule.center2[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
+  return _renderer->Update(handle, MeshFactory::MakeCapsule<Mesh<Vertex3D>>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Ellipsoid ellipsoid)
@@ -214,7 +230,7 @@ void ARVisualizer::Update(mesh_handle handle, Ellipsoid ellipsoid)
   if (!IsRunning()) { return; }
   glm::vec3 vCenter = glm::vec3( ellipsoid.center[0], ellipsoid.center[1], ellipsoid.center[2] );
 
-  Mesh<Vertex3D> mesh = MeshFactory::MakeUVSphere<Vertex3D>(vCenter, ellipsoid.radius, UVSPHERE_RESOLUTION);
+  Mesh<Vertex3D> mesh = MeshFactory::MakeUVSphere<Mesh<Vertex3D>>(vCenter, ellipsoid.radius, UVSPHERE_RESOLUTION);
 
   float* t = ellipsoid.transform;
 
@@ -247,7 +263,7 @@ void ARVisualizer::RemoveAll()
   _renderer->RemoveAllMeshes();
 }
 
-void ARVisualizer::DrawVoxels(const ARVisualizer::Voxel* voxels, unsigned long numVoxels)
+void ARVisualizer::DrawVoxels(const Voxel* voxels, unsigned long numVoxels)
 {
   if (!IsRunning()) { return; }
   _renderer->DrawVoxels(voxels, numVoxels);

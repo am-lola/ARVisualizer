@@ -23,15 +23,14 @@ int main(void)
 
    // Quads are built from a position, a normal, and width/height
    float quadCenter1[3] = {-0.5, 0.0, 2.0 };
-   float quadNormal1[3] = { 1.0, 0.0,-1.0 };
+   float quadNormal1[3] = { 0.0, 0.0,-1.0 };
 
    ar::Quad quad1 = ar::Quad(quadCenter1, quadNormal1, 1.0f, 1.5f, ar::Color( 0.5, 0.5, 0.25, 1.0 ));
 
   float quadCenter2[3] = { 0.5, 0.0, 2.0 };
-  float quadNormal2[3] = { 0.0, 1.0,-1.0 };
+  float quadNormal2[3] = { 0.0, 0.0,-1.0 };
 
-  ar::Quad quad2 = ar::Quad(quadCenter2, quadNormal2, 0.5f, 0.5f, ar::Color( 0.25, 0.0, 0.25, 0.5 ));
-
+  ar::Quad quad2 = ar::Quad(quadCenter2, quadNormal2, 0.5f, 0.5f, ar::Color( 0.5, 0.0, 0.5, 1.0 ));
 
    // Triangles are specified by three points in space
   float triVertices1[9] = {
@@ -61,6 +60,14 @@ int main(void)
 
   ar::Capsule capsule = ar::Capsule(capsuleCenter1, capsuleCenter2, 1.0, ar::Color( 0.1, 0.8, 0.3, 1.0 ));
 
+   // Cubes just need a position and a size
+  float cubeCenter[3] = { -2.5, 2.0, 6.0 };
+  ar::Cube cube = ar::Cube(cubeCenter, 1.5, ar::Color( 1.0, 1.0, 0.0 ));
+
+   // Boxes are like cubes, but can have different dimensions along each axis
+  float boxCenter[3] = { 0, -1.5, 5.0 };
+  ar::Box box = ar::Box(boxCenter, 1.5, 3.5, 0.25, ar::Color( 0.5, 0.2, 0.8));
+
   // tell the visualizer about our fancy new shapes
   visualizer->Add(capsule);
   visualizer->Add(sphere);
@@ -68,6 +75,8 @@ int main(void)
   visualizer->Add(quad2);
   visualizer->Add(tri1);
   visualizer->Add(tri2);
+  visualizer->Add(cube);
+  visualizer->Add(box);
 
   // Keep rendering until the user wants to quit
   std::cout << "Press enter to exit..." << std::endl;
