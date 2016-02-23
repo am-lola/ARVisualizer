@@ -1,10 +1,6 @@
 #include "Renderer.hpp"
-// #include "mesh/vertex.hpp"
-// #include "mesh/mesh.hpp"
 #include "mesh/MeshFactory.hpp"
 #include "common.hpp"
-//
-// #include <imgui.h>
 
 namespace ar
 {
@@ -17,12 +13,12 @@ Renderer::Renderer(GLFWwindow* window)
 
   _windowEvents.GetFrameBufferResizedDelegate() += [this](int w, int h)
   {
-    this->onWindowResized(w, h);
+    this->OnWindowResized(w, h);
   };
 
   _windowEvents.GetWindowResizedDelegate() += [this](int w, int h)
   {
-    this->onFramebufferResized(w, h);
+    this->OnFramebufferResized(w, h);
   };
 
   // Listen for keyboard input
@@ -81,9 +77,9 @@ void Renderer::Start()
   std::condition_variable init_complete;
   _renderThread = std::thread([this, &init_complete]()
   {
-    this->init();
+    this->Init();
     init_complete.notify_all();
-    this->render();
+    this->Render();
   });
 
   // wait for initialization to finish before returning
@@ -274,12 +270,12 @@ void Renderer::UpdateProjection()
   }
 }
 
-void Renderer::init()
+void Renderer::Init()
 {
   MutexLockGuard guard(_mutex);
 
   // setup OpenGL context and open a window for rendering
-  init_GL();
+  Init_GL();
 
   // init buffers
   _2DMeshBuffer = UniquePtr<VertexBuffer<Vertex2D>>(new VertexBuffer<Vertex2D>());
@@ -293,10 +289,10 @@ void Renderer::init()
   _voxelShader.loadAndLink(ShaderSources::sh_voxel_vert, ShaderSources::sh_voxel_frag);
 
   // setup default goemetry needed for rendering and send it to OpenGL
-  init_geometry();
+  Init_geometry();
 
   // generate texture handles and allocate space for default textures
-  init_textures();
+  Init_textures();
 
   _imguiRenderer.Init();
 
@@ -304,7 +300,7 @@ void Renderer::init()
   _running = true;
 }
 
-void Renderer::init_GL()
+void Renderer::Init_GL()
 {
   // bind GL context to this thread
   glfwMakeContextCurrent(_window);
@@ -316,7 +312,7 @@ void Renderer::init_GL()
   glPointSize(5.0f);
 }
 
-void Renderer::init_geometry()
+void Renderer::Init_geometry()
 {
   Mesh2D videoPane = MeshFactory::MakeQuad<Mesh2D>(glm::vec2(0, 0), 2.0, 2.0); // vertices range from -1..1
   videoPane.SetShader(&_videoShader);
@@ -327,7 +323,7 @@ void Renderer::init_geometry()
   _voxelInstancedVertexBuffer->SetIndices(voxel_base_mesh.GetIndices());
 }
 
-void Renderer::init_textures()
+void Renderer::Init_textures()
 {
     // initialize video texture to be the same size as our window
     _videoWidth = _windowWidth; _videoHeight = _windowHeight;
@@ -339,24 +335,24 @@ void Renderer::init_textures()
 
     GLuint videoTexture;
     glGenTextures(1, &videoTexture);
-    bufferTexture(_videoWidth, _videoHeight, videoTexture, _currentVideoFrame.get());
+    BufferTexture(_videoWidth, _videoHeight, videoTexture, _currentVideoFrame.get());
 
     _2DMeshes[0].SetTexture(videoTexture); /// TODO: Don't do this...
 }
 
-void Renderer::onWindowResized(int newWidth, int newHeight)
+void Renderer::OnWindowResized(int newWidth, int newHeight)
 {
   _windowWidth = newWidth;
   _windowHeight = newHeight;
 }
 
-void Renderer::onFramebufferResized(int newWidth, int newHeight)
+void Renderer::OnFramebufferResized(int newWidth, int newHeight)
 {
   glViewport(0, 0, newWidth, newHeight);
   UpdateProjection();
 }
 
-void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
+void Renderer::BufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
 {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex);
@@ -380,7 +376,7 @@ void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* p
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Renderer::enableRenderPass(RenderPassParams pass)
+void Renderer::EnableRenderPass(RenderPassParams pass)
 {
   // Enable Depth if set, otherwise ensure it's disabled
   if (pass & EnableDepth)
@@ -416,25 +412,25 @@ void Renderer::enableRenderPass(RenderPassParams pass)
   }
 }
 
-void Renderer::render()
+void Renderer::Render()
 {
   while (_running)
   {
     // check for new meshes, video data, etc.
-    update();
+    Update();
 
     // Render!
-    renderOneFrame();
+    RenderOneFrame();
 
     glfwSwapBuffers(_window);
     glfwPollEvents();
   }
 
   // if we've stopped rendering, cleanup
-  shutdown();
+  Shutdown();
 }
 
-void Renderer::update()
+void Renderer::Update()
 {
 
   // TODO: Pass deltaTime
@@ -444,7 +440,7 @@ void Renderer::update()
   if (_newVideoFrame)
   {
     MutexLockGuard guard(_mutex);
-    bufferTexture(_videoWidth, _videoHeight, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
+    BufferTexture(_videoWidth, _videoHeight, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
     _newVideoFrame = false;
   }
 
@@ -549,7 +545,7 @@ void Renderer::update()
   _mutex.unlock();
 }
 
-void Renderer::renderOneFrame()
+void Renderer::RenderOneFrame()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -557,7 +553,7 @@ void Renderer::renderOneFrame()
   * First pass:
   *   render all 2D textured shapes
   *************/
-  enableRenderPass(Blend_None);
+  EnableRenderPass(Blend_None);
   for (auto& m : _2DMeshes)
   {
     const auto& shader = m.GetShader();
@@ -574,7 +570,7 @@ void Renderer::renderOneFrame()
   * Second pass:
   *   render point cloud
   *************/
-  enableRenderPass(Blend_Add);
+  EnableRenderPass(Blend_Add);
   for (auto& cloud : _pointClouds)
   {
     if (cloud.ShouldDraw())
@@ -601,7 +597,7 @@ void Renderer::renderOneFrame()
   if (_voxelInstancedVertexBuffer->InstanceCount() > 0)
   {
     ShaderProgram& shader = _voxelShader;
-    enableRenderPass(Blend_None | EnableDepth);
+    EnableRenderPass(Blend_None | EnableDepth);
     shader.enable();
 
     glm::mat4 modelTransform = glm::mat4(1.0f);
@@ -622,7 +618,7 @@ void Renderer::renderOneFrame()
   * Third pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  enableRenderPass(Blend_Add);
+  EnableRenderPass(Blend_Add);
   for (auto& m : _3DMeshes)
   {
     const auto& shader = m.GetShader();
@@ -646,12 +642,12 @@ void Renderer::renderOneFrame()
   glUseProgram(0);
 
   // Render GUI last
-  renderGUI();
+  RenderGUI();
 }
 
 static std::mutex _renderGUILock;
 
-void Renderer::renderGUI()
+void Renderer::RenderGUI()
 {
   // Still need to lock here to prevent a crash when switching focus between windows.
   MutexLockGuard guard(_renderGUILock);
@@ -674,7 +670,7 @@ void Renderer::renderGUI()
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
 }
 
-void Renderer::shutdown()
+void Renderer::Shutdown()
 {
   // Clean up any textures still in use
   for (auto m : _2DMeshes)

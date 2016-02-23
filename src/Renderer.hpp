@@ -101,12 +101,6 @@ public:
       UpdateProjection();
   }
 
-  // Updates projection as needed when the window changes size
-  void onWindowResized(int newWidth, int newHeight);
-
-  // Updates the GL viewport when the framebuffer changes size
-  void onFramebufferResized(int newWidth, int newHeight);
-
 private:
   std::atomic_bool _running {false};
 
@@ -121,6 +115,7 @@ private:
 
   std::thread _renderThread;
 
+    /// TODO: Move this to Camera class
   struct camera_parms {
       float fov          = 45.0f;  // field of view, in degrees
       float nearClip     = 0.1f;   // distance to near clipping plane
@@ -154,43 +149,63 @@ private:
   ShaderProgram _voxelShader;
   UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
 
+  // Generates a unique ID used to reference meshes from external components
   unsigned int GenerateMeshHandle();
 
   // Regenerates projection matrix
   void UpdateProjection();
 
+  // ! Call from _renderThread only
+  // Updates projection as needed when the window changes size
+  void OnWindowResized(int newWidth, int newHeight);
+
+  // ! Call from _renderThread only
+  // Updates the GL viewport when the framebuffer changes size
+  void OnFramebufferResized(int newWidth, int newHeight);
+
+  // ! Call from _renderThread only
   // Sets up the OpenGL context & initializes data needed for rendering
-  void init();
+  void Init();
 
+  // ! Call from _renderThread only
   // handles OpenGL context binding and default rendering settings
-  void init_GL();
+  void Init_GL();
 
+  // ! Call from _renderThread only
   // sets up vertex data for objects we know we need (e.g. a plane to render the video on)
-  void init_geometry();   /// TODO: Move this to another class
+  void Init_geometry();   /// TODO: Move this to another class
 
+  // ! Call from _renderThread only
   // allocates and initializes default textures
-  void init_textures();   /// TODO: Move this to another class
+  void Init_textures();   /// TODO: Move this to another class
 
+  // ! Call from _renderThread only
   // sends the data in pixels to the texture unit on the GPU referenced by tex
-  void bufferTexture(int width, int height, GLuint tex, unsigned char* pixels);
+  void BufferTexture(int width, int height, GLuint tex, unsigned char* pixels);
 
+  // ! Call from _renderThread only
   // Prepares OpenGL state for rendering with the given parameters
-  void enableRenderPass(RenderPassParams pass);
+  void EnableRenderPass(RenderPassParams pass);
 
+  // ! Call from _renderThread only
   // the main render loop
-  void render();
+  void Render();
 
+  // ! Call from _renderThread only
   // checks for new mesh data, video data, meshes which should be deleted, etc.
-  void update();
+  void Update();
 
+  // ! Call from _renderThread only
   // renders just one frame
-  void renderOneFrame();
+  void RenderOneFrame();
 
+  // ! Call from _renderThread only
   // renders the GUI
-  void renderGUI();
+  void RenderGUI();
 
+  // ! Call from _renderThread only
   // Final cleanup which needs to be done (from the render thread) when we stop rendering
-  void shutdown();
+  void Shutdown();
 
 };
 
