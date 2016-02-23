@@ -76,6 +76,8 @@ public:
   // Updates an existing scene object
   void Update(mesh_handle handle, Triangle triangle);
   void Update(mesh_handle handle, Quad quad);
+  void Update(mesh_handle handle, Box box);
+  void Update(mesh_handle handle, Cube cube);
   void Update(mesh_handle handle, Sphere sphere);
   void Update(mesh_handle handle, Capsule capsule);
   void Update(mesh_handle handle, Ellipsoid ellipsoid);

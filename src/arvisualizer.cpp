@@ -208,6 +208,22 @@ void ARVisualizer::Update(mesh_handle handle, Quad quad)
   return _renderer->Update(handle, MeshFactory::MakeQuad<Mesh<Vertex3D>>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
 }
 
+void ARVisualizer::Update(mesh_handle handle, Box box)
+{
+  if (!IsRunning()) { return; }
+  glm::vec3 vCenter = glm::vec3( box.center[0], box.center[1], box.center[2] );
+
+  return _renderer->Update(handle, MeshFactory::MakeBox<Mesh<Vertex3D>>(vCenter, box.sizeX, box.sizeY, box.sizeZ), std::make_shared<FlatColorMaterial>(box.color));
+}
+
+void ARVisualizer::Update(mesh_handle handle, Cube cube)
+{
+  if (!IsRunning()) { return; }
+  glm::vec3 vCenter = glm::vec3( cube.center[0], cube.center[1], cube.center[2] );
+
+  return _renderer->Update(handle, MeshFactory::MakeCube<Mesh<Vertex3D>>(vCenter, cube.size), std::make_shared<FlatColorMaterial>(cube.color));
+}
+
 void ARVisualizer::Update(mesh_handle handle, Sphere sphere)
 {
   if (!IsRunning()) { return; }
