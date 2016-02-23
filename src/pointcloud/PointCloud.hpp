@@ -49,11 +49,8 @@ public:
 
   VertexBufferType* GetVertexBuffer() { return _vertexBuffer.get(); }
 
-  glm::mat4 GetTransform() const
-  {
-    // Quick&Dirty adjusting the transformation for Asus Xtion
-    return glm::orientate4(glm::vec3(glm::radians(12.0f), glm::radians(180.0f), 0.0f));
-  }
+  glm::mat4 GetTransform() const  { return _transform; }
+  void SetTransform(glm::mat4 transform) { _transform = transform; }
 
   void SetPoints(const VertexType* points, size_t numPoints)
   {
@@ -151,7 +148,7 @@ private:
   Vector<VertexType> _newPoints;
   size_t _numPoints = 0;
   ShaderProgram* _shaderProgram;
-
+  glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
   UniquePtr<VertexBufferType> _vertexBuffer;
 
   bool _shouldDraw = true;

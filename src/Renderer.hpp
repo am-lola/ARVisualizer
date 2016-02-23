@@ -70,6 +70,8 @@ public:
 
   void Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material);
 
+  void UpdateTransform(unsigned int handle, glm::mat4 transform, bool absolute);
+
   void RemoveMesh(unsigned int handle);
 
   void RemoveAllMeshes();

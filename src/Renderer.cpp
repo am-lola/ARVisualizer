@@ -199,6 +199,54 @@ void Renderer::Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> mate
   _new3DMeshes.push_back(mesh);
 }
 
+void Renderer::UpdateTransform(unsigned int handle, glm::mat4 transform, bool absolute)
+{
+  if (handle == 0) { return; }
+  MutexLockGuard guard(_mutex);
+  for (auto& m : _3DMeshes)
+  {
+    if (m.ID() == handle)
+    {
+      if (absolute)
+      {
+        m.SetTransform(transform);
+      }
+      else
+      {
+        m.SetTransform(transform * m.GetTransform());
+      }
+    }
+  }
+  for (auto& m : _new3DMeshes)
+  {
+    if (m.ID() == handle)
+    {
+      if (absolute)
+      {
+        m.SetTransform(transform);
+      }
+      else
+      {
+        m.SetTransform(transform * m.GetTransform());
+      }
+    }
+  }
+  for (auto& c : _pointClouds)
+  {
+    if (c.ID() == handle)
+    {
+      if (absolute)
+      {
+        c.SetTransform(transform);
+      }
+      else
+      {
+        c.SetTransform(transform * c.GetTransform());
+      }
+    }
+  }
+}
+
 void Renderer::RemoveMesh(unsigned int handle)
 {
   if (handle == 0) { return; } // zero is reserved as a non-unique default ID

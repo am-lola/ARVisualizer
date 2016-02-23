@@ -269,6 +269,19 @@ void ARVisualizer::Update(mesh_handle handle, PointCloudData pointcloud)
   _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints);
 }
 
+void ARVisualizer::Transform(mesh_handle handle, ar::Transform transform, bool absolute)
+{
+  if (!IsRunning()) { return; }
+  glm::mat4 transformMat = glm::mat4(
+    transform.rotation[0][0], transform.rotation[1][0], transform.rotation[2][0], 0,
+    transform.rotation[0][1], transform.rotation[1][1], transform.rotation[2][1], 0,
+    transform.rotation[0][2], transform.rotation[1][2], transform.rotation[2][2], 0,
+    transform.translation[0], transform.translation[1], transform.translation[2], 1
+  );
+
+  _renderer->UpdateTransform(handle, transformMat, absolute);
+}
+
 void ARVisualizer::Remove(mesh_handle handle)
 {
   if (!IsRunning()) { return; }

@@ -2,6 +2,7 @@
 #define _ARVISUALIZER_H
 
 #include "geometry/Color.hpp"
+#include "geometry/Transform.hpp"
 #include "geometry/Triangle.hpp"
 #include "geometry/Quad.hpp"
 #include "geometry/Box.hpp"
@@ -82,6 +83,9 @@ public:
   void Update(mesh_handle handle, Capsule capsule);
   void Update(mesh_handle handle, Ellipsoid ellipsoid);
   void Update(mesh_handle handle, PointCloudData pointcloud);
+
+  // Transforms an existing scene object
+  void Transform(mesh_handle handle, ar::Transform transform, bool absolute);
 
   // Removes an object from the scene
   void Remove(mesh_handle handle);
