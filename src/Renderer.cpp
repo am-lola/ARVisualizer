@@ -5,6 +5,9 @@
 namespace ar
 {
 
+// used to synchronize between all active rendering threads to work around IMGUI not playing nice with threads
+std::mutex Renderer::_renderGUILock;
+
 Renderer::Renderer(GLFWwindow* window)
   : _windowEvents(window), _imguiRenderer(window), _camera(_windowEvents)
 {
@@ -644,8 +647,6 @@ void Renderer::RenderOneFrame()
   // Render GUI last
   RenderGUI();
 }
-
-static std::mutex _renderGUILock;
 
 void Renderer::RenderGUI()
 {

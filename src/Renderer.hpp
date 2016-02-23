@@ -104,7 +104,11 @@ public:
 private:
   std::atomic_bool _running {false};
 
+  // used to synchronize between rendering thread and other threads contributing data and commands
   std::mutex _mutex;
+
+  // used to synchronize between all active rendering threads to work around IMGUI not playing nice with threads
+  static std::mutex _renderGUILock;
 
   GLFWWindowEvents _windowEvents;
   GLFWwindow* _window;
