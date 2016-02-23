@@ -13,7 +13,7 @@ namespace ar
     float radius;
     Color color;
 
-    Ellipsoid(float* center, float* transform, float radius) : color()
+    Ellipsoid(double* center, double* transform, double radius) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -28,7 +28,7 @@ namespace ar
     }
 
 
-    Ellipsoid(float* center, float* transform, float radius, Color color)
+    Ellipsoid(double* center, double* transform, double radius, Color color)
     {
       for (int i = 0; i < 3; i++)
       {

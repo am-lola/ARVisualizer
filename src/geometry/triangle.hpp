@@ -14,7 +14,7 @@ namespace ar
     Color color;
 
     // Creates a triangle. Expects vertex_positions in the order: x1, y1, z1, x2, y2, z2, ...
-    Triangle(float* vertex_positions) : color()
+    Triangle(double* vertex_positions) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -25,7 +25,7 @@ namespace ar
     }
 
     // Creates a triangle. Points are expected to be ordered: x, y, z
-    Triangle(float p1[3], float p2[3], float p3[3]) : color()
+    Triangle(double p1[3], double p2[3], double p3[3]) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -36,7 +36,7 @@ namespace ar
     }
 
     // Creates a triangle. Expects vertex_positions in the order: x1, y1, z1, x2, y2, z2, ...
-    Triangle(float* vertex_positions, Color color)
+    Triangle(double* vertex_positions, Color color)
     {
       this->color = color;
 
