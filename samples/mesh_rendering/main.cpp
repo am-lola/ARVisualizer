@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "arvisualizer.hpp"
+#include "ARVisualizer.hpp"
 
 /*
   A small sample application to show basic usage of ARVisualizer

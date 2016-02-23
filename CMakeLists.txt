@@ -32,18 +32,18 @@ if (ARVIS_BUILD_LIBRARY)
 
     set(CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++")
     file(GLOB libarvis_src
-        src/arvisualizer.*pp
-        src/renderer.*pp
-        src/imguiRenderer.*pp
-        src/loadShaders.*pp
+        src/ARVisualizer.*pp
+        src/Renderer.*pp
+        src/ImguiRenderer.*pp
+        src/LoadShaders.*pp
         src/ShaderProgram.*pp
-        src/material.*pp
-        src/camera.*pp
-        src/mesh/mesh.*pp
-        src/mesh/meshfactory.*pp
-        src/windowmanager/windowmanager.*pp
-        src/windowmanager/windowevents.*pp
-        src/windowmanager/glfwwindowevents.*pp
+        src/Material.*pp
+        src/Camera.*pp
+        src/mesh/Mesh.*pp
+        src/mesh/MeshFactory.*pp
+        src/windowmanager/WindowManager.*pp
+        src/windowmanager/WindowEvents.*pp
+        src/windowmanager/GLFWWindowEvents.*pp
         extern/imgui/imgui.cpp
         extern/imgui/imgui_draw.cpp
         extern/imgui/imgui_demo.cpp
@@ -73,19 +73,19 @@ if (ARVIS_BUILD_LIBRARY)
       LIBRARY DESTINATION ${lib_install_dir}
     )
     install(FILES
-      src/arvisualizer.hpp
+      src/ARVisualizer.hpp
       DESTINATION ${include_install_dir}
     )
     install(FILES
-      src/geometry/box.hpp
-      src/geometry/capsule.hpp
-      src/geometry/color.hpp
-      src/geometry/ellipsoid.hpp
-      src/geometry/pointclouddata.hpp
-      src/geometry/quad.hpp
-      src/geometry/sphere.hpp
-      src/geometry/triangle.hpp
-      src/geometry/voxel.hpp
+      src/geometry/Box.hpp
+      src/geometry/Capsule.hpp
+      src/geometry/Color.hpp
+      src/geometry/Ellipsoid.hpp
+      src/geometry/PointCloudData.hpp
+      src/geometry/Quad.hpp
+      src/geometry/Sphere.hpp
+      src/geometry/Triangle.hpp
+      src/geometry/Voxel.hpp
       DESTINATION ${include_install_dir}/geometry/
     )
     install(FILES

@@ -1,7 +1,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
-#include "arvisualizer.hpp"
+#include "ARVisualizer.hpp"
 
 ar::ARVisualizer* visualizer;
 ar::PointCloudData pointCloud(ar::PCL_PointXYZ);

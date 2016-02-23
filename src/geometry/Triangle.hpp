@@ -1,7 +1,7 @@
 #ifndef _ARTRIANGLE_H
 #define _ARTRIANGLE_H
 
-#include "color.hpp"
+#include "Color.hpp"
 
 namespace ar
 {

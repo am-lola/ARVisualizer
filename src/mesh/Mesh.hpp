@@ -2,9 +2,10 @@
 #define _MESH_H
 #include <vector>
 #include <memory>
+
 #include "ShaderProgram.hpp"
-#include "material.hpp"
-#include "vertex.hpp"
+#include "Material.hpp"
+#include "Vertex.hpp"
 #include "common.hpp"
 
 namespace ar

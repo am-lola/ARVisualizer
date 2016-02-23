@@ -2,10 +2,10 @@
 #define _POINTCLOUD_H
 
 #include "ShaderProgram.hpp"
-#include "material.hpp"
-#include "mesh/vertex.hpp"
+#include "Material.hpp"
+#include "mesh/Vertex.hpp"
 #include "common.hpp"
-#include "pointCloudVertexBuffer.hpp"
+#include "PointCloudVertexBuffer.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>

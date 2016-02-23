@@ -1,7 +1,7 @@
 #ifndef _ARSPHERE_H
 #define _ARSPHERE_H
 
-#include "color.hpp"
+#include "Color.hpp"
 
 namespace ar
 {

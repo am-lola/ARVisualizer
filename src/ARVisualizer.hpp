@@ -1,15 +1,15 @@
 #ifndef _ARVISUALIZER_H
 #define _ARVISUALIZER_H
 
-#include "geometry/color.hpp"
-#include "geometry/triangle.hpp"
-#include "geometry/quad.hpp"
-#include "geometry/box.hpp"
-#include "geometry/sphere.hpp"
-#include "geometry/capsule.hpp"
-#include "geometry/ellipsoid.hpp"
-#include "geometry/pointclouddata.hpp"
-#include "geometry/voxel.hpp"
+#include "geometry/Color.hpp"
+#include "geometry/Triangle.hpp"
+#include "geometry/Quad.hpp"
+#include "geometry/Box.hpp"
+#include "geometry/Sphere.hpp"
+#include "geometry/Capsule.hpp"
+#include "geometry/Ellipsoid.hpp"
+#include "geometry/PointCloudData.hpp"
+#include "geometry/Voxel.hpp"
 
 namespace ar
 {

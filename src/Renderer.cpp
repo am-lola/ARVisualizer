@@ -1,11 +1,10 @@
-#include "renderer.hpp"
-#include "mesh/vertex.hpp"
-#include "mesh/mesh.hpp"
-#include "mesh/meshfactory.hpp"
-#include "windowmanager/windowmanager.hpp"
+#include "Renderer.hpp"
+// #include "mesh/vertex.hpp"
+// #include "mesh/mesh.hpp"
+#include "mesh/MeshFactory.hpp"
 #include "common.hpp"
-
-#include <imgui.h>
+//
+// #include <imgui.h>
 
 namespace ar
 {

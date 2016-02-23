@@ -1,7 +1,7 @@
 #ifndef _ARQUAD_H
 #define _ARQUAD_H
 
-#include "color.hpp"
+#include "Color.hpp"
 
 namespace ar
 {

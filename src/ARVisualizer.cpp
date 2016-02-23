@@ -1,7 +1,7 @@
-#include "arvisualizer.hpp"
-#include "renderer.hpp"
-#include "mesh/meshfactory.hpp"
-#include "windowmanager/windowmanager.hpp"
+#include "ARVisualizer.hpp"
+#include "Renderer.hpp"
+#include "mesh/MeshFactory.hpp"
+#include "windowmanager/WindowManager.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
 namespace ar

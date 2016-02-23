@@ -1,7 +1,7 @@
 // ImGui GLFW3 binding with OpenGL3 + shaders. Adapted from imgui_impl_glfw_gl3.cpp.
 // https://github.com/ocornut/imgui
 
-#include "imguiRenderer.hpp"
+#include "ImguiRenderer.hpp"
 #include "common.hpp"
 #include <mutex>
 

@@ -1,7 +1,7 @@
 #ifndef _ARCAPSULE_H
 #define _ARCAPSULE_H
 
-#include "color.hpp"
+#include "Color.hpp"
 
 namespace ar
 {

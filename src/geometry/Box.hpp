@@ -1,7 +1,7 @@
 #ifndef _ARBOX_H
 #define _ARBOX_H
 
-#include "color.hpp"
+#include "Color.hpp"
 
 namespace ar
 {

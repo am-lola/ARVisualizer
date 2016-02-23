@@ -1,4 +1,4 @@
-#include "windowmanager.hpp"
+#include "WindowManager.hpp"
 
 namespace ar
 {

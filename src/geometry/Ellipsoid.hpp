@@ -1,7 +1,7 @@
 #ifndef _ARELLIPSOID_H
 #define _ARELLIPSOID_H
 
-#include "color.hpp"
+#include "Color.hpp"
 
 namespace ar
 {

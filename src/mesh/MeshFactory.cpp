@@ -1,9 +1,10 @@
-#include "meshfactory.hpp"
+#include "MeshFactory.hpp"
 #include <vector>
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/string_cast.hpp>
+
 namespace ar
 {
 
