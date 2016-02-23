@@ -196,7 +196,7 @@ void ARVisualizer::Update(mesh_handle handle, Triangle t)
     { t.p3[0], t.p3[1], t.p3[2] }
   };
 
-  return _renderer->Update(handle, MeshFactory::MakeTriangle<Mesh<Vertex3D>>(positions), std::make_shared<FlatColorMaterial>(t.color));
+  _renderer->Update(handle, MeshFactory::MakeTriangle<Mesh<Vertex3D>>(positions), std::make_shared<FlatColorMaterial>(t.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Quad quad)
@@ -205,7 +205,7 @@ void ARVisualizer::Update(mesh_handle handle, Quad quad)
   glm::vec3 vCenter = glm::vec3( quad.center[0], quad.center[1], quad.center[2] );
   glm::vec3 vNormal = glm::vec3( quad.normal[0], quad.normal[1], quad.normal[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeQuad<Mesh<Vertex3D>>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
+  _renderer->Update(handle, MeshFactory::MakeQuad<Mesh<Vertex3D>>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Box box)
@@ -213,7 +213,7 @@ void ARVisualizer::Update(mesh_handle handle, Box box)
   if (!IsRunning()) { return; }
   glm::vec3 vCenter = glm::vec3( box.center[0], box.center[1], box.center[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeBox<Mesh<Vertex3D>>(vCenter, box.sizeX, box.sizeY, box.sizeZ), std::make_shared<FlatColorMaterial>(box.color));
+  _renderer->Update(handle, MeshFactory::MakeBox<Mesh<Vertex3D>>(vCenter, box.sizeX, box.sizeY, box.sizeZ), std::make_shared<FlatColorMaterial>(box.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Cube cube)
@@ -221,7 +221,7 @@ void ARVisualizer::Update(mesh_handle handle, Cube cube)
   if (!IsRunning()) { return; }
   glm::vec3 vCenter = glm::vec3( cube.center[0], cube.center[1], cube.center[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeCube<Mesh<Vertex3D>>(vCenter, cube.size), std::make_shared<FlatColorMaterial>(cube.color));
+  _renderer->Update(handle, MeshFactory::MakeCube<Mesh<Vertex3D>>(vCenter, cube.size), std::make_shared<FlatColorMaterial>(cube.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Sphere sphere)
@@ -229,7 +229,7 @@ void ARVisualizer::Update(mesh_handle handle, Sphere sphere)
   if (!IsRunning()) { return; }
   glm::vec3 vCenter = glm::vec3( sphere.center[0], sphere.center[1], sphere.center[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeUVSphere<Mesh<Vertex3D>>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
+  _renderer->Update(handle, MeshFactory::MakeUVSphere<Mesh<Vertex3D>>(vCenter, sphere.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(sphere.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Capsule capsule)
@@ -238,7 +238,7 @@ void ARVisualizer::Update(mesh_handle handle, Capsule capsule)
   glm::vec3 vCenter1 = glm::vec3( capsule.center1[0], capsule.center1[1], capsule.center1[2] );
   glm::vec3 vCenter2 = glm::vec3( capsule.center2[0], capsule.center2[1], capsule.center2[2] );
 
-  return _renderer->Update(handle, MeshFactory::MakeCapsule<Mesh<Vertex3D>>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
+  _renderer->Update(handle, MeshFactory::MakeCapsule<Mesh<Vertex3D>>(vCenter1, vCenter2, capsule.radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(capsule.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Ellipsoid ellipsoid)
@@ -259,12 +259,14 @@ void ARVisualizer::Update(mesh_handle handle, Ellipsoid ellipsoid)
   };
 
   mesh.SetTransform(glm::make_mat4(transform));
-  return _renderer->Update(handle, mesh, std::make_shared<FlatColorMaterial>(ellipsoid.color));
+  _renderer->Update(handle, mesh, std::make_shared<FlatColorMaterial>(ellipsoid.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, PointCloudData pointcloud)
 {
-  return _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints);
+  if (!IsRunning()) { return; }
+
+  _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints);
 }
 
 void ARVisualizer::Remove(mesh_handle handle)
