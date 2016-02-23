@@ -3,7 +3,7 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
-#include "color.hpp"
+#include "geometry/color.hpp"
 #include "mesh.hpp"
 
 namespace ar

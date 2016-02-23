@@ -21,13 +21,13 @@
 #include "ShaderProgram.hpp"
 #include "material.hpp"
 #include "mesh/vertexbuffer.hpp"
+#include "mesh/instancedVertexBuffer.hpp"
 #include "mesh/mesh.hpp"
 #include "pointcloud/pointCloud.hpp"
 #include "windowmanager/glfwwindowevents.hpp"
 #include "imguiRenderer.hpp"
 #include "camera.hpp"
-#include "voxel.hpp"
-#include "instancedVertexBuffer.hpp"
+#include "geometry/voxel.hpp"
 
 namespace ar
 {

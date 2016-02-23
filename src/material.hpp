@@ -2,7 +2,7 @@
 #define _MATERIAL_H
 
 #include <vector>
-#include "color.hpp"
+#include "geometry/color.hpp"
 #include "ShaderProgram.hpp"
 
 namespace ar

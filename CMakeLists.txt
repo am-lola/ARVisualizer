@@ -74,8 +74,19 @@ if (ARVIS_BUILD_LIBRARY)
     )
     install(FILES
       src/arvisualizer.hpp
-      src/color.hpp
       DESTINATION ${include_install_dir}
+    )
+    install(FILES
+      src/geometry/box.hpp
+      src/geometry/capsule.hpp
+      src/geometry/color.hpp
+      src/geometry/ellipsoid.hpp
+      src/geometry/pointclouddata.hpp
+      src/geometry/quad.hpp
+      src/geometry/sphere.hpp
+      src/geometry/triangle.hpp
+      src/geometry/voxel.hpp
+      DESTINATION ${include_install_dir}/geometry/
     )
     install(FILES
       "${project_config}"
