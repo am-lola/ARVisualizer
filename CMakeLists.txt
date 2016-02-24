@@ -107,4 +107,8 @@ if (ARVIS_BUILD_SAMPLES)
 
     add_executable(sample_multiple_windows samples/multiple_windows/main.cpp)
     target_link_libraries(sample_multiple_windows arvisualizer)
+
+    add_executable(sample_user_interface samples/user_interface/main.cpp)
+    target_link_libraries(sample_user_interface arvisualizer)
+    set_target_properties(sample_user_interface PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
