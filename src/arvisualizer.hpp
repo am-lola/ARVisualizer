@@ -94,6 +94,7 @@ public:
   void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
 
   IUIWindow* AddUIWindow(const char* name);
+  IUIWindow* AddUIWindow(const char* name, float initialWidth, float initialHeight);
 
 private:
   Renderer* _renderer;

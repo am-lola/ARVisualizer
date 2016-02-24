@@ -7,7 +7,7 @@
 namespace ar
 {
 
-IUIWindow* createUIWindow(const char* name);
+IUIWindow* createUIWindow(const char* name, float initialWidth, float initialHeight);
 
 class UserInterface
 {
@@ -21,9 +21,9 @@ public:
     }
   }
 
-  IUIWindow* AddWindow(const char* name)
+  IUIWindow* AddWindow(const char* name, float initialWidth = 0.0f, float initialHeight = 0.0f)
   {
-    IUIWindow* window = createUIWindow(name);
+    IUIWindow* window = createUIWindow(name, initialWidth, initialHeight);
     _windows.push_back(window);
     return window;
   }

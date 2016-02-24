@@ -200,6 +200,11 @@ IUIWindow* ARVisualizer::AddUIWindow(const char* name)
   return _ui->AddWindow(name);
 }
 
+IUIWindow* ARVisualizer::AddUIWindow(const char* name, float initialWidth, float initialHeight)
+{
+  return _ui->AddWindow(name, initialWidth, initialHeight);
+}
+
 void ARVisualizer::renderExternGUI()
 {
   _ui->draw();

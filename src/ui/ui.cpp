@@ -102,11 +102,21 @@ public:
   std::string _text;
 };
 
-class UISameLine : public UIBaseElement
+class UIAuxiliaryElement : public UIBaseElement
 {
 public:
 
+  enum Type
+  {
+    SameLine,
+    Separator
+  };
+
+  UIAuxiliaryElement(Type type) : _type(type) { }
+
   virtual void draw() override;
+
+  Type _type;
 };
 
 struct UIElement
@@ -121,7 +131,8 @@ class UIWindow : public IUIWindow
 {
 public:
 
-  UIWindow(const char* name) : _name(name) { }
+  UIWindow(const char* name, float initSizeX, float initSizeY)
+    : _name(name), _initSize(initSizeX, initSizeY) { }
   virtual ~UIWindow() { }
 
   virtual ui_element_handle AddButton(const char* label) override;
@@ -147,6 +158,7 @@ public:
   virtual ui_element_handle AddInputText(const char* label) override;
   virtual ui_element_handle AddText(const char* fmt, ...) override;
 
+  virtual void AddSeparator() override;
   virtual void SameLine() override;
 
   virtual bool GetButtonState(ui_element_handle handle) override;
@@ -166,6 +178,9 @@ private:
   {
     MutexLockGuard lockGuard(_mutex);
 
+    if (_initSize.x > 0.0f || _initSize.y > 0.0f)
+      ImGui::SetNextWindowSize(_initSize, ImGuiSetCond_FirstUseEver);
+
     if (!ImGui::Begin(_name.c_str()))
     {
       ImGui::End();
@@ -174,10 +189,11 @@ private:
 
     ImGui::PushItemWidth(-100);
 
-    for (UIElement& el : _elements)
+    for (int handle = 0; handle < (int)_elements.size(); handle++)
     {
-      if (el._element)
-        el._element->draw();
+      ImGui::PushID(handle); // Set the handle as the unique ID for ImGui
+      _elements[handle]._element->draw();
+      ImGui::PopID();
     }
 
     ImGui::PopItemWidth();
@@ -191,14 +207,15 @@ private:
   }
 
   std::string _name;
+  ImVec2 _initSize;
 
   mutable std::mutex _mutex;
   Vector<UIElement> _elements;
 };
 
-IUIWindow* createUIWindow(const char* name)
+IUIWindow* createUIWindow(const char* name, float initialWidth, float initialHeight)
 {
-  return new UIWindow(name);
+  return new UIWindow(name, initialWidth, initialHeight);
 }
 
 void UIButton::draw()
@@ -288,11 +305,18 @@ void UIText::draw()
   ImGui::Text("%s", _text.c_str());
 }
 
-void UISameLine::draw()
+void UIAuxiliaryElement::draw()
 {
-  ImGui::SameLine();
+  switch (_type)
+  {
+    case SameLine:
+      ImGui::SameLine();
+      break;
+    case Separator:
+      ImGui::Separator();
+      break;
+  }
 }
-
 
 
 template <typename T, std::size_t N, UISliderType::Type TType>
@@ -306,8 +330,16 @@ UISlider<T>* constructSlider(const char* label, T min, T max, const T* values)
   slider->_label = label;
   slider->_min = min;
   slider->_max = max;
-  for (size_t i = 0; i < N; i++)
-    slider->_values[i] = values[i];
+  if (values != nullptr)
+  {
+    for (size_t i = 0; i < N; i++)
+      slider->_values[i] = values[i];
+  }
+  else
+  {
+    for (size_t i = 0; i < N; i++)
+      slider->_values[i] = 0;
+  }
 
   return slider;
 };
@@ -324,8 +356,16 @@ UISlider<T>* constructSlider(const char* label, T min, T max, float speed, const
   slider->_min = min;
   slider->_max = max;
   slider->_speed = speed;
-  for (size_t i = 0; i < N; i++)
-    slider->_values[i] = values[i];
+  if (values != nullptr)
+  {
+    for (size_t i = 0; i < N; i++)
+      slider->_values[i] = values[i];
+  }
+  else
+  {
+    for (size_t i = 0; i < N; i++)
+      slider->_values[i] = 0;
+  }
 
   return slider;
 };
@@ -514,6 +554,8 @@ ui_element_handle UIWindow::AddInputText(const char* label)
   return getLastElementHandle();
 }
 
+constexpr int _textBufferSize = 512;
+
 ui_element_handle UIWindow::AddText(const char* fmt, ...)
 {
   MutexLockGuard lockGuard(_mutex);
@@ -523,9 +565,8 @@ ui_element_handle UIWindow::AddText(const char* fmt, ...)
   va_list args;
   va_start(args, fmt);
 
-  auto size = std::vsnprintf(nullptr, 0, fmt, args) + 1;
-  char buf[size];
-  std::vsnprintf(buf, size, fmt, args);
+  char buf[_textBufferSize];
+  std::vsnprintf(buf, _textBufferSize, fmt, args);
   uiText->_text = buf;
   va_end(args);
 
@@ -542,18 +583,24 @@ void UIWindow::UpdateText(ui_element_handle handle, const char* fmt, ...)
   va_list args;
   va_start(args, fmt);
 
-  auto size = std::vsnprintf(nullptr, 0, fmt, args) + 1;
-  char buf[size];
-  std::vsnprintf(buf, size, fmt, args);
+  char buf[_textBufferSize];
+  std::vsnprintf(buf, _textBufferSize, fmt, args);
   uiText->_text = buf;
   va_end(args);
+}
+
+void UIWindow::AddSeparator()
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  _elements.emplace_back(new UIAuxiliaryElement(UIAuxiliaryElement::Separator));
 }
 
 void UIWindow::SameLine()
 {
   MutexLockGuard lockGuard(_mutex);
 
-  _elements.emplace_back(new UISameLine());
+  _elements.emplace_back(new UIAuxiliaryElement(UIAuxiliaryElement::SameLine));
 }
 
 bool UIWindow::GetButtonState(ui_element_handle handle)

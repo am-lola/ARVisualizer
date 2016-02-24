@@ -2,6 +2,8 @@
 #define _UI_H
 
 #include <string>
+#include <iostream>
+#include <cstdarg>
 
 namespace ar
 {
@@ -37,6 +39,7 @@ public:
   virtual ui_element_handle AddInputText(const char* label) = 0;
   virtual ui_element_handle AddText(const char* fmt, ...) = 0;
 
+  virtual void AddSeparator() = 0;
   virtual void SameLine() = 0;
 
   virtual bool GetButtonState(ui_element_handle handle) = 0;
