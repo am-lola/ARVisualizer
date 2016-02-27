@@ -9,6 +9,7 @@
 #include "geometry/Sphere.hpp"
 #include "geometry/Capsule.hpp"
 #include "geometry/Ellipsoid.hpp"
+#include "geometry/Polygon.hpp"
 #include "geometry/PointCloudData.hpp"
 #include "geometry/Voxel.hpp"
 
@@ -67,6 +68,7 @@ public:
   // Adds an object to the scene
   mesh_handle Add(Triangle triangle);
   mesh_handle Add(Quad quad);
+  mesh_handle Add(Polygon polygon);
   mesh_handle Add(Box box);
   mesh_handle Add(Cube cube);
   mesh_handle Add(Sphere sphere);
@@ -77,6 +79,7 @@ public:
   // Updates an existing scene object
   void Update(mesh_handle handle, Triangle triangle);
   void Update(mesh_handle handle, Quad quad);
+  void Update(mesh_handle handle, Polygon polygon);
   void Update(mesh_handle handle, Box box);
   void Update(mesh_handle handle, Cube cube);
   void Update(mesh_handle handle, Sphere sphere);

@@ -21,15 +21,13 @@ int main(void)
     Make some shapes
    *******************/
 
-   // Quads are built from a position, a normal, and width/height
-   double quadCenter1[3] = {-0.5, 0.0, 2.0 };
-   double quadNormal1[3] = { 0.0, 0.0,-1.0 };
-
-   ar::Quad quad1 = ar::Quad(quadCenter1, quadNormal1, 1.0f, 1.5f, ar::Color( 0.5, 0.5, 0.25, 1.0 ));
+  // Quads are built from a position, a normal, and width/height
+  double quadCenter1[3] = {-0.5, 0.0, 2.0 };
+  double quadNormal1[3] = { 0.0, 0.0,-1.0 };
+  ar::Quad quad1 = ar::Quad(quadCenter1, quadNormal1, 1.0f, 1.5f, ar::Color( 0.5, 0.5, 0.25, 1.0 ));
 
   double quadCenter2[3] = { 0.5, 0.0, 2.0 };
   double quadNormal2[3] = { 0.0, 0.0,-1.0 };
-
   ar::Quad quad2 = ar::Quad(quadCenter2, quadNormal2, 0.5f, 0.5f, ar::Color( 0.5, 0.0, 0.5, 1.0 ));
 
    // Triangles are specified by three points in space
@@ -38,7 +36,6 @@ int main(void)
       0.5, 0.25, 2.0,
       0.0, 0.0,  1.0
   };
-
   ar::Triangle tri1 = ar::Triangle(triVertices1, ar::Color( 0.0, 0.5, 0.25, 0.75 ));
 
   double triVertices2[3][3] = {
@@ -46,18 +43,15 @@ int main(void)
     { -0.5, 0.0, 2.0 },
     { 0.5, -0.5, 2.0 }
   };
-
   ar::Triangle tri2 = ar::Triangle(triVertices2[0], triVertices2[1], triVertices2[2], ar::Color( 1.0, 0.5, 0.25, 0.25 ));
 
    // A sphere is specified with just a position and a radius
   double sphereCenter[3] = { 0.0, 0.0, 4.0 };
-
   ar::Sphere sphere = ar::Sphere(sphereCenter, 2.0, ar::Color( 0.6, 0.35, 0.2, 0.7 ));
 
    // Capsules need two positions (one for each end) and a radius
   double capsuleCenter1[3] = { 2.5, 2.0, 6.0 };
   double capsuleCenter2[3] = { 2.0,-1.0, 5.0 };
-
   ar::Capsule capsule = ar::Capsule(capsuleCenter1, capsuleCenter2, 1.0, ar::Color( 0.1, 0.8, 0.3, 1.0 ));
 
    // Cubes just need a position and a size
@@ -68,7 +62,21 @@ int main(void)
   double boxCenter[3] = { 0, -1.5, 5.0 };
   ar::Box box = ar::Box(boxCenter, 1.5, 3.5, 0.25, ar::Color( 0.5, 0.2, 0.8));
 
+  // Polygons can be described with a set of vertex locations (x, y, z, x, y, z, ...)
+  double polypts[24] = { // array length = 3 * vertex_count
+     0.0,-2.0, -4.5,
+    -5.0,-2.0, -5.0,
+    -4.5,-2.0,  0.0,
+    -5.0,-2.0,  5.0,
+     0.0,-2.0,  4.5,
+     5.0,-2.0,  5.0,
+     4.5,-2.0,  0.0,
+     5.0,-2.0, -5.0
+  };
+  ar::Polygon poly = ar::Polygon(polypts, 8, ar::Color(0.2, 0.7, 0));
+
   // tell the visualizer about our fancy new shapes
+  visualizer->Add(poly);
   visualizer->Add(capsule);
   visualizer->Add(sphere);
   visualizer->Add(quad1);

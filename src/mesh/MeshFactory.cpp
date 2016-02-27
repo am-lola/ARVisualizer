@@ -410,6 +410,55 @@ Mesh<VertexP3N3> MeshFactory::MakeCapsule<Mesh<VertexP3N3>>(glm::vec3 center1, g
   return m;
 }
 
+template <>
+Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions)
+{
+  Vector<VertexP3N3> vertices;
+  Vector<GLuint> indices;
+
+  int root = 0;
+  int prev_pos = 1; int prev_idx = 1;
+  int curr_pos = 2; int curr_idx = 2;
+  while (curr_pos < vertexPositions.size())
+  {
+    glm::vec3 normal = glm::cross(glm::normalize(vertexPositions[prev_pos] - vertexPositions[root]),  // generate a uniform normal for each triangle
+                                  glm::normalize(vertexPositions[curr_pos] - vertexPositions[root]));
+
+    if (curr_pos == 2) // root vertex only needs to be added once
+    {
+      vertices.push_back({
+        { vertexPositions[root].x, vertexPositions[root].y, vertexPositions[root].z },
+        { normal.x, normal.y, normal.z }
+      });
+    }
+    indices.push_back(root);
+
+    if (prev_pos == 1) // second vertex will be added as curr_pos in future iterations
+    {
+      vertices.push_back({
+        { vertexPositions[prev_pos].x, vertexPositions[prev_pos].y, vertexPositions[prev_pos].z },
+        { normal.x, normal.y, normal.z }
+      });
+    }
+    indices.push_back(prev_idx);
+
+    vertices.push_back({
+      { vertexPositions[curr_pos].x, vertexPositions[curr_pos].y, vertexPositions[curr_pos].z },
+      { normal.x, normal.y, normal.z }
+    });
+    indices.push_back(curr_idx);
+
+    prev_pos = curr_pos;
+    curr_pos++;
+    prev_idx = curr_idx;
+    curr_idx = vertices.size(); // after first iteration, we only add one vertex per iteration
+  }
+
+  Mesh<VertexP3N3> m = Mesh<VertexP3N3>(vertices, indices);
+  return m;
+}
+
+
 glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation)
 {
   float eps = 0.001f; // tolerance for detecting vectors which are nearly opposite

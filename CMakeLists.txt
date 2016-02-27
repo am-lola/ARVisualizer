@@ -82,6 +82,7 @@ if (ARVIS_BUILD_LIBRARY)
       src/geometry/Color.hpp
       src/geometry/Ellipsoid.hpp
       src/geometry/PointCloudData.hpp
+      src/geometry/Polygon.hpp
       src/geometry/Quad.hpp
       src/geometry/Sphere.hpp
       src/geometry/Triangle.hpp

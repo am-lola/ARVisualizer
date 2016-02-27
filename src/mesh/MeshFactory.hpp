@@ -80,6 +80,13 @@ public:
   template <typename MeshT>
   static MeshT MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution);
 
+  // Triangle fan
+  // Generates a triangle fan using the first vertex as the root. Vertex positions should be given in counter-clockwise order.
+  // For best results, vertexPositions should describe a *convex* shape
+  // Normals for each triangle are automatically generated, and are uniform across each face.
+  template <typename MeshT>
+  static MeshT MakeTriangleFan(Vector<glm::vec3> vertexPositions);
+
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset
   static glm::mat4 MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation);

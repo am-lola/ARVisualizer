@@ -118,6 +118,18 @@ mesh_handle ARVisualizer::Add(Quad quad)
   return _renderer->Add3DMesh(MeshFactory::MakeQuad<Mesh<Vertex3D>>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
 }
 
+mesh_handle ARVisualizer::Add(Polygon polygon)
+{
+  if (!IsRunning()) { return 0; }
+  Vector<glm::vec3> points;
+  for(int i = 0; i < polygon.numPoints * 3; i += 3)
+  {
+    points.push_back({ polygon.points[i], polygon.points[i+1], polygon.points[i+2] });
+  }
+
+  return _renderer->Add3DMesh(MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points), std::make_shared<FlatColorMaterial>(polygon.color));
+}
+
 mesh_handle ARVisualizer::Add(Box box)
 {
   if (!IsRunning()) { return 0; }
@@ -206,6 +218,18 @@ void ARVisualizer::Update(mesh_handle handle, Quad quad)
   glm::vec3 vNormal = glm::vec3( quad.normal[0], quad.normal[1], quad.normal[2] );
 
   _renderer->Update(handle, MeshFactory::MakeQuad<Mesh<Vertex3D>>(vCenter, vNormal, quad.width, quad.height), std::make_shared<FlatColorMaterial>(quad.color));
+}
+
+void ARVisualizer::Update(mesh_handle handle, Polygon polygon)
+{
+  if (!IsRunning()) { return; }
+  Vector<glm::vec3> points;
+  for(int i = 0; i < polygon.numPoints * 3; i += 3)
+  {
+    points.push_back({ polygon.points[i], polygon.points[i+1], polygon.points[i+2] });
+  }
+
+  _renderer->Add3DMesh(MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points), std::make_shared<FlatColorMaterial>(polygon.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Box box)
