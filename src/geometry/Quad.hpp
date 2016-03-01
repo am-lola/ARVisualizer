@@ -54,6 +54,22 @@ namespace ar
       this->color = color;
     }
 
+    Quad(double x, double y, double z, double* normal, double width, double height, Color color)
+    {
+      this->center[0] = x;
+      this->center[1] = y;
+      this->center[2] = z;
+
+      for (int i = 0; i < 3; i++)
+      {
+        this->normal[i] = normal[i];
+      }
+
+      this->width = width;
+      this->height = height;
+      this->color = color;
+    }
+
   };
 
 } // namespace ar
