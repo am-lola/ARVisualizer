@@ -151,7 +151,7 @@ unsigned int Renderer::Add3DMesh(Mesh3D mesh, SharedPtr<Material> material)
   return handle;
 }
 
-unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints)
+unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints, Color color)
 {
   if (!_running)
   {
@@ -168,13 +168,14 @@ unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints)
   pointcloud.SetPoints(verts, numPoints);
   pointcloud.SetID(handle);
   pointcloud.SetShader(&_pointCloudShader);
+  pointcloud.SetMaterial(std::make_shared<FlatColorMaterial>(color));
 
   _pointClouds.push_back(std::move(pointcloud));
 
   return handle;
 }
 
-void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints)
+void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color)
 {
   const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
   for (auto& cloud : _pointClouds)
@@ -183,6 +184,7 @@ void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size
     {
       MutexLockGuard guard(_mutex);
       cloud.SetPoints(verts, numPoints);
+      cloud.SetMaterial(std::make_shared<FlatColorMaterial>(color));
       break;
     }
   }
@@ -628,6 +630,7 @@ void Renderer::RenderOneFrame()
     {
       const auto& shader = cloud.GetShader();
       shader->enable();
+      cloud.GetMaterial()->Apply();
 
       glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * cloud.GetTransform();
       glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);

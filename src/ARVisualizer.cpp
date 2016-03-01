@@ -196,7 +196,7 @@ mesh_handle ARVisualizer::Add(PointCloudData pointcloud)
       throw std::runtime_error("PCL_PointXYZRGBA is not supported yet.");
   }
 
-  return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints);
+  return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints, pointcloud.color);
 }
 
 void ARVisualizer::Update(mesh_handle handle, Triangle t)
@@ -290,7 +290,7 @@ void ARVisualizer::Update(mesh_handle handle, PointCloudData pointcloud)
 {
   if (!IsRunning()) { return; }
 
-  _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints);
+  _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints, pointcloud.color);
 }
 
 void ARVisualizer::Update(mesh_handle handle, ar::Transform transform, bool absolute)

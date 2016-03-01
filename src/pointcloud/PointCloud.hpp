@@ -45,7 +45,16 @@ public:
   void SetShader(ShaderProgram* s)
   {
     _shaderProgram = s;
+    if (_material != nullptr)
+      _material->SetShader(s);
   }
+
+  SharedPtr<Material> GetMaterial() { return _material; };
+  void SetMaterial(SharedPtr<Material> m) {
+    _material = m;
+    if (_shaderProgram != nullptr)
+      _material->SetShader(_shaderProgram);
+  };
 
   VertexBufferType* GetVertexBuffer() { return _vertexBuffer.get(); }
 
@@ -148,6 +157,7 @@ private:
   Vector<VertexType> _newPoints;
   size_t _numPoints = 0;
   ShaderProgram* _shaderProgram;
+  SharedPtr<Material> _material;
   glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
   UniquePtr<VertexBufferType> _vertexBuffer;
 

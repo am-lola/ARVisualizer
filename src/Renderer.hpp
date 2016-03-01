@@ -64,9 +64,9 @@ public:
 
   unsigned int Add3DMesh(Mesh3D mesh, SharedPtr<Material> material);
 
-  unsigned int AddPointCloud(const void* pointData, size_t numPoints);
+  unsigned int AddPointCloud(const void* pointData, size_t numPoints, Color color);
 
-  void UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints);
+  void UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color);
 
   void Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material);
 
