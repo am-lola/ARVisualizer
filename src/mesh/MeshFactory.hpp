@@ -30,7 +30,6 @@ public:
   template <typename MeshT>
   static MeshT MakeTriangle(Vector<glm::vec3> vertexPositions, Color vertexColors);
 
-
   // 2D quads
   template <typename MeshT>
   static MeshT MakeQuad(glm::vec2 center, double width, double height);
@@ -63,7 +62,6 @@ public:
   template <typename MeshT>
   static MeshT MakeIcosphere(glm::vec3 center, double radius, unsigned int subdivisions, Color color);
 
-
   // Basic UVSphere
   template <typename MeshT>
   static MeshT MakeUVSphere(glm::vec3 center, double radius, int resolution);
@@ -79,6 +77,10 @@ public:
   // Capsule with constant color
   template <typename MeshT>
   static MeshT MakeCapsule(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution);
+
+  // Constructs a mesh from raw data
+  template <typename MeshT>
+  static MeshT MakeTriangleMesh(Vector<glm::vec3> vertexPositions, Vector<GLuint> indices, Vector<glm::vec3> normals);
 
   // Triangle fan
   // Generates a triangle fan using the first vertex as the root. Vertex positions should be given in counter-clockwise order.

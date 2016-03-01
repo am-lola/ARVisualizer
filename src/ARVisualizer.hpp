@@ -10,6 +10,7 @@
 #include "geometry/Capsule.hpp"
 #include "geometry/Ellipsoid.hpp"
 #include "geometry/Polygon.hpp"
+#include "geometry/PolyMesh.hpp"
 #include "geometry/PointCloudData.hpp"
 #include "geometry/Voxel.hpp"
 
@@ -69,6 +70,7 @@ public:
   mesh_handle Add(Triangle triangle);
   mesh_handle Add(Quad quad);
   mesh_handle Add(Polygon polygon);
+  mesh_handle Add(PolyMesh mesh);
   mesh_handle Add(Box box);
   mesh_handle Add(Cube cube);
   mesh_handle Add(Sphere sphere);
@@ -80,6 +82,7 @@ public:
   void Update(mesh_handle handle, Triangle triangle);
   void Update(mesh_handle handle, Quad quad);
   void Update(mesh_handle handle, Polygon polygon);
+  void Update(mesh_handle handle, PolyMesh mesh);
   void Update(mesh_handle handle, Box box);
   void Update(mesh_handle handle, Cube cube);
   void Update(mesh_handle handle, Sphere sphere);

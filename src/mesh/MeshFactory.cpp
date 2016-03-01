@@ -411,6 +411,47 @@ Mesh<VertexP3N3> MeshFactory::MakeCapsule<Mesh<VertexP3N3>>(glm::vec3 center1, g
 }
 
 template <>
+Mesh<VertexP3N3> MeshFactory::MakeTriangleMesh<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions, Vector<GLuint> indices, Vector<glm::vec3> normals)
+{
+  Vector<VertexP3N3> vertices;
+
+  // if we have the right number of normals, use them; if not generate some
+  if (vertexPositions.size() == normals.size())
+  {
+    for (int i = 0; i < vertexPositions.size(); i++)
+    {
+      vertices.push_back({
+        { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
+        { normals[i].x, normals[i].y, normals[i].z }
+      });
+    }
+  }
+  else
+  {
+    for (int i = 0; i < vertexPositions.size(); i++)
+    {
+      vertices.push_back({
+        { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
+        { 0, 0, 0 }
+      });
+    }
+
+    // generate flat normals for each triangle in the mesh according to their vertex ordering
+    for (int i = 0; i < indices.size(); i+=3)
+    {
+      glm::vec3 normal = glm::cross(glm::normalize(vertexPositions[indices[i+1]] - vertexPositions[indices[i]]),
+                                    glm::normalize(vertexPositions[indices[i+2]] - vertexPositions[indices[i]]));
+      vertices[indices[i]].normal[0] = normal.x; vertices[indices[i]].normal[1] = normal.y; vertices[indices[i]].normal[2] = normal.z;
+      vertices[indices[i+1]].normal[0] = normal.x; vertices[indices[i+1]].normal[1] = normal.y; vertices[indices[i+1]].normal[2] = normal.z;
+      vertices[indices[i+2]].normal[0] = normal.x; vertices[indices[i+2]].normal[1] = normal.y; vertices[indices[i+2]].normal[2] = normal.z;
+    }
+  }
+
+  Mesh<VertexP3N3> m = Mesh<VertexP3N3>(vertices, indices);
+  return m;
+}
+
+template <>
 Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions)
 {
   Vector<VertexP3N3> vertices;

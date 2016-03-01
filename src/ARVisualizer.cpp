@@ -130,6 +130,43 @@ mesh_handle ARVisualizer::Add(Polygon polygon)
   return _renderer->Add3DMesh(MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points), std::make_shared<FlatColorMaterial>(polygon.color));
 }
 
+mesh_handle ARVisualizer::Add(PolyMesh mesh)
+{
+  if (!IsRunning()) { return 0; }
+  Vector<glm::vec3> vertices;
+  Vector<glm::vec3> normals;
+  Vector<GLuint> indices;
+
+  // get vertices & normals (if any)
+  for (int i = 0; i < mesh.numPoints * 3; i += 3)
+  {
+    vertices.push_back({ mesh.points[i], mesh.points[i+1], mesh.points[i+2] });
+
+    if (mesh.normals != NULL)
+    {
+      normals.push_back({ mesh.normals[i], mesh.normals[i+1], mesh.normals[i+2] });
+    }
+  }
+
+  // if indices were provided, collect them, otherwise assume all vertices are to be used in order
+  if (mesh.numIndices > 0)
+  {
+    for (int i = 0; i < mesh.numIndices; i++)
+    {
+      indices.push_back(mesh.indices[i]);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < mesh.numPoints; i++)
+    {
+      indices.push_back(i);
+    }
+  }
+
+  return _renderer->Add3DMesh(MeshFactory::MakeTriangleMesh<Mesh<Vertex3D>>(vertices, indices, normals), std::make_shared<FlatColorMaterial>(mesh.color));
+}
+
 mesh_handle ARVisualizer::Add(Box box)
 {
   if (!IsRunning()) { return 0; }
@@ -229,7 +266,44 @@ void ARVisualizer::Update(mesh_handle handle, Polygon polygon)
     points.push_back({ polygon.points[i], polygon.points[i+1], polygon.points[i+2] });
   }
 
-  _renderer->Add3DMesh(MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points), std::make_shared<FlatColorMaterial>(polygon.color));
+  _renderer->Update(handle, MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points), std::make_shared<FlatColorMaterial>(polygon.color));
+}
+
+void ARVisualizer::Update(mesh_handle handle, PolyMesh mesh)
+{
+  if (!IsRunning()) { return; }
+  Vector<glm::vec3> vertices;
+  Vector<glm::vec3> normals;
+  Vector<GLuint> indices;
+
+  // get vertices
+  for (int i = 0; i < mesh.numPoints * 3; i += 3)
+  {
+    vertices.push_back({ mesh.points[i], mesh.points[i+1], mesh.points[i+2] });
+
+    if (mesh.normals != NULL)
+    {
+      normals.push_back({ mesh.normals[i], mesh.normals[i+1], mesh.normals[i+2] });
+    }
+  }
+
+  // if indices were provided, collect them, otherwise assume all vertices are to be used in order
+  if (mesh.numIndices > 0)
+  {
+    for (int i = 0; i < mesh.numIndices; i++)
+    {
+      indices.push_back(mesh.indices[i]);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < mesh.numPoints; i++)
+    {
+      indices.push_back(i);
+    }
+  }
+
+  _renderer->Update(handle, MeshFactory::MakeTriangleMesh<Mesh<Vertex3D>>(vertices, indices, normals), std::make_shared<FlatColorMaterial>(mesh.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, Box box)
