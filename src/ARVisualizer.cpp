@@ -293,7 +293,7 @@ void ARVisualizer::Update(mesh_handle handle, PointCloudData pointcloud)
   _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints);
 }
 
-void ARVisualizer::Transform(mesh_handle handle, ar::Transform transform, bool absolute)
+void ARVisualizer::Update(mesh_handle handle, ar::Transform transform, bool absolute)
 {
   if (!IsRunning()) { return; }
   glm::mat4 transformMat = glm::mat4(

@@ -87,8 +87,8 @@ public:
   void Update(mesh_handle handle, Ellipsoid ellipsoid);
   void Update(mesh_handle handle, PointCloudData pointcloud);
 
-  // Transforms an existing scene object
-  void Transform(mesh_handle handle, ar::Transform transform, bool absolute);
+  // Updates an existing object's position and/or orientation
+  void Update(mesh_handle handle, ar::Transform transform, bool absolute);
 
   // Removes an object from the scene
   void Remove(mesh_handle handle);
