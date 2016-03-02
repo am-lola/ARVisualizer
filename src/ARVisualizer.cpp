@@ -20,14 +20,24 @@ ARVisualizer::~ARVisualizer()
   }
 }
 
-void ARVisualizer::Start(int width, int height)
-{
-  _renderer = WindowManager::Instance().NewRenderer(width, height, "AR visualizer");
-}
-
 void ARVisualizer::Start()
 {
-  Start(1024, 768);
+  Start("AR Visualizer", 1024, 768);
+}
+
+void ARVisualizer::Start(const char* name)
+{
+  Start(name, 1024, 768);
+}
+
+void ARVisualizer::Start(int width, int height)
+{
+  Start("AR Visualizer", width, height);
+}
+
+void ARVisualizer::Start(const char* name, int width, int height)
+{
+  _renderer = WindowManager::Instance().NewRenderer(width, height, name);
 }
 
 void ARVisualizer::Stop()

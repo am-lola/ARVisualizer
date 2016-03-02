@@ -1,6 +1,8 @@
 #ifndef _ARVISUALIZER_H
 #define _ARVISUALIZER_H
 
+#include <string>
+
 #include "geometry/Color.hpp"
 #include "geometry/Transform.hpp"
 #include "geometry/Triangle.hpp"
@@ -40,8 +42,10 @@ public:
   ~ARVisualizer();
 
   // Begins rendering
-  void Start(int width, int height);
   void Start();
+  void Start(const char* name);
+  void Start(int width, int height);
+  void Start(const char* name, int width, int height);
 
   // Stops all rendering activity
   void Stop();
