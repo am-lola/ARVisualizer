@@ -40,7 +40,7 @@ namespace ar
       // set translation to (0,0,0), and rotation to the input matrix
       for (int i = 0; i < 3; i++)
       {
-        translation[3] = 0.0;
+        translation[i] = 0.0;
         for (int j = 0; j < 3; j++)
         {
           this->rotation[i][j] = rotation[i][j];

@@ -1,6 +1,13 @@
 #ifndef _PC_VERTEXBUFFER_H
 #define _PC_VERTEXBUFFER_H
 
+#include "common.hpp"
+
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES
+#endif
+#include <GLFW/glfw3.h>
+
 namespace ar
 {
 

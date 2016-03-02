@@ -22,9 +22,6 @@ namespace ar
         this->center[i] = center[i];
         this->normal[i] = normal[i];
       }
-
-      this->width = width;
-      this->height = height;
     }
 
     // Creates a quad. Center & normal are expected to be ordered: x, y, z

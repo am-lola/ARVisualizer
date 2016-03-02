@@ -29,7 +29,7 @@ public:
   void ClearDirty() { _dirty = false; };
 
   bool PendingDelete() { return _pendingDelete; };
-  bool MarkForDeletion() { _pendingDelete = true; };
+  void MarkForDeletion() { _pendingDelete = true; };
 
   unsigned int VertexCount() { return _vertices.size(); };
   Vector<VertexT> GetVertices() { return _vertices; };

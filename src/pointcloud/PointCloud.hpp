@@ -39,7 +39,7 @@ public:
   bool Dirty() { return _dirty; }
 
   bool PendingDelete() { return _pendingDelete; };
-  bool MarkForDeletion() { _pendingDelete = true; };
+  void MarkForDeletion() { _pendingDelete = true; };
 
   ShaderProgram* GetShader() { return _shaderProgram; }
   void SetShader(ShaderProgram* s)
