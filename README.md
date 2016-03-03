@@ -10,9 +10,9 @@ After building and installing the library (`make`, `sudo make install`, you shou
     am2b-ar_LIBRARY_DIR  :  Path to the directory containing the shared library
     am2b-ar_INCLUDE_DIR  :  Path to the header files you need to compile against
 
-The ARVisualizer class can be found by including `<am2b-ar/arvisualizer.hpp>`:
+The ARVisualizer class can be found by including `<am2b-ar/ARVisualizer.hpp>`:
 
-    #include <am2b-ar/arvisualizer.hpp>
+    #include <am2b-ar/ARVisualizer.hpp>
     
     int main(void)
     {
