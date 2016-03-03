@@ -9,7 +9,9 @@ namespace ar
   struct Ellipsoid
   {
     float center[3];
-    float transform[9]; // Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
+
+     // Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
+    float transform[9];
     float radius;
     Color color;
 

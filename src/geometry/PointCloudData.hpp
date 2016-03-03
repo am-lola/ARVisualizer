@@ -13,9 +13,16 @@ namespace ar
 
   struct PointCloudData
   {
-    const void* pointData;    // Points xyzw (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats).
-    unsigned long numPoints;  // Number of points in the array.
-    PointCloudDataType type;  // Format points are stored in.
+    // Points xyzw (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats).
+    const void* pointData;
+
+    // Number of points in the array.
+    unsigned long numPoints;
+
+    // Point format
+    PointCloudDataType type;
+
+    // Constant color for the cloud
     Color color;
 
     PointCloudData() : pointData(0), numPoints(0), type(PCL_PointXYZ), color() {}

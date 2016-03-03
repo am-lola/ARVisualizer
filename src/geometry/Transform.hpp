@@ -3,7 +3,7 @@
 
 namespace ar
 {
-
+  // Stores translation & rotation parameters to be applied to objects in the visualizer
   struct Transform
   {
     double translation[3];  // x, y, z offset from origin

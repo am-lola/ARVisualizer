@@ -5,7 +5,7 @@
 
 namespace ar
 {
-
+  // Structure describing a cuboid
   struct Box
   {
     float center[3];

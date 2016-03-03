@@ -5,13 +5,21 @@
 
 namespace ar
 {
-
+  // Struct used to describe simple Polygonal shapes from a list of points
   struct Polygon
   {
-    float* points;          // x,y,z coords of each point (length must be 3*numPoints)
-    unsigned int numPoints; // number of points in points
+    // x,y,z coords of each point (length must be 3*numPoints)
+    float* points;
+
+    // number of points in points
+    unsigned int numPoints;
+
+    // constant color for the shape
     Color color;
 
+    // Constructor
+    // @points 3D coordinates, arranged [x,y,z,x,y,z,...]
+    // @count  Total number of 3D points
     Polygon(double* points, unsigned int count) : color()
     {
       this->points = new float[count*3];
@@ -23,7 +31,10 @@ namespace ar
       this->numPoints = count;
     }
 
-
+    // Constructor
+    // @points 3D coordinates, arranged [x,y,z,x,y,z,...]
+    // @count  Total number of 3D points
+    // @color  Color of the mesh
     Polygon(double* points, unsigned int count, Color color)
     {
       this->points = new float[count*3];

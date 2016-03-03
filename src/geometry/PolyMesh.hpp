@@ -5,14 +5,25 @@
 
 namespace ar
 {
-
+  // Raw mesh format to render arbitrary geometry
   struct PolyMesh
   {
-    float* points;          // x,y,z coords of each point (length must be 3*numPoints)
-    unsigned int numPoints; // number of points in points
-    unsigned int* indices;  // [Optional] If filled, triangles will be generated as (points[indices[0]], points[indices[1]], points[indices[2]], ...)
-    unsigned int numIndices;// number of indices in indices
-    float* normals;         // [Optional] If filled, must contain one normal per point. If not set, normals will be automatically generated.
+    // x,y,z coords of each point (length must be 3*numPoints)
+    float* points;
+
+    // number of points in points
+    unsigned int numPoints;
+
+    // [Optional] If filled, triangles will be generated as (points[indices[0]], points[indices[1]], points[indices[2]], ...)
+    unsigned int* indices;
+
+    // number of indices in indices
+    unsigned int numIndices;
+
+    // [Optional] If filled, must contain one normal per point. If not set, normals will be automatically generated.
+    float* normals;
+
+    // Constant color for the whole mesh
     Color color;
 
     PolyMesh(double* points, unsigned int count) : color(), numPoints(count), numIndices(0), indices(0), normals(0)
@@ -110,4 +121,5 @@ namespace ar
   };
 
 } // namespace ar
+
 #endif // _ARPOLYMESH_H

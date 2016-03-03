@@ -5,7 +5,7 @@
 
 namespace ar
 {
-
+  // Describes a rectangle in 3D space
   struct Quad
   {
     float center[3];

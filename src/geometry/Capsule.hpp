@@ -5,7 +5,7 @@
 
 namespace ar
 {
-
+  // Structure used to describe a Capsule shape
   struct Capsule
   {
     float center1[3];
