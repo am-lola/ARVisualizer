@@ -43,8 +43,7 @@ public:
 
   glm::mat4 GetTransform() const
   {
-    // Quick&Dirty adjusting the transformation for Asus Xtion
-    return glm::orientate4(glm::vec3(glm::radians(12.0f), glm::radians(180.0f), 0.0f));
+    return glm::mat4(1.0f);
   }
 
   void SetPoints(const VertexType* points, size_t numPoints)

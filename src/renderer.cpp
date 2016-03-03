@@ -29,17 +29,20 @@ Renderer::Renderer(GLFWwindow* window)
   // Listen for keyboard input
   _windowEvents.GetKeyboardKeyDelegate() += [this](int k, int scan, int action, int mods)
   {
-    if (action == GLFW_PRESS && k == GLFW_KEY_1)
+    if (!ImGui::IsAnyItemActive())
     {
-      this->_renderType = GL_TRIANGLES;
-    }
-    else if (action == GLFW_PRESS && k == GLFW_KEY_2)
-    {
-      this->_renderType = GL_LINE_LOOP;
-    }
-    else if (action == GLFW_PRESS && k == GLFW_KEY_3)
-    {
-      this->_renderType = GL_POINTS;
+      if (action == GLFW_PRESS && k == GLFW_KEY_1)
+      {
+        this->_renderType = GL_TRIANGLES;
+      }
+      else if (action == GLFW_PRESS && k == GLFW_KEY_2)
+      {
+        this->_renderType = GL_LINE_LOOP;
+      }
+      else if (action == GLFW_PRESS && k == GLFW_KEY_3)
+      {
+        this->_renderType = GL_POINTS;
+      }
     }
 
     this->_imguiRenderer.OnKeyPress(k, scan, action, mods);
@@ -632,6 +635,9 @@ void Renderer::renderGUI()
   _imguiRenderer.NewFrame();
   _camera.RenderGUI();
   _pointCloud.RenderGUI();
+
+  _renderGUIDelegate();
+
   ImGui::ShowTestWindow();
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());

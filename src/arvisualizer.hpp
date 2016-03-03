@@ -2,6 +2,7 @@
 #define _ARVISUALIZER_H
 
 #include "color.hpp"
+#include "ui.hpp"
 
 namespace ar
 {
@@ -15,8 +16,10 @@ namespace ar
 #define UVSPHERE_RESOLUTION 16
 
 class Renderer;
+class UserInterface;
 
 typedef unsigned int mesh_handle;
+typedef unsigned int ui_element_handle;
 
 /*
   The main interface to the AR Visualization library
@@ -64,7 +67,7 @@ public:
   mesh_handle AddCapsule(double center1[3], double center2[3], double radius, Color color);
 
   //    Transformation: Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
-  mesh_handle AddEllipsoid(float center[3], float* transformation, double radius, Color color);
+  mesh_handle AddEllipsoid(float* center, float* transformation, double radius, Color color);
 
   void Remove(mesh_handle handle);
 
@@ -90,8 +93,14 @@ public:
 
   void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
 
+  IUIWindow* AddUIWindow(const char* name);
+  IUIWindow* AddUIWindow(const char* name, float initialWidth, float initialHeight);
+
 private:
   Renderer* _renderer;
+  UserInterface* _ui;
+
+  void renderExternGUI();
 };
 
 } // namespace ar

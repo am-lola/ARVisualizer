@@ -101,6 +101,8 @@ public:
   // Updates the GL viewport when the framebuffer changes size
   void onFramebufferResized(int newWidth, int newHeight);
 
+  Delegate<void()> _renderGUIDelegate;
+
 private:
   std::atomic_bool _running {false};
 

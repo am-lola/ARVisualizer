@@ -2,12 +2,14 @@
 #include "renderer.hpp"
 #include "mesh/meshfactory.hpp"
 #include "windowmanager/windowmanager.hpp"
+#include "ui/ui_internal.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
 namespace ar
 {
 
 ARVisualizer::ARVisualizer()
+  : _ui(new UserInterface)
 {
   _renderer = nullptr;
 }
@@ -18,11 +20,17 @@ ARVisualizer::~ARVisualizer()
   {
     Stop();
   }
+
+  delete _ui;
 }
 
 void ARVisualizer::Start(int width, int height)
 {
   _renderer = WindowManager::Instance().NewRenderer(width, height, "AR visualizer");
+  _renderer->_renderGUIDelegate += [this]()
+  {
+    this->renderExternGUI();
+  };
 }
 
 void ARVisualizer::Start()
@@ -135,7 +143,7 @@ mesh_handle ARVisualizer::AddCapsule(double center1[3], double center2[3], doubl
   return _renderer->Add3DMesh(MeshFactory::MakeCapsule<Vertex3D>(vCenter1, vCenter2, radius, UVSPHERE_RESOLUTION), std::make_shared<FlatColorMaterial>(color));
 }
 
-mesh_handle ARVisualizer::AddEllipsoid(float center[3], float* transformation, double radius, Color color)
+mesh_handle ARVisualizer::AddEllipsoid(float* center, float* transformation, double radius, Color color)
 {
   if (!IsRunning()) { return 0; }
   glm::vec3 vCenter = glm::vec3( center[0], center[1], center[2] );
@@ -186,4 +194,20 @@ void ARVisualizer::DrawVoxels(const ARVisualizer::Voxel* voxels, unsigned long n
   if (!IsRunning()) { return; }
   _renderer->DrawVoxels(voxels, numVoxels);
 }
+
+IUIWindow* ARVisualizer::AddUIWindow(const char* name)
+{
+  return _ui->AddWindow(name);
+}
+
+IUIWindow* ARVisualizer::AddUIWindow(const char* name, float initialWidth, float initialHeight)
+{
+  return _ui->AddWindow(name, initialWidth, initialHeight);
+}
+
+void ARVisualizer::renderExternGUI()
+{
+  _ui->draw();
+}
+
 } // namespace ar
