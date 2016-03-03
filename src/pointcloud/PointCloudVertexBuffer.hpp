@@ -1,6 +1,13 @@
 #ifndef _PC_VERTEXBUFFER_H
 #define _PC_VERTEXBUFFER_H
 
+#include "common.hpp"
+
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES
+#endif
+#include <GLFW/glfw3.h>
+
 namespace ar
 {
 
@@ -52,6 +59,12 @@ public:
   void SetVertices(const VertexT* vertices, size_t numVertices)
   {
     _vertices.assign(vertices, vertices + numVertices);
+    _dirty = true;
+  }
+
+  void SetVertices(Vector<VertexT> vertices)
+  {
+    _vertices = std::move(vertices); // steal vertices from caller
     _dirty = true;
   }
 

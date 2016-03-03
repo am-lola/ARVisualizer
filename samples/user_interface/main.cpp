@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "arvisualizer.hpp"
+#include "ARVisualizer.hpp"
 #include <thread>
 
 int main(void)

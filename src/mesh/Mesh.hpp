@@ -2,9 +2,10 @@
 #define _MESH_H
 #include <vector>
 #include <memory>
+
 #include "ShaderProgram.hpp"
-#include "material.hpp"
-#include "vertex.hpp"
+#include "Material.hpp"
+#include "Vertex.hpp"
 #include "common.hpp"
 
 namespace ar
@@ -28,7 +29,7 @@ public:
   void ClearDirty() { _dirty = false; };
 
   bool PendingDelete() { return _pendingDelete; };
-  bool MarkForDeletion() { _pendingDelete = true; };
+  void MarkForDeletion() { _pendingDelete = true; };
 
   unsigned int VertexCount() { return _vertices.size(); };
   Vector<VertexT> GetVertices() { return _vertices; };
@@ -74,10 +75,11 @@ private:
   glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
 };
 
-class TexturedQuad : public Mesh<VertexP2T2>
+template <typename VertexT>
+class TexturedMesh : public Mesh<VertexT>
 {
 public:
-  using Mesh::Mesh;
+  using Mesh<VertexT>::Mesh;
 
   GLuint GetTexture() { return _texture; };
   void SetTexture(GLuint tex) { _texture = tex; };

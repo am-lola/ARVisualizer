@@ -1,6 +1,6 @@
-#include "camera.hpp"
+#include "Camera.hpp"
 #include "common.hpp"
-#include "windowmanager/windowevents.hpp"
+#include "windowmanager/WindowEvents.hpp"
 
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/constants.hpp>
@@ -60,7 +60,7 @@ void Camera::OnMouseMove(double xpos, double ypos)
 
   if (!_mousePressed)
     return;
-  
+
   const float pi = glm::pi<float>();
   const float twoPi = pi * 2.0f;
 
@@ -88,7 +88,7 @@ void Camera::OnMouseButton(int button, int action, int mods)
 
   if (button != 0)
     return;
-  
+
   if (action == GLFW_PRESS)
     _mousePressed = true;
   else if (action == GLFW_RELEASE)
@@ -166,7 +166,7 @@ void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
   _forward = forward;
   _up = up;
   _right = glm::cross(_forward, _up);
-  
+
   // TODO: Calculate _rot
   // glm::mat3 mat(_right, _up, _forward);
 }

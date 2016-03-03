@@ -11,6 +11,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui")
 
 option(ARVIS_BUILD_LIBRARY "Build AR Visualization library" TRUE)
 option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
+option(ARVIS_BUILD_DOCS    "Build Project Documentation" FALSE)
 option(GLFW_STATIC_LINKAGE "Link GLFW3 statically" TRUE)
 
 # Figure out whether we should be linking against the static or shared version of GLFW3
@@ -32,19 +33,19 @@ if (ARVIS_BUILD_LIBRARY)
 
     set(CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++")
     file(GLOB libarvis_src
-        src/arvisualizer.*pp
-        src/renderer.*pp
-        src/imguiRenderer.*pp
-        src/loadShaders.*pp
+        src/ARVisualizer.*pp
+        src/Renderer.*pp
+        src/ImguiRenderer.*pp
+        src/LoadShaders.*pp
         src/ShaderProgram.*pp
-        src/material.*pp
-        src/camera.*pp
-        src/mesh/mesh.*pp
-        src/mesh/meshfactory.*pp
-        src/windowmanager/windowmanager.*pp
-        src/windowmanager/windowevents.*pp
-        src/windowmanager/glfwwindowevents.*pp
-        src/ui/ui.*pp
+        src/Material.*pp
+        src/Camera.*pp
+        src/mesh/Mesh.*pp
+        src/mesh/MeshFactory.*pp
+        src/windowmanager/WindowManager.*pp
+        src/windowmanager/WindowEvents.*pp
+        src/windowmanager/GLFWWindowEvents.*pp
+        src/ui/ui.cpp
         extern/imgui/imgui.cpp
         extern/imgui/imgui_draw.cpp
         extern/imgui/imgui_demo.cpp
@@ -74,10 +75,23 @@ if (ARVIS_BUILD_LIBRARY)
       LIBRARY DESTINATION ${lib_install_dir}
     )
     install(FILES
-      src/arvisualizer.hpp
-      src/color.hpp
+      src/ARVisualizer.hpp
       src/ui.hpp
       DESTINATION ${include_install_dir}
+    )
+    install(FILES
+      src/geometry/Box.hpp
+      src/geometry/Capsule.hpp
+      src/geometry/Color.hpp
+      src/geometry/Ellipsoid.hpp
+      src/geometry/PointCloudData.hpp
+      src/geometry/Polygon.hpp
+      src/geometry/PolyMesh.hpp
+      src/geometry/Quad.hpp
+      src/geometry/Sphere.hpp
+      src/geometry/Triangle.hpp
+      src/geometry/Voxel.hpp
+      DESTINATION ${include_install_dir}/geometry/
     )
     install(FILES
       "${project_config}"
@@ -111,4 +125,27 @@ if (ARVIS_BUILD_SAMPLES)
     add_executable(sample_user_interface samples/user_interface/main.cpp)
     target_link_libraries(sample_user_interface arvisualizer)
     set_target_properties(sample_user_interface PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
+# Documentation
+if (ARVIS_BUILD_DOCS)
+    find_program(CLDOC cldoc)
+    if( NOT CLDOC )
+        message("CLDOC: ${CLDOC}")
+        message(FATAL_ERROR "Could not find cldoc! Documentation cannot be built!")
+    else()
+        add_custom_target(
+             documentation
+             COMMAND
+             ${CLDOC} generate
+             -I${CMAKE_CURRENT_SOURCE_DIR}/src
+             -I${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
+             --std=c++11
+             --
+             --basedir ${CMAKE_CURRENT_SOURCE_DIR}/src
+             --output ${CMAKE_CURRENT_BINARY_DIR}/docs
+             ${CMAKE_CURRENT_SOURCE_DIR}/src/*
+             COMMENT "Generating Documentation..."
+         )
+    endif()
 endif()

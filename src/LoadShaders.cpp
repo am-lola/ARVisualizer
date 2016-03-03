@@ -1,12 +1,13 @@
 /* Adapted from http://www.opengl-tutorial.org/ */
 /* opengl-tutorial licenses all their code under WTFPL */
 
-#include "loadShaders.hpp"
+#include "LoadShaders.hpp"
+#include "common.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include "common.hpp"
 
 namespace ar
 {

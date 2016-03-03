@@ -19,15 +19,17 @@
 #include "RenderPassParams.hpp"
 #include "ShaderSources.g.hpp"
 #include "ShaderProgram.hpp"
-#include "material.hpp"
-#include "mesh/vertexbuffer.hpp"
-#include "mesh/mesh.hpp"
-#include "pointcloud/pointCloud.hpp"
-#include "windowmanager/glfwwindowevents.hpp"
-#include "imguiRenderer.hpp"
-#include "camera.hpp"
-#include "arvisualizer.hpp"
-#include "instancedVertexBuffer.hpp"
+#include "Material.hpp"
+#include "mesh/VertexBuffer.hpp"
+#include "mesh/InstancedVertexBuffer.hpp"
+#include "mesh/Mesh.hpp"
+#include "pointcloud/PointCloud.hpp"
+#include "windowmanager/GLFWWindowEvents.hpp"
+#include "windowmanager/WindowManager.hpp"
+#include "ImguiRenderer.hpp"
+#include "Camera.hpp"
+#include "geometry/Voxel.hpp"
+
 namespace ar
 {
 
@@ -35,7 +37,7 @@ namespace ar
 typedef VertexP3N3 Vertex3D;
 typedef VertexP2T2 Vertex2D;
 typedef Mesh<Vertex3D> Mesh3D;
-typedef TexturedQuad Mesh2D;
+typedef TexturedMesh<VertexP2T2> Mesh2D;
 
 
 class Renderer
@@ -62,13 +64,19 @@ public:
 
   unsigned int Add3DMesh(Mesh3D mesh, SharedPtr<Material> material);
 
+  unsigned int AddPointCloud(const void* pointData, size_t numPoints, Color color);
+
+  void UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color);
+
+  void Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material);
+
+  void UpdateTransform(unsigned int handle, glm::mat4 transform, bool absolute);
+
   void RemoveMesh(unsigned int handle);
 
   void RemoveAllMeshes();
 
-  void DrawPointCloud(const void* pointData, size_t numPoints);
-
-  void DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels);
+  void DrawVoxels(const Voxel* voxels, size_t numVoxels);
 
   // Gets the View matrix
   glm::mat4 GetViewMatrix() const
@@ -95,18 +103,16 @@ public:
       UpdateProjection();
   }
 
-  // Updates projection as needed when the window changes size
-  void onWindowResized(int newWidth, int newHeight);
-
-  // Updates the GL viewport when the framebuffer changes size
-  void onFramebufferResized(int newWidth, int newHeight);
-
   Delegate<void()> _renderGUIDelegate;
 
 private:
   std::atomic_bool _running {false};
 
+  // used to synchronize between rendering thread and other threads contributing data and commands
   std::mutex _mutex;
+
+  // used to synchronize between all active rendering threads to work around IMGUI not playing nice with threads
+  static std::mutex _renderGUILock;
 
   GLFWWindowEvents _windowEvents;
   GLFWwindow* _window;
@@ -117,6 +123,7 @@ private:
 
   std::thread _renderThread;
 
+    /// TODO: Move this to Camera class
   struct camera_parms {
       float fov          = 45.0f;  // field of view, in degrees
       float nearClip     = 0.1f;   // distance to near clipping plane
@@ -137,56 +144,76 @@ private:
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
-  Vector<TexturedQuad> _2DMeshes;
+  Vector<Mesh2D> _2DMeshes;
   UniquePtr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
 
   Vector<Mesh3D> _3DMeshes;
   Vector<Mesh3D> _new3DMeshes; // TODO: This is a temporary workaround and should be removed later
   UniquePtr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
 
-  PointCloud<VertexP4> _pointCloud;
+  Vector<PointCloud<VertexP4>> _pointClouds;
   ShaderProgram _pointCloudShader;
 
   ShaderProgram _voxelShader;
   UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
 
-  unsigned int GenerateMeshHandle(Mesh3D mesh);
+  // Generates a unique ID used to reference meshes from external components
+  unsigned int GenerateMeshHandle();
 
   // Regenerates projection matrix
   void UpdateProjection();
 
+  // ! Call from _renderThread only
+  // Updates projection as needed when the window changes size
+  void OnWindowResized(int newWidth, int newHeight);
+
+  // ! Call from _renderThread only
+  // Updates the GL viewport when the framebuffer changes size
+  void OnFramebufferResized(int newWidth, int newHeight);
+
+  // ! Call from _renderThread only
   // Sets up the OpenGL context & initializes data needed for rendering
-  void init();
+  void Init();
 
+  // ! Call from _renderThread only
   // handles OpenGL context binding and default rendering settings
-  void init_GL();
+  void Init_GL();
 
+  // ! Call from _renderThread only
   // sets up vertex data for objects we know we need (e.g. a plane to render the video on)
-  void init_geometry();   /// TODO: Move this to another class
+  void Init_geometry();   /// TODO: Move this to another class
 
+  // ! Call from _renderThread only
   // allocates and initializes default textures
-  void init_textures();   /// TODO: Move this to another class
+  void Init_textures();   /// TODO: Move this to another class
 
+  // ! Call from _renderThread only
   // sends the data in pixels to the texture unit on the GPU referenced by tex
-  void bufferTexture(int width, int height, GLuint tex, unsigned char* pixels);
+  void BufferTexture(int width, int height, GLuint tex, unsigned char* pixels);
 
+  // ! Call from _renderThread only
   // Prepares OpenGL state for rendering with the given parameters
-  void enableRenderPass(RenderPassParams pass);
+  void EnableRenderPass(RenderPassParams pass);
 
+  // ! Call from _renderThread only
   // the main render loop
-  void render();
+  void Render();
 
+  // ! Call from _renderThread only
   // checks for new mesh data, video data, meshes which should be deleted, etc.
-  void update();
+  void Update();
 
+  // ! Call from _renderThread only
   // renders just one frame
-  void renderOneFrame();
+  void RenderOneFrame();
 
+  // ! Call from _renderThread only
   // renders the GUI
-  void renderGUI();
+  void RenderGUI();
 
+  // ! Call from _renderThread only
   // Final cleanup which needs to be done (from the render thread) when we stop rendering
-  void shutdown();
+  void Shutdown();
 
 };
 

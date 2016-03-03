@@ -1,8 +1,19 @@
 #ifndef _ARVISUALIZER_H
 #define _ARVISUALIZER_H
 
-#include "color.hpp"
 #include "ui.hpp"
+#include "geometry/Color.hpp"
+#include "geometry/Transform.hpp"
+#include "geometry/Triangle.hpp"
+#include "geometry/Quad.hpp"
+#include "geometry/Box.hpp"
+#include "geometry/Sphere.hpp"
+#include "geometry/Capsule.hpp"
+#include "geometry/Ellipsoid.hpp"
+#include "geometry/Polygon.hpp"
+#include "geometry/PolyMesh.hpp"
+#include "geometry/PointCloudData.hpp"
+#include "geometry/Voxel.hpp"
 
 namespace ar
 {
@@ -32,8 +43,10 @@ public:
   ~ARVisualizer();
 
   // Begins rendering
-  void Start(int width, int height);
   void Start();
+  void Start(const char* name);
+  void Start(int width, int height);
+  void Start(const char* name, int width, int height);
 
   // Stops all rendering activity
   void Stop();
@@ -58,38 +71,38 @@ public:
   // Updates the projection based on the given camera matrix
   void SetCameraIntrinsics(double camera_matrix[3][3]);
 
-  mesh_handle AddTriangle(double vertexPositions[3][3], Color color);
+  // Adds an object to the scene
+  mesh_handle Add(Triangle triangle);
+  mesh_handle Add(Quad quad);
+  mesh_handle Add(Polygon polygon);
+  mesh_handle Add(PolyMesh mesh);
+  mesh_handle Add(Box box);
+  mesh_handle Add(Cube cube);
+  mesh_handle Add(Sphere sphere);
+  mesh_handle Add(Capsule capsule);
+  mesh_handle Add(Ellipsoid ellipsoid);
+  mesh_handle Add(PointCloudData pointcloud);
 
-  mesh_handle AddQuad(double center[3], double normal[3], double width, double height, Color color);
+  // Updates an existing scene object
+  void Update(mesh_handle handle, Triangle triangle);
+  void Update(mesh_handle handle, Quad quad);
+  void Update(mesh_handle handle, Polygon polygon);
+  void Update(mesh_handle handle, PolyMesh mesh);
+  void Update(mesh_handle handle, Box box);
+  void Update(mesh_handle handle, Cube cube);
+  void Update(mesh_handle handle, Sphere sphere);
+  void Update(mesh_handle handle, Capsule capsule);
+  void Update(mesh_handle handle, Ellipsoid ellipsoid);
+  void Update(mesh_handle handle, PointCloudData pointcloud);
 
-  mesh_handle AddSphere(double center[3], double radius, Color color);
+  // Updates an existing object's position and/or orientation
+  void Update(mesh_handle handle, ar::Transform transform, bool absolute);
 
-  mesh_handle AddCapsule(double center1[3], double center2[3], double radius, Color color);
-
-  //    Transformation: Column-major 3x3 matrix with orthogonal axes as columns, ordered by descending size for best results.
-  mesh_handle AddEllipsoid(float* center, float* transformation, double radius, Color color);
-
+  // Removes an object from the scene
   void Remove(mesh_handle handle);
 
+  // Removes all objects
   void RemoveAll();
-
-  enum PointCloudDataType
-  {
-    PCL_PointXYZ,
-    PCL_PointXYZRGBA
-  };
-
-  // Draw a point cloud
-  //    Points: Points xyzw (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats).
-  //    NumPoints: Number of points in the array.
-  void DrawPointCloud(const void* pointData, unsigned long numPoints, PointCloudDataType dataType);
-
-  struct Voxel
-  {
-    float center[3];
-    float color[4];
-    float size;
-  };
 
   void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
 

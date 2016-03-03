@@ -1,14 +1,15 @@
-#include "meshfactory.hpp"
+#include "MeshFactory.hpp"
 #include <vector>
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/string_cast.hpp>
+
 namespace ar
 {
 
 template <>
-Mesh<VertexP2> MeshFactory::MakeTriangle<VertexP2>(Vector<glm::vec2> vertexPositions)
+Mesh<VertexP2> MeshFactory::MakeTriangle<Mesh<VertexP2>>(Vector<glm::vec2> vertexPositions)
 {
   Vector<VertexP2> verts;
   Vector<GLuint> indices = {0, 1, 2};
@@ -21,7 +22,7 @@ Mesh<VertexP2> MeshFactory::MakeTriangle<VertexP2>(Vector<glm::vec2> vertexPosit
 }
 
 template <>
-Mesh<VertexP3> MeshFactory::MakeTriangle<VertexP3>(Vector<glm::vec3> vertexPositions)
+Mesh<VertexP3> MeshFactory::MakeTriangle<Mesh<VertexP3>>(Vector<glm::vec3> vertexPositions)
 {
   Vector<VertexP3> verts;
   Vector<GLuint> indices = {0, 1, 2};
@@ -34,7 +35,7 @@ Mesh<VertexP3> MeshFactory::MakeTriangle<VertexP3>(Vector<glm::vec3> vertexPosit
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(Vector<glm::vec3> vertexPositions, Vector<Color> vertexColors)
+Mesh<VertexP3C4> MeshFactory::MakeTriangle<Mesh<VertexP3C4>>(Vector<glm::vec3> vertexPositions, Vector<Color> vertexColors)
 {
   Vector<VertexP3C4> verts;
   Vector<GLuint> indices = {0, 1, 2};
@@ -47,14 +48,14 @@ Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(Vector<glm::vec3> vertexP
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeTriangle<VertexP3C4>(Vector<glm::vec3> vertexPositions, Color color)
+Mesh<VertexP3C4> MeshFactory::MakeTriangle<Mesh<VertexP3C4>>(Vector<glm::vec3> vertexPositions, Color color)
 {
   Vector<Color> vertexColors = { color, color, color };
-  return MakeTriangle<VertexP3C4>(vertexPositions, vertexColors);
+  return MakeTriangle<Mesh<VertexP3C4>>(vertexPositions, vertexColors);
 }
 
 template <>
-Mesh<VertexP3N3> MeshFactory::MakeTriangle<VertexP3N3>(Vector<glm::vec3> vertexPositions)
+Mesh<VertexP3N3> MeshFactory::MakeTriangle<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions)
 {
   Vector<VertexP3N3> verts;
   Vector<GLuint> indices = {0, 1, 2};
@@ -74,7 +75,7 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangle<VertexP3N3>(Vector<glm::vec3> vertexP
 }
 
 template <>
-Mesh<VertexP2> MeshFactory::MakeQuad<VertexP2>(glm::vec2 center, double width, double height)
+Mesh<VertexP2> MeshFactory::MakeQuad<Mesh<VertexP2>>(glm::vec2 center, double width, double height)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<GLuint> indices;
@@ -91,7 +92,34 @@ Mesh<VertexP2> MeshFactory::MakeQuad<VertexP2>(glm::vec2 center, double width, d
 }
 
 template <>
-Mesh<VertexP3> MeshFactory::MakeQuad<VertexP3>(glm::vec3 center, glm::vec3 normal, double width, double height)
+TexturedMesh<VertexP2T2> MeshFactory::MakeQuad<TexturedMesh<VertexP2T2>>(glm::vec2 center, double width, double height)
+{
+  Vector<glm::vec3> vertex_positions;
+  Vector<GLuint> indices;
+  Vector<VertexP2T2> verts;
+  Vector<Vector<float>> UVs =  {
+                      {0.0f, 1.0f},
+                      {1.0f, 1.0f},
+                      {0.0f, 0.0f},
+                      {1.0f, 0.0f}
+  };
+
+  MakeQuadMesh(width, height, &vertex_positions, &indices);
+
+  float tu, tv = 0;
+  for (int i = 0; i < vertex_positions.size(); i++)
+  {
+    verts.push_back({
+      {vertex_positions[i].x, vertex_positions[i].y},
+      {UVs[i][0], UVs[i][1]}
+    });
+  }
+
+  return TexturedMesh<VertexP2T2>(verts, indices);
+}
+
+template <>
+Mesh<VertexP3> MeshFactory::MakeQuad<Mesh<VertexP3>>(glm::vec3 center, glm::vec3 normal, double width, double height)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<GLuint> indices;
@@ -105,13 +133,13 @@ Mesh<VertexP3> MeshFactory::MakeQuad<VertexP3>(glm::vec3 center, glm::vec3 norma
   }
 
   Mesh<VertexP3> m = Mesh<VertexP3>(verts, indices);
-  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, -1.0f), normal));
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
 
   return Mesh<VertexP3>(verts, indices);
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 normal, double width, double height, Vector<Color> vertexColors)
+Mesh<VertexP3C4> MeshFactory::MakeQuad<Mesh<VertexP3C4>>(glm::vec3 center, glm::vec3 normal, double width, double height, Vector<Color> vertexColors)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<GLuint> indices;
@@ -128,20 +156,20 @@ Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 n
   }
 
   Mesh<VertexP3C4> m = Mesh<VertexP3C4>(verts, indices);
-  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, -1.0f), normal));
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), normal));
 
   return m;
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeQuad<VertexP3C4>(glm::vec3 center, glm::vec3 normal, double width, double height, Color color)
+Mesh<VertexP3C4> MeshFactory::MakeQuad<Mesh<VertexP3C4>>(glm::vec3 center, glm::vec3 normal, double width, double height, Color color)
 {
   Vector<Color> vertexColors = {color, color, color, color};
-  return MakeQuad<VertexP3C4>(center, normal, width, height, vertexColors);
+  return MakeQuad<Mesh<VertexP3C4>>(center, normal, width, height, vertexColors);
 }
 
 template <>
-Mesh<VertexP3N3> MeshFactory::MakeQuad<VertexP3N3>(glm::vec3 center, glm::vec3 normal, double width, double height)
+Mesh<VertexP3N3> MeshFactory::MakeQuad<Mesh<VertexP3N3>>(glm::vec3 center, glm::vec3 normal, double width, double height)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<GLuint> indices;
@@ -159,13 +187,55 @@ Mesh<VertexP3N3> MeshFactory::MakeQuad<VertexP3N3>(glm::vec3 center, glm::vec3 n
   }
 
   Mesh<VertexP3N3> m = Mesh<VertexP3N3>(verts, indices);
-  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, -1.0f), n_normal));
+  m.SetTransform(MakeTransform(center, glm::vec3(0.0f, 0.0f, 1.0f), n_normal));
 
   return m;
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeIcosphere<VertexP3C4>(glm::vec3 center, double radius, unsigned int subdivisions, Color color)
+Mesh<VertexP3N3> MeshFactory::MakeBox(glm::vec3 center, double xLength, double yLength, double zLength)
+{
+  Vector<glm::vec3> vertex_positions;
+  Vector<GLuint> indices;
+  Vector<VertexP3N3> verts;
+  Vector<glm::vec3> normals
+  {
+    {  0,  0,  1 },
+    {  0,  0, -1 },
+    {  0,  1,  0 },
+    {  0, -1,  0 },
+    {  1,  0,  0 },
+    { -1,  0,  0 },
+  };
+
+  MakeBoxMesh(xLength, yLength, zLength, &vertex_positions, &indices);
+
+  for (int i = 0; i < normals.size(); i++)
+  {
+    for (int j = 0; j < 4; j++) // four vertices per face in the cube
+    {
+      verts.push_back({
+        { vertex_positions[4*i + j].x, vertex_positions[4*i + j].y, vertex_positions[4*i + j].z },
+        { normals[i].x, normals[i].y, normals[i].z }
+      });
+    }
+  }
+
+  Mesh<VertexP3N3> m = Mesh<VertexP3N3>(verts, indices);
+
+  // assign it a transform translating it to center
+  m.SetTransform(glm::translate(glm::mat4(1.0f), center));
+  return m;
+}
+
+template <>
+Mesh<VertexP3N3> MeshFactory::MakeCube(glm::vec3 center, double size)
+{
+  return MakeBox<Mesh<VertexP3N3>>(center, size, size, size);
+}
+
+template <>
+Mesh<VertexP3C4> MeshFactory::MakeIcosphere<Mesh<VertexP3C4>>(glm::vec3 center, double radius, unsigned int subdivisions, Color color)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<VertexP3C4> vertices;
@@ -192,7 +262,7 @@ Mesh<VertexP3C4> MeshFactory::MakeIcosphere<VertexP3C4>(glm::vec3 center, double
 }
 
 template <>
-Mesh<VertexP3N3> MeshFactory::MakeIcosphere<VertexP3N3>(glm::vec3 center, double radius, unsigned int subdivisions)
+Mesh<VertexP3N3> MeshFactory::MakeIcosphere<Mesh<VertexP3N3>>(glm::vec3 center, double radius, unsigned int subdivisions)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<VertexP3N3> vertices;
@@ -221,7 +291,7 @@ Mesh<VertexP3N3> MeshFactory::MakeIcosphere<VertexP3N3>(glm::vec3 center, double
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeUVSphere<VertexP3C4>(glm::vec3 center, double radius, Color color, int resolution)
+Mesh<VertexP3C4> MeshFactory::MakeUVSphere<Mesh<VertexP3C4>>(glm::vec3 center, double radius, Color color, int resolution)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<VertexP3C4> vertices;
@@ -246,7 +316,7 @@ Mesh<VertexP3C4> MeshFactory::MakeUVSphere<VertexP3C4>(glm::vec3 center, double 
 }
 
 template <>
-Mesh<VertexP3N3> MeshFactory::MakeUVSphere<VertexP3N3>(glm::vec3 center, double radius, int resolution)
+Mesh<VertexP3N3> MeshFactory::MakeUVSphere<Mesh<VertexP3N3>>(glm::vec3 center, double radius, int resolution)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<VertexP3N3> vertices;
@@ -272,7 +342,7 @@ Mesh<VertexP3N3> MeshFactory::MakeUVSphere<VertexP3N3>(glm::vec3 center, double 
 }
 
 template <>
-Mesh<VertexP3C4> MeshFactory::MakeCapsule<VertexP3C4>(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution)
+Mesh<VertexP3C4> MeshFactory::MakeCapsule<Mesh<VertexP3C4>>(glm::vec3 center1, glm::vec3 center2, double radius, Color color, int resolution)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<VertexP3C4> vertices;
@@ -305,7 +375,7 @@ Mesh<VertexP3C4> MeshFactory::MakeCapsule<VertexP3C4>(glm::vec3 center1, glm::ve
 }
 
 template <>
-Mesh<VertexP3N3> MeshFactory::MakeCapsule<VertexP3N3>(glm::vec3 center1, glm::vec3 center2, double radius, int resolution)
+Mesh<VertexP3N3> MeshFactory::MakeCapsule<Mesh<VertexP3N3>>(glm::vec3 center1, glm::vec3 center2, double radius, int resolution)
 {
   Vector<glm::vec3> vertex_positions;
   Vector<VertexP3N3> vertices;
@@ -339,6 +409,96 @@ Mesh<VertexP3N3> MeshFactory::MakeCapsule<VertexP3N3>(glm::vec3 center1, glm::ve
   m.SetTransform(MakeTransform(center, glm::vec3(1,0,0), axis)); // from_rotation is (1,0,0) because our capsule is generated along the x-axis
   return m;
 }
+
+template <>
+Mesh<VertexP3N3> MeshFactory::MakeTriangleMesh<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions, Vector<GLuint> indices, Vector<glm::vec3> normals)
+{
+  Vector<VertexP3N3> vertices;
+
+  // if we have the right number of normals, use them; if not generate some
+  if (vertexPositions.size() == normals.size())
+  {
+    for (int i = 0; i < vertexPositions.size(); i++)
+    {
+      vertices.push_back({
+        { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
+        { normals[i].x, normals[i].y, normals[i].z }
+      });
+    }
+  }
+  else
+  {
+    for (int i = 0; i < vertexPositions.size(); i++)
+    {
+      vertices.push_back({
+        { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
+        { 0, 0, 0 }
+      });
+    }
+
+    // generate flat normals for each triangle in the mesh according to their vertex ordering
+    for (int i = 0; i < indices.size(); i+=3)
+    {
+      glm::vec3 normal = glm::cross(glm::normalize(vertexPositions[indices[i+1]] - vertexPositions[indices[i]]),
+                                    glm::normalize(vertexPositions[indices[i+2]] - vertexPositions[indices[i]]));
+      vertices[indices[i]].normal[0] = normal.x; vertices[indices[i]].normal[1] = normal.y; vertices[indices[i]].normal[2] = normal.z;
+      vertices[indices[i+1]].normal[0] = normal.x; vertices[indices[i+1]].normal[1] = normal.y; vertices[indices[i+1]].normal[2] = normal.z;
+      vertices[indices[i+2]].normal[0] = normal.x; vertices[indices[i+2]].normal[1] = normal.y; vertices[indices[i+2]].normal[2] = normal.z;
+    }
+  }
+
+  Mesh<VertexP3N3> m = Mesh<VertexP3N3>(vertices, indices);
+  return m;
+}
+
+template <>
+Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions)
+{
+  Vector<VertexP3N3> vertices;
+  Vector<GLuint> indices;
+
+  int root = 0;
+  int prev_pos = 1; int prev_idx = 1;
+  int curr_pos = 2; int curr_idx = 2;
+  while (curr_pos < vertexPositions.size())
+  {
+    glm::vec3 normal = glm::cross(glm::normalize(vertexPositions[prev_pos] - vertexPositions[root]),  // generate a uniform normal for each triangle
+                                  glm::normalize(vertexPositions[curr_pos] - vertexPositions[root]));
+
+    if (curr_pos == 2) // root vertex only needs to be added once
+    {
+      vertices.push_back({
+        { vertexPositions[root].x, vertexPositions[root].y, vertexPositions[root].z },
+        { normal.x, normal.y, normal.z }
+      });
+    }
+    indices.push_back(root);
+
+    if (prev_pos == 1) // second vertex will be added as curr_pos in future iterations
+    {
+      vertices.push_back({
+        { vertexPositions[prev_pos].x, vertexPositions[prev_pos].y, vertexPositions[prev_pos].z },
+        { normal.x, normal.y, normal.z }
+      });
+    }
+    indices.push_back(prev_idx);
+
+    vertices.push_back({
+      { vertexPositions[curr_pos].x, vertexPositions[curr_pos].y, vertexPositions[curr_pos].z },
+      { normal.x, normal.y, normal.z }
+    });
+    indices.push_back(curr_idx);
+
+    prev_pos = curr_pos;
+    curr_pos++;
+    prev_idx = curr_idx;
+    curr_idx = vertices.size(); // after first iteration, we only add one vertex per iteration
+  }
+
+  Mesh<VertexP3N3> m = Mesh<VertexP3N3>(vertices, indices);
+  return m;
+}
+
 
 glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation)
 {
@@ -394,8 +554,8 @@ void MeshFactory::MakeQuadMesh(double width, double height, Vector<glm::vec3>* v
   };
 
   *indices = {
-    0, 3, 1,  // first triangle
-    0, 2, 3   // second triangle
+    0, 1, 2,  // first triangle
+    1, 3, 2   // second triangle
   };
 }
 
@@ -628,6 +788,37 @@ void MeshFactory::MakeCapsuleMesh(double length, double radius, unsigned int res
       r_indices.push_back((i+1) * resolution + (j+1)); // top-right
     }
   }
+}
+
+void MeshFactory::MakeBoxMesh(double xLength, double yLength, double zLength, Vector<glm::vec3>* vertex_positions, Vector<GLuint>* indices)
+{
+  double halfX = xLength / 2.0;
+  double halfY = yLength / 2.0;
+  double halfZ = zLength / 2.0;
+
+  *vertex_positions = {
+    { -halfX, -halfY,  halfZ }, {  halfX, -halfY,  halfZ },
+    {  halfX,  halfY,  halfZ }, { -halfX,  halfY,  halfZ },
+    { -halfX, -halfY, -halfZ }, { -halfX,  halfY, -halfZ },
+    {  halfX,  halfY, -halfZ }, {  halfX, -halfY, -halfZ },
+    { -halfX,  halfY, -halfZ }, { -halfX,  halfY,  halfZ },
+    {  halfX,  halfY,  halfZ }, {  halfX,  halfY, -halfZ },
+    { -halfX, -halfY, -halfZ }, {  halfX, -halfY, -halfZ },
+    {  halfX, -halfY,  halfZ }, { -halfX, -halfY,  halfZ },
+    {  halfX, -halfY, -halfZ }, {  halfX,  halfY, -halfZ },
+    {  halfX,  halfY,  halfZ }, {  halfX, -halfY,  halfZ },
+    { -halfX, -halfY, -halfZ }, { -halfX, -halfY,  halfZ },
+    { -halfX,  halfY,  halfZ }, { -halfX,  halfY, -halfZ }
+  };
+
+  *indices = {
+     0,  1,  2,      0,  2,  3,
+     4,  5,  6,      4,  6,  7,
+     8,  9, 10,      8, 10, 11,
+    12, 13, 14,     12, 14, 15,
+    16, 17, 18,     16, 18, 19,
+    20, 21, 22,     20, 22, 23
+  };
 }
 
 } // namespace ar

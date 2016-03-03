@@ -1,14 +1,12 @@
-#include "renderer.hpp"
-#include "mesh/vertex.hpp"
-#include "mesh/mesh.hpp"
-#include "mesh/meshfactory.hpp"
-#include "windowmanager/windowmanager.hpp"
+#include "Renderer.hpp"
+#include "mesh/MeshFactory.hpp"
 #include "common.hpp"
-
-#include <imgui.h>
 
 namespace ar
 {
+
+// used to synchronize between all active rendering threads to work around IMGUI not playing nice with threads
+std::mutex Renderer::_renderGUILock;
 
 Renderer::Renderer(GLFWwindow* window)
   : _windowEvents(window), _imguiRenderer(window), _camera(_windowEvents)
@@ -18,12 +16,12 @@ Renderer::Renderer(GLFWwindow* window)
 
   _windowEvents.GetFrameBufferResizedDelegate() += [this](int w, int h)
   {
-    this->onWindowResized(w, h);
+    this->OnWindowResized(w, h);
   };
 
   _windowEvents.GetWindowResizedDelegate() += [this](int w, int h)
   {
-    this->onFramebufferResized(w, h);
+    this->OnFramebufferResized(w, h);
   };
 
   // Listen for keyboard input
@@ -85,9 +83,9 @@ void Renderer::Start()
   std::condition_variable init_complete;
   _renderThread = std::thread([this, &init_complete]()
   {
-    this->init();
+    this->Init();
     init_complete.notify_all();
-    this->render();
+    this->Render();
   });
 
   // wait for initialization to finish before returning
@@ -147,13 +145,111 @@ void Renderer::SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up
 unsigned int Renderer::Add3DMesh(Mesh3D mesh, SharedPtr<Material> material)
 {
   MutexLockGuard guard(_mutex);
-  unsigned int handle = GenerateMeshHandle(mesh);
+  unsigned int handle = GenerateMeshHandle();
   mesh.SetMaterial(material);
   mesh.SetShader(&_defaultShader);
   mesh.SetID(handle);
 
   _new3DMeshes.push_back(mesh);
   return handle;
+}
+
+unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints, Color color)
+{
+  if (!_running)
+  {
+    throw std::runtime_error("Renderer was not started before being sent data!");
+  }
+
+  MutexLockGuard guard(_mutex);
+
+  unsigned int handle = GenerateMeshHandle();
+  const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
+
+  PointCloud<VertexP4> pointcloud;
+
+  pointcloud.SetPoints(verts, numPoints);
+  pointcloud.SetID(handle);
+  pointcloud.SetShader(&_pointCloudShader);
+  pointcloud.SetMaterial(std::make_shared<FlatColorMaterial>(color));
+
+  _pointClouds.push_back(std::move(pointcloud));
+
+  return handle;
+}
+
+void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color)
+{
+  const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
+  for (auto& cloud : _pointClouds)
+  {
+    if (cloud.ID() == handle)
+    {
+      MutexLockGuard guard(_mutex);
+      cloud.SetPoints(verts, numPoints);
+      cloud.SetMaterial(std::make_shared<FlatColorMaterial>(color));
+      break;
+    }
+  }
+}
+
+void Renderer::Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material)
+{
+  MutexLockGuard guard(_mutex);
+  RemoveMesh(handle);
+
+  mesh.SetMaterial(material);
+  mesh.SetShader(&_defaultShader);
+  mesh.SetID(handle);
+  _new3DMeshes.push_back(mesh);
+}
+
+void Renderer::UpdateTransform(unsigned int handle, glm::mat4 transform, bool absolute)
+{
+  if (handle == 0) { return; }
+  MutexLockGuard guard(_mutex);
+  for (auto& m : _3DMeshes)
+  {
+    if (m.ID() == handle)
+    {
+      if (absolute)
+      {
+        m.SetTransform(transform);
+      }
+      else
+      {
+        m.SetTransform(transform * m.GetTransform());
+      }
+    }
+  }
+  for (auto& m : _new3DMeshes)
+  {
+    if (m.ID() == handle)
+    {
+      if (absolute)
+      {
+        m.SetTransform(transform);
+      }
+      else
+      {
+        m.SetTransform(transform * m.GetTransform());
+      }
+    }
+  }
+  for (auto& c : _pointClouds)
+  {
+    if (c.ID() == handle)
+    {
+      if (absolute)
+      {
+        c.SetTransform(transform);
+      }
+      else
+      {
+        c.SetTransform(transform * c.GetTransform());
+      }
+    }
+  }
 }
 
 void Renderer::RemoveMesh(unsigned int handle)
@@ -165,7 +261,6 @@ void Renderer::RemoveMesh(unsigned int handle)
     if (m.ID() == handle)
     {
       m.MarkForDeletion();
-      break;
     }
   }
   for (auto& m : _new3DMeshes)
@@ -173,7 +268,13 @@ void Renderer::RemoveMesh(unsigned int handle)
     if (m.ID() == handle)
     {
       m.MarkForDeletion();
-      break;
+    }
+  }
+  for (auto& c : _pointClouds)
+  {
+    if (c.ID() == handle)
+    {
+      c.MarkForDeletion();
     }
   }
 }
@@ -188,12 +289,16 @@ void Renderer::RemoveAllMeshes()
   {
     m.MarkForDeletion();
   }
+  for (auto& c : _pointClouds)
+  {
+    c.MarkForDeletion();
+  }
 }
 
 /// TODO: make this more robust
 /// Each mesh should get a unique ID we can use later to find it, even if
 /// the renderer has resorted the vector containing it.
-unsigned int Renderer::GenerateMeshHandle(Mesh3D mesh)
+unsigned int Renderer::GenerateMeshHandle()
 {
   static unsigned int nextID = 0;
   return ++nextID;
@@ -221,18 +326,17 @@ void Renderer::UpdateProjection()
   }
 }
 
-void Renderer::init()
+void Renderer::Init()
 {
   MutexLockGuard guard(_mutex);
 
   // setup OpenGL context and open a window for rendering
-  init_GL();
+  Init_GL();
 
   // init buffers
   _2DMeshBuffer = UniquePtr<VertexBuffer<Vertex2D>>(new VertexBuffer<Vertex2D>());
   _3DMeshBuffer = UniquePtr<VertexBuffer<Vertex3D>>(new VertexBuffer<Vertex3D>());
   _voxelInstancedVertexBuffer = UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>>(new InstancedVertexBuffer<VertexP3N3, VertexP3C4S>());
-  _pointCloud.InitVertexBuffer();
 
   // load shaders
   _defaultShader.loadAndLink(ShaderSources::sh_simpleNormal_vert, ShaderSources::sh_simpleLit_frag);
@@ -240,13 +344,11 @@ void Renderer::init()
   _pointCloudShader.loadAndLink(ShaderSources::sh_pointCloud_vert, ShaderSources::sh_flatShaded_frag);
   _voxelShader.loadAndLink(ShaderSources::sh_voxel_vert, ShaderSources::sh_voxel_frag);
 
-  _pointCloud.SetShader(&_pointCloudShader);
-
   // setup default goemetry needed for rendering and send it to OpenGL
-  init_geometry();
+  Init_geometry();
 
   // generate texture handles and allocate space for default textures
-  init_textures();
+  Init_textures();
 
   _imguiRenderer.Init();
 
@@ -254,7 +356,7 @@ void Renderer::init()
   _running = true;
 }
 
-void Renderer::init_GL()
+void Renderer::Init_GL()
 {
   // bind GL context to this thread
   glfwMakeContextCurrent(_window);
@@ -266,70 +368,18 @@ void Renderer::init_GL()
   glPointSize(5.0f);
 }
 
-void Renderer::init_geometry()
+void Renderer::Init_geometry()
 {
-  // prepare video pane
-  // TODO: Get this from MeshFactory
-  Vector<Vertex2D> videoVertices = {
-    //   Position        UV Coords
-     { {-1.0f, -1.0f}, {0.0f, 1.0f} },
-     { { 1.0f, -1.0f}, {1.0f, 1.0f} },
-     { {-1.0f,  1.0f}, {0.0f, 0.0f} },
-     { { 1.0f,  1.0f}, {1.0f, 0.0f} }
-  };
+  Mesh2D videoPane = MeshFactory::MakeQuad<Mesh2D>(glm::vec2(0, 0), 2.0, 2.0); // vertices range from -1..1
+  videoPane.SetShader(&_videoShader);
+  _2DMeshes.push_back(videoPane); //TexturedQuad(videoVertices, videoIndices, &_videoShader));
 
-  Vector<GLuint> videoIndices = {
-      0, 1, 3, // first triangle
-      0, 3, 2  // second triangle
-  };
-
-  _2DMeshes.push_back(TexturedQuad(videoVertices, videoIndices, &_videoShader));
-
-  // create a flat shaded cube for the voxel buffer
-  // TODO: Move this to MeshFactory
-  Vector<Vertex3D> cube
-    {
-      { -1, -1,  1 }, {  1, -1,  1 }, {  1,  1,  1 }, { -1,  1,  1 },
-      { -1, -1, -1 }, { -1,  1, -1 }, {  1,  1, -1 }, {  1, -1, -1 },
-      { -1,  1, -1 }, { -1,  1,  1 }, {  1,  1,  1 }, {  1,  1, -1 },
-      { -1, -1, -1 }, {  1, -1, -1 }, {  1, -1,  1 }, { -1, -1,  1 },
-      {  1, -1, -1 }, {  1,  1, -1 }, {  1,  1,  1 }, {  1, -1,  1 },
-      { -1, -1, -1 }, { -1, -1,  1 }, { -1,  1,  1 }, { -1,  1, -1 },
-    };
-
-  const Vector<glm::vec3> faceNormals
-    {
-      {  0,  0,  1 },
-      {  0,  0, -1 },
-      {  0,  1,  0 },
-      {  0, -1,  0 },
-      {  1,  0,  0 },
-      { -1,  0,  0 },
-    };
-
-  const Vector<GLuint> indices
-    {
-      0,  1,  2,      0,  2,  3,
-      4,  5,  6,      4,  6,  7,
-      8,  9,  10,     8,  10, 11,
-      12, 13, 14,     12, 14, 15,
-      16, 17, 18,     16, 18, 19,
-      20, 21, 22,     20, 22, 23,
-    };
-
-  // Set vertex normals
-  for (size_t i = 0; i < cube.size(); i++)
-  {
-    cube[i].normal[0] = faceNormals[i / 4].x;
-    cube[i].normal[1] = faceNormals[i / 4].y;
-    cube[i].normal[2] = faceNormals[i / 4].z;
-  }
-
-  _voxelInstancedVertexBuffer->SetVertices(cube);
-  _voxelInstancedVertexBuffer->SetIndices(indices);
+  auto voxel_base_mesh = MeshFactory::MakeCube<Mesh3D>(glm::vec3(0, 0, 0), 1.0);
+  _voxelInstancedVertexBuffer->SetVertices(voxel_base_mesh.GetVertices());
+  _voxelInstancedVertexBuffer->SetIndices(voxel_base_mesh.GetIndices());
 }
 
-void Renderer::init_textures()
+void Renderer::Init_textures()
 {
     // initialize video texture to be the same size as our window
     _videoWidth = _windowWidth; _videoHeight = _windowHeight;
@@ -341,24 +391,24 @@ void Renderer::init_textures()
 
     GLuint videoTexture;
     glGenTextures(1, &videoTexture);
-    bufferTexture(_videoWidth, _videoHeight, videoTexture, _currentVideoFrame.get());
+    BufferTexture(_videoWidth, _videoHeight, videoTexture, _currentVideoFrame.get());
 
     _2DMeshes[0].SetTexture(videoTexture); /// TODO: Don't do this...
 }
 
-void Renderer::onWindowResized(int newWidth, int newHeight)
+void Renderer::OnWindowResized(int newWidth, int newHeight)
 {
   _windowWidth = newWidth;
   _windowHeight = newHeight;
 }
 
-void Renderer::onFramebufferResized(int newWidth, int newHeight)
+void Renderer::OnFramebufferResized(int newWidth, int newHeight)
 {
   glViewport(0, 0, newWidth, newHeight);
   UpdateProjection();
 }
 
-void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
+void Renderer::BufferTexture(int width, int height, GLuint tex, unsigned char* pixels)
 {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex);
@@ -382,7 +432,7 @@ void Renderer::bufferTexture(int width, int height, GLuint tex, unsigned char* p
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Renderer::enableRenderPass(RenderPassParams pass)
+void Renderer::EnableRenderPass(RenderPassParams pass)
 {
   // Enable Depth if set, otherwise ensure it's disabled
   if (pass & EnableDepth)
@@ -418,25 +468,25 @@ void Renderer::enableRenderPass(RenderPassParams pass)
   }
 }
 
-void Renderer::render()
+void Renderer::Render()
 {
   while (_running)
   {
     // check for new meshes, video data, etc.
-    update();
+    Update();
 
     // Render!
-    renderOneFrame();
+    RenderOneFrame();
 
     glfwSwapBuffers(_window);
     glfwPollEvents();
   }
 
   // if we've stopped rendering, cleanup
-  shutdown();
+  Shutdown();
 }
 
-void Renderer::update()
+void Renderer::Update()
 {
 
   // TODO: Pass deltaTime
@@ -446,7 +496,7 @@ void Renderer::update()
   if (_newVideoFrame)
   {
     MutexLockGuard guard(_mutex);
-    bufferTexture(_videoWidth, _videoHeight, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
+    BufferTexture(_videoWidth, _videoHeight, _2DMeshes[0].GetTexture(), _currentVideoFrame.get());
     _newVideoFrame = false;
   }
 
@@ -456,30 +506,48 @@ void Renderer::update()
   // mesh, but we'd still have to go through all the other meshes to update their offsets
   // and re-send the modified buffer to the GPU, so the gains may not be terribly meaningful.
   bool mustRegenerateVBO_2D = false;
-  for (int i = 0; i < _2DMeshes.size(); i++)
+  for (auto it = _2DMeshes.begin(); it != _2DMeshes.end(); )
   {
-    if (_2DMeshes[i].PendingDelete())
+    if (it->PendingDelete())
     {
-      _2DMeshes.erase(_2DMeshes.begin() + i); // remove mesh
+      it = _2DMeshes.erase(it);
       _2DMeshBuffer->ClearAll();   // empty vertex buffer so it can be rebuilt
       mustRegenerateVBO_2D = true;
     }
+    else
+    {
+      ++it;
+    }
   }
   bool mustRegenerateVBO_3D = false;
-  for (int i = 0; i < _3DMeshes.size(); i++)
+  for (auto it = _3DMeshes.begin(); it != _3DMeshes.end(); )
   {
-    if (_3DMeshes[i].PendingDelete())
+    if (it->PendingDelete())
     {
-      _3DMeshes.erase(_3DMeshes.begin() + i);
+      it = _3DMeshes.erase(it);
       _3DMeshBuffer->ClearAll();
       mustRegenerateVBO_3D = true;
     }
+    else
+    {
+      ++it;
+    }
   }
 
-  // if we have any new mesh data, and nobody else is using it right now,
-  // update buffers and send it to the GPU
-  if (!_mutex.try_lock())
-    return;
+  for (auto it = _pointClouds.begin(); it != _pointClouds.end(); )
+  {
+    if (it->PendingDelete())
+    {
+      it = _pointClouds.erase(it);
+    }
+    else
+    {
+      ++it;
+    }
+  }
+
+  // if we have any new mesh data, update buffers and send it to the GPU
+  _mutex.lock();
 
   for (auto& m : _2DMeshes)
   {
@@ -496,25 +564,36 @@ void Renderer::update()
   }
   for (auto& m : _new3DMeshes)
   {
+    if (!m.PendingDelete()) // if a mesh was already deleted, don't bother adding it
+      _3DMeshes.push_back(m);
+  }
+  _new3DMeshes.clear(); // empty new list since we've extracted all new meshes
+  for (auto& m : _3DMeshes)
+  {
     if (m.Dirty() || mustRegenerateVBO_3D)
     {
       m.SetVertexOffset(_3DMeshBuffer->AddVertices(m.GetVertices()));
       m.SetIndexOffset(_3DMeshBuffer->AddIndices(m.GetIndices()));
       m.ClearDirty();
-      _3DMeshes.push_back(m);
     }
   }
-  _new3DMeshes.clear(); // empty new list since we've extracted all new meshes
 
   if (_3DMeshBuffer->Dirty())
   {
     _3DMeshBuffer->BufferData();
   }
 
-
-  if (_pointCloud.GetVertexBuffer()->Dirty())
+  for (auto& cloud : _pointClouds)
   {
-    _pointCloud.GetVertexBuffer()->BufferData();
+    if (cloud.Dirty())
+    {
+      cloud.UpdateBuffer();
+    }
+
+    if (cloud.GetVertexBuffer()->Dirty())
+    {
+      cloud.GetVertexBuffer()->BufferData();
+    }
   }
 
   _voxelInstancedVertexBuffer->BufferData();
@@ -522,7 +601,7 @@ void Renderer::update()
   _mutex.unlock();
 }
 
-void Renderer::renderOneFrame()
+void Renderer::RenderOneFrame()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -530,7 +609,7 @@ void Renderer::renderOneFrame()
   * First pass:
   *   render all 2D textured shapes
   *************/
-  enableRenderPass(Blend_None);
+  EnableRenderPass(Blend_None);
   for (auto& m : _2DMeshes)
   {
     const auto& shader = m.GetShader();
@@ -547,31 +626,35 @@ void Renderer::renderOneFrame()
   * Second pass:
   *   render point cloud
   *************/
-  if (_pointCloud.ShouldDraw())
+  EnableRenderPass(Blend_Add);
+  for (auto& cloud : _pointClouds)
   {
-    enableRenderPass(Blend_Add);
-    const auto& shader = _pointCloud.GetShader();
-    shader->enable();
+    if (cloud.ShouldDraw())
+    {
+      const auto& shader = cloud.GetShader();
+      shader->enable();
+      cloud.GetMaterial()->Apply();
 
-    glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * _pointCloud.GetTransform();
-    glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
-    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &_pointCloud.GetTransform()[0][0]);
-    glUniform1f(shader->getUniform("fadeDepth"), _pointCloud._fadeDepth);
+      glm::mat4 mvp = GetProjectionMatrix() * GetViewMatrix() * cloud.GetTransform();
+      glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &cloud.GetTransform()[0][0]);
+      glUniform1f(shader->getUniform("fadeDepth"), cloud._fadeDepth);
 
 
-    GLfloat storedPointSize;
-    glGetFloatv(GL_POINT_SIZE, &storedPointSize);
-    glPointSize(_pointCloud._pointSize);
+      GLfloat storedPointSize;
+      glGetFloatv(GL_POINT_SIZE, &storedPointSize);
+      glPointSize(cloud._pointSize);
 
-    _pointCloud.GetVertexBuffer()->Draw();
+      cloud.GetVertexBuffer()->Draw();
 
-    glPointSize(storedPointSize);
+      glPointSize(storedPointSize);
+    }
   }
 
   if (_voxelInstancedVertexBuffer->InstanceCount() > 0)
   {
     ShaderProgram& shader = _voxelShader;
-    enableRenderPass(Blend_None | EnableDepth);
+    EnableRenderPass(Blend_None | EnableDepth);
     shader.enable();
 
     glm::mat4 modelTransform = glm::mat4(1.0f);
@@ -592,7 +675,7 @@ void Renderer::renderOneFrame()
   * Third pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  enableRenderPass(Blend_Add);
+  EnableRenderPass(Blend_Add);
   for (auto& m : _3DMeshes)
   {
     const auto& shader = m.GetShader();
@@ -616,12 +699,10 @@ void Renderer::renderOneFrame()
   glUseProgram(0);
 
   // Render GUI last
-  renderGUI();
+  RenderGUI();
 }
 
-static std::mutex _renderGUILock;
-
-void Renderer::renderGUI()
+void Renderer::RenderGUI()
 {
   // Still need to lock here to prevent a crash when switching focus between windows.
   MutexLockGuard guard(_renderGUILock);
@@ -634,16 +715,19 @@ void Renderer::renderGUI()
 
   _imguiRenderer.NewFrame();
   _camera.RenderGUI();
-  _pointCloud.RenderGUI();
 
   _renderGUIDelegate();
 
-  ImGui::ShowTestWindow();
+  for (auto& cloud : _pointClouds)
+  {
+    cloud.RenderGUI();
+  }
+
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
 }
 
-void Renderer::shutdown()
+void Renderer::Shutdown()
 {
   // Clean up any textures still in use
   for (auto m : _2DMeshes)
@@ -661,20 +745,7 @@ void Renderer::shutdown()
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 
-void Renderer::DrawPointCloud(const void* pointData, size_t numPoints)
-{
-  if (!_running)
-  {
-    throw std::runtime_error("Renderer was not started before being sent data!");
-  }
-
-  MutexLockGuard guard(_mutex);
-
-  const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
-  _pointCloud.SetPoints(verts, numPoints);
-}
-
-void Renderer::DrawVoxels(const ARVisualizer::Voxel* voxels, size_t numVoxels)
+void Renderer::DrawVoxels(const Voxel* voxels, size_t numVoxels)
 {
   if (!_running)
   {

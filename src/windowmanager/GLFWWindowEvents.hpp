@@ -1,7 +1,7 @@
 #ifndef _GLFWWINDOWEVENTS_H
 #define _GLFWWINDOWEVENTS_H
 
-#include "windowevents.hpp"
+#include "WindowEvents.hpp"
 
 #ifndef GL_GLEXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES

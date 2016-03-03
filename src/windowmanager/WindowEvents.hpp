@@ -1,7 +1,7 @@
 #ifndef _WINDOWEVENTS_H
 #define _WINDOWEVENTS_H
 
-#include "delegate.hpp"
+#include "Delegate.hpp"
 
 namespace ar
 {

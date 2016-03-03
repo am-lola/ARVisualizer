@@ -8,8 +8,9 @@
 
 in vec4 frag_color;
 out vec4 outColor;
+uniform vec4 color;
 
 void main()
 {
-  outColor = frag_color;
+  outColor = frag_color * color;
 }

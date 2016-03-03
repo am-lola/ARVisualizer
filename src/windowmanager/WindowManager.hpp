@@ -8,8 +8,8 @@
 #include <algorithm>
 #include <condition_variable>
 #include <atomic>
-#include "renderer.hpp"
-#include "wmcommand.hpp"
+#include "Renderer.hpp"
+#include "WMCommand.hpp"
 
 namespace ar
 {

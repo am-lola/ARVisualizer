@@ -6,6 +6,9 @@ namespace ar
 
 // The commands WindowManger is able to process are defined here
 
+
+class Renderer;
+
 enum WMCommandType
 {
   OPEN_WINDOW,
