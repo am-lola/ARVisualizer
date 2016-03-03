@@ -11,6 +11,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui")
 
 option(ARVIS_BUILD_LIBRARY "Build AR Visualization library" TRUE)
 option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
+option(ARVIS_BUILD_DOCS    "Build Project Documentation" FALSE)
 option(GLFW_STATIC_LINKAGE "Link GLFW3 statically" TRUE)
 
 # Figure out whether we should be linking against the static or shared version of GLFW3
@@ -119,3 +120,27 @@ if (ARVIS_BUILD_SAMPLES)
     add_executable(sample_multiple_windows samples/multiple_windows/main.cpp)
     target_link_libraries(sample_multiple_windows arvisualizer)
 endif()
+
+# Documentation
+if (ARVIS_BUILD_DOCS)
+    find_program(CLDOC cldoc)
+    if( NOT CLDOC )
+        message("CLDOC: ${CLDOC}")
+        message(FATAL_ERROR "Could not find cldoc! Documentation cannot be built!")
+    else()
+        add_custom_target(
+             documentation
+             COMMAND
+             ${CLDOC} generate
+             -I${CMAKE_CURRENT_SOURCE_DIR}/src
+             -I${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
+             --std=c++11
+             --
+             --basedir ${CMAKE_CURRENT_SOURCE_DIR}/src
+             --output ${CMAKE_CURRENT_BINARY_DIR}/docs
+             ${CMAKE_CURRENT_SOURCE_DIR}/src/*
+             COMMENT "Generating Documentation..."
+         )
+    endif()
+endif()
+
