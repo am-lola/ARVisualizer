@@ -38,7 +38,7 @@ To compile the samples, you will also need [PCL](http://pointclouds.org/) and [O
 
 To build the documentation you will also need [cldoc](https://jessevdk.github.io/cldoc/)
 
-A script is provided in /scripts/install_dependencies.sh which can be used to automatically fetch and install the necessary dependencies on Ubuntu-based platforms:
+A script is provided in `/scripts/install_dependencies.sh` which can be used to automatically fetch and install the necessary dependencies on Ubuntu-based platforms:
 
     install_dependencies.sh
         Installs the minimum dependencies necessary to build the library
