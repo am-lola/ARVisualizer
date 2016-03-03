@@ -89,6 +89,7 @@ if (ARVIS_BUILD_LIBRARY)
       src/geometry/PolyMesh.hpp
       src/geometry/Quad.hpp
       src/geometry/Sphere.hpp
+      src/geometry/Transform.hpp
       src/geometry/Triangle.hpp
       src/geometry/Voxel.hpp
       DESTINATION ${include_install_dir}/geometry/
