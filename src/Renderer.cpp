@@ -186,8 +186,7 @@ void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size
     if (cloud.ID() == handle)
     {
       MutexLockGuard guard(_mutex);
-      cloud.SetPoints(verts, numPoints);
-      cloud.SetMaterial(std::make_shared<FlatColorMaterial>(color));
+      cloud.SetPoints(verts, numPoints); /// TODO: Update pointcloud's color
       break;
     }
   }
