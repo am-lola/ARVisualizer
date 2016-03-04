@@ -48,6 +48,60 @@ void Camera::Update(float deltaTime)
   _position += _up * (_movementUp * _movementSpeed * deltaTime);
 }
 
+void Camera::RenderGUI()
+{
+  ImGui::Begin("Camera");
+
+  ImGui::Text("Pos: (%.2f, %.2f, %.2f)", _position.x, _position.y, _position.z);
+
+  ImGui::Separator();
+  ImGui::PushItemWidth(-100);
+
+  static float sensitivity;
+  static float movementSpeed;
+  sensitivity   = _sensitivity;
+  movementSpeed = _movementSpeed;
+
+  ImGui::SliderFloat("Sensitivity", &sensitivity, 0.2f, 10.0f);
+  _sensitivity = sensitivity;
+  ImGui::SliderFloat("Movement Speed", &movementSpeed, 0.2f, 20.0f);
+  _movementSpeed = movementSpeed;
+
+  if (ImGui::Button("Reset View"))
+    Reset();
+
+  ImGui::End();
+}
+
+void Camera::Reset()
+{
+  _position = _basePosition;
+  _forward  = _baseForward;
+  _up       = _baseUp;
+  _right    = glm::cross(_up, _forward);
+}
+
+glm::mat4 Camera::GetViewMatrix() const
+{
+  return glm::lookAt(
+      _position,
+      _forward + _position,
+      _up
+    );
+}
+
+void Camera::SetPosition(const glm::vec3& position)
+{
+  _position = position;
+}
+
+void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
+{
+  _forward = forward;
+  _up = up;
+  _right = glm::cross(_up, _forward);
+}
+
 void Camera::OnMouseMove(double xpos, double ypos)
 {
   if (ImGui::IsAnyItemActive() || ImGui::IsMouseHoveringAnyWindow())
@@ -59,31 +113,15 @@ void Camera::OnMouseMove(double xpos, double ypos)
   _prevMouseX = xpos;
   _prevMouseY = ypos;
 
-  if (!_mousePressed)
-    return;
-
-  float rot_hor = deltaX * _sensitivity * -0.01f;
-  float rot_ver = deltaY * _sensitivity *  0.01f;
-
-  if (rot_hor != 0)
+  if (_leftMousePressed)
   {
-    // rotate around vertical axis
-    _forward = glm::rotate(_forward, rot_hor, _up);
-    // compute new right vector (necessary to keep horizontal movement & vertical rotation correct)
-    _right = glm::normalize(glm::cross(_up, _forward));
+    Rotate(deltaX, deltaY);
+  }
+  if (_rightMousePressed)
+  {
+    Pan(deltaX, deltaY);
   }
 
-  if (rot_ver != 0)
-  {
-    // rotate around horizontal axis
-    glm::vec3 newForward = glm::rotate(_forward, rot_ver, _right);
-
-    // only take the new vertical rotation if it's within +/- 90 degrees of our vertical axis
-    if (glm::angle(glm::cross(newForward, _right), _up) < glm::half_pi<float>())
-    {
-      _forward = newForward;
-    }
-  }
 }
 
 void Camera::OnMouseButton(int button, int action, int mods)
@@ -91,13 +129,28 @@ void Camera::OnMouseButton(int button, int action, int mods)
   if (action == GLFW_PRESS && (ImGui::IsAnyItemActive() || ImGui::IsMouseHoveringAnyWindow()))
     return;
 
-  if (button != 0)
-    return;
-
   if (action == GLFW_PRESS)
-    _mousePressed = true;
+  {
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+      _leftMousePressed = true;
+    }
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+    {
+      _rightMousePressed = true;
+    }
+  }
   else if (action == GLFW_RELEASE)
-    _mousePressed = false;
+  {
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+      _leftMousePressed = false;
+    }
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+    {
+      _rightMousePressed = false;
+    }
+  }
 }
 
 void Camera::OnKey(int key, int scancode, int action, int mods)
@@ -152,58 +205,39 @@ void Camera::OnScroll(double offset)
   _movementSpeed = std::max(0.1f, _movementSpeed + deltaSpeed);
 }
 
-glm::mat4 Camera::GetViewMatrix() const
+void Camera::Rotate(double dx, double dy)
 {
-  return glm::lookAt(
-      _position,
-      _forward + _position,
-      _up
-    );
+  float rot_hor = dx * _sensitivity * -0.01f;
+  float rot_ver = dy * _sensitivity *  0.01f;
+
+  if (rot_hor != 0)
+  {
+    // rotate around vertical axis
+    _forward = glm::rotate(_forward, rot_hor, _up);
+    // compute new right vector (necessary to keep horizontal movement & vertical rotation correct)
+    _right = glm::cross(_up, _forward);
+  }
+
+  if (rot_ver != 0)
+  {
+    // rotate around horizontal axis
+    glm::vec3 newForward = glm::rotate(_forward, rot_ver, _right);
+
+    // only take the new vertical rotation if it's within +/- 90 degrees of our vertical axis
+    if (glm::angle(glm::cross(newForward, _right), _up) < glm::half_pi<float>())
+    {
+      _forward = newForward;
+    }
+  }
+
 }
 
-void Camera::SetPosition(const glm::vec3& position)
+void Camera::Pan(double dx, double dy)
 {
-  _position = position;
+  // 'up' vector w.r.t. camera
+  glm::vec3 cameraUp = glm::cross(_forward, _right);
+  glm::vec3 translation = _movementSpeed * 0.001f * ((float)dx * _right + (float)dy * cameraUp);
+  _position += translation;
 }
 
-void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
-{
-  _forward = forward;
-  _up = up;
-  _right = glm::cross(_forward, _up);
-}
-
-void Camera::Reset()
-{
-  _position = _basePosition;
-  _forward  = _baseForward;
-  _up       = _baseUp;
-  _right    = glm::cross(_forward, _up);
-}
-
-void Camera::RenderGUI()
-{
-  ImGui::Begin("Camera");
-
-  ImGui::Text("Pos: (%.2f, %.2f, %.2f)", _position.x, _position.y, _position.z);
-
-  ImGui::Separator();
-  ImGui::PushItemWidth(-100);
-
-  static float sensitivity;
-  static float movementSpeed;
-  sensitivity   = _sensitivity;
-  movementSpeed = _movementSpeed;
-
-  ImGui::SliderFloat("Sensitivity", &sensitivity, 0.2f, 10.0f);
-  _sensitivity = sensitivity;
-  ImGui::SliderFloat("Movement Speed", &movementSpeed, 0.2f, 20.0f);
-  _movementSpeed = movementSpeed;
-
-  if (ImGui::Button("Reset View"))
-    Reset();
-
-  ImGui::End();
-}
-
-}
+} // namespace ar

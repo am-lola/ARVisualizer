@@ -33,6 +33,16 @@ private:
   void OnKey(int key, int scancode, int action, int mods);
   void OnScroll(double offset);
 
+  // Computes new camera orientation from mouse movement
+  // @dx X-distance mouse has moved since previous frame
+  // @dy Y-distance mouse has moved since previous frame
+  void Rotate(double dx, double dy);
+
+  // Computes new camera location from mouse movement
+  // @dx X-distance mouse has moved since previous frame
+  // @dy Y-distance mouse has moved since previous frame
+  void Pan(double dx, double dy);
+
   glm::vec3 _position; // where the camera is
   glm::vec3 _forward;  // where the camera is looking
   glm::vec3 _right;    // right vector
@@ -45,7 +55,8 @@ private:
 
   double _prevMouseX = 0;
   double _prevMouseY = 0;
-  bool _mousePressed = false;
+  bool _leftMousePressed  = false;
+  bool _rightMousePressed = false;
 
   int _movementForward = 0;
   int _movementSide = 0;
