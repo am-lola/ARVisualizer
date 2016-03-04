@@ -38,7 +38,10 @@ private:
   glm::vec3 _right;    // right vector
   glm::vec3 _up;       // "up" in world space
 
-  glm::vec3 _rot;      // yaw, pitch, roll (euler angles)
+  // default (untransformed) camera pose parameters
+  glm::vec3 _basePosition = {0.0f, 0.0f, 0.0f};
+  glm::vec3 _baseForward  = {0.0f, 0.0f, 1.0f};
+  glm::vec3 _baseUp       = {0.0f, 1.0f, 0.0f};
 
   double _prevMouseX = 0;
   double _prevMouseY = 0;

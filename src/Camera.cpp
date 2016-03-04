@@ -2,7 +2,8 @@
 #include "common.hpp"
 #include "windowmanager/WindowEvents.hpp"
 
-#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp>
 #include <glm/gtc/constants.hpp>
 #include <GLFW/glfw3.h>
 
@@ -61,24 +62,28 @@ void Camera::OnMouseMove(double xpos, double ypos)
   if (!_mousePressed)
     return;
 
-  const float pi = glm::pi<float>();
-  const float twoPi = pi * 2.0f;
+  float rot_hor = deltaX * _sensitivity * -0.01f;
+  float rot_ver = deltaY * _sensitivity *  0.01f;
 
-  _rot.x -= deltaX * _sensitivity * 0.01f;
-  _rot.y += deltaY * _sensitivity * 0.01f;
+  if (rot_hor != 0)
+  {
+    // rotate around vertical axis
+    _forward = glm::rotate(_forward, rot_hor, _up);
+    // compute new right vector (necessary to keep horizontal movement & vertical rotation correct)
+    _right = glm::normalize(glm::cross(_up, _forward));
+  }
 
-  // Normalize yaw angle
-  if (_rot.x < -twoPi)
-    _rot.x += twoPi;
-  else if (_rot.x > twoPi)
-    _rot.x -= twoPi;
+  if (rot_ver != 0)
+  {
+    // rotate around horizontal axis
+    glm::vec3 newForward = glm::rotate(_forward, rot_ver, _right);
 
-  // Clamp pitch to +-90°. Add a small constant for numerical stability.
-  _rot.y = clamp(_rot.y, -pi/2.0f + 0.01f, pi/2.0f - 0.01f);
-
-  glm::mat3 mat = glm::orientate3(_rot);
-  _forward = mat[2];
-  _right = mat[0];
+    // only take the new vertical rotation if it's within +/- 90 degrees of our vertical axis
+    if (glm::angle(glm::cross(newForward, _right), _up) < glm::half_pi<float>())
+    {
+      _forward = newForward;
+    }
+  }
 }
 
 void Camera::OnMouseButton(int button, int action, int mods)
@@ -166,18 +171,14 @@ void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
   _forward = forward;
   _up = up;
   _right = glm::cross(_forward, _up);
-
-  // TODO: Calculate _rot
-  // glm::mat3 mat(_right, _up, _forward);
 }
 
 void Camera::Reset()
 {
-  _position = glm::vec3(0.0f, 0.0f, 0.0f);
-  _forward  = glm::vec3(0.0f, 0.0f, 1.0f);
-  _right    = glm::vec3(1.0f, 0.0f, 0.0f);
-  _up       = glm::vec3(0.0f, 1.0f, 0.0f);
-  _rot      = glm::vec3(0.0f, 0.0f, 0.0f);
+  _position = _basePosition;
+  _forward  = _baseForward;
+  _up       = _baseUp;
+  _right    = glm::cross(_forward, _up);
 }
 
 void Camera::RenderGUI()
@@ -185,18 +186,19 @@ void Camera::RenderGUI()
   ImGui::Begin("Camera");
 
   ImGui::Text("Pos: (%.2f, %.2f, %.2f)", _position.x, _position.y, _position.z);
-  ImGui::Text("Rot: (%.2f, %.2f, %.2f)", _rot.x, _rot.y, _rot.z);
-  ImGui::Text("Movement speed: %.2f", _movementSpeed);
 
   ImGui::Separator();
-
   ImGui::PushItemWidth(-100);
 
-  static float sensitivity = 1.0f;
+  static float sensitivity;
+  static float movementSpeed;
+  sensitivity   = _sensitivity;
+  movementSpeed = _movementSpeed;
 
-  sensitivity = _sensitivity;
   ImGui::SliderFloat("Sensitivity", &sensitivity, 0.2f, 10.0f);
   _sensitivity = sensitivity;
+  ImGui::SliderFloat("Movement Speed", &movementSpeed, 0.2f, 20.0f);
+  _movementSpeed = movementSpeed;
 
   if (ImGui::Button("Reset View"))
     Reset();
