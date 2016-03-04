@@ -107,6 +107,7 @@ public:
 
 private:
   std::atomic_bool _running {false};
+  double _lastFrameTime = 0;
 
   // used to synchronize between rendering thread and other threads contributing data and commands
   std::mutex _mutex;

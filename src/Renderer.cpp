@@ -488,9 +488,12 @@ void Renderer::Render()
 
 void Renderer::Update()
 {
+  // get time since last frame
+  double currentTime = glfwGetTime();
+  double deltaTime = currentTime - _lastFrameTime;
+  _lastFrameTime = currentTime;
 
-  // TODO: Pass deltaTime
-  _camera.Update(0.016);
+  _camera.Update(deltaTime);
 
   // if we've received a new video frame, send it to the GPU
   if (_newVideoFrame)
