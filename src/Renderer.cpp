@@ -62,7 +62,7 @@ Renderer::Renderer(GLFWwindow* window)
   };
 
   // set a default projection matrix
-  UpdateProjection();
+  _camera.UpdateProjection();
 }
 
 Renderer::~Renderer()
@@ -304,28 +304,6 @@ unsigned int Renderer::GenerateMeshHandle()
   return ++nextID;
 }
 
-void Renderer::UpdateProjection()
-{
-  if (_useCameraIntrinsics)
-  {
-    _projectionMatrix = glm::mat4(
-      _cameraMatrix[0][0] / _cameraMatrix[0][2], 0, 0, 0,
-      0, _cameraMatrix[1][1] / _cameraMatrix[1][2], 0, 0,
-      0, 0, -(_camera_params.farClip + _camera_params.nearClip) / (_camera_params.farClip - _camera_params.nearClip), -1.0,
-      0, 0, (-2.0 * _camera_params.farClip * _camera_params.nearClip) / (_camera_params.farClip - _camera_params.nearClip), 0
-    );
-  }
-  else
-  {
-    _projectionMatrix = glm::perspective(
-       _camera_params.fov,
-       (float)_windowWidth / (float)_windowHeight,
-       _camera_params.nearClip,
-       _camera_params.farClip
-     );
-  }
-}
-
 void Renderer::Init()
 {
   MutexLockGuard guard(_mutex);
@@ -405,7 +383,7 @@ void Renderer::OnWindowResized(int newWidth, int newHeight)
 void Renderer::OnFramebufferResized(int newWidth, int newHeight)
 {
   glViewport(0, 0, newWidth, newHeight);
-  UpdateProjection();
+  _camera.SetAspectRatio((float)newWidth / (float)newHeight);
 }
 
 void Renderer::BufferTexture(int width, int height, GLuint tex, unsigned char* pixels)

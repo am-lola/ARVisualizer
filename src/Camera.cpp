@@ -48,6 +48,42 @@ void Camera::Update(float deltaTime)
   _position += _up * (_movementUp * _movementSpeed * deltaTime);
 }
 
+void Camera::UpdateProjection()
+{
+  if (_useCameraIntrinsics)
+  {
+    _projectionMatrix = glm::mat4(
+      _cameraMatrix[0][0] / _cameraMatrix[0][2], 0,        0,       0,
+      0, _cameraMatrix[1][1] / _cameraMatrix[1][2],        0,       0,
+      0, 0, -(_farClip + _nearClip) / (_farClip - _nearClip),    -1.0,
+      0, 0, (-2.0 * _farClip * _nearClip) / (_farClip - _nearClip), 0
+    );
+  }
+  else
+  {
+    _projectionMatrix = glm::perspective(
+       _fov * _zoom,
+       _aspect,
+       _nearClip,
+       _farClip
+     );
+  }
+}
+
+void Camera::SetIntrinsics(double camera_matrix[3][3])
+{
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      _cameraMatrix[i][j] = camera_matrix[i][j];
+    }
+  }
+
+  _useCameraIntrinsics = true;
+  UpdateProjection();
+}
+
 void Camera::RenderGUI()
 {
   ImGui::Begin("Camera");
@@ -79,6 +115,7 @@ void Camera::Reset()
   _forward  = _baseForward;
   _up       = _baseUp;
   _right    = glm::cross(_up, _forward);
+  _zoom     = _baseZoom;
 }
 
 glm::mat4 Camera::GetViewMatrix() const
@@ -88,6 +125,11 @@ glm::mat4 Camera::GetViewMatrix() const
       _forward + _position,
       _up
     );
+}
+
+glm::mat4 Camera::GetProjectionMatrix() const
+{
+  return _projectionMatrix;
 }
 
 void Camera::SetPosition(const glm::vec3& position)
@@ -100,6 +142,12 @@ void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
   _forward = forward;
   _up = up;
   _right = glm::cross(_up, _forward);
+}
+
+void Camera::SetAspectRatio(float ratio)
+{
+  _aspect = ratio;
+  UpdateProjection();
 }
 
 void Camera::OnMouseMove(double xpos, double ypos)
@@ -200,9 +248,7 @@ void Camera::OnScroll(double offset)
   if (ImGui::IsAnyItemActive() || ImGui::IsMouseHoveringAnyWindow())
     return;
 
-  // Control movement speed with the mouse wheel
-  const float deltaSpeed = (float)offset;
-  _movementSpeed = std::max(0.1f, _movementSpeed + deltaSpeed);
+  Zoom(offset);
 }
 
 void Camera::Rotate(double dx, double dy)
@@ -238,6 +284,12 @@ void Camera::Pan(double dx, double dy)
   glm::vec3 cameraUp = glm::cross(_forward, _right);
   glm::vec3 translation = _movementSpeed * 0.001f * ((float)dx * _right + (float)dy * cameraUp);
   _position += translation;
+}
+
+void Camera::Zoom(double dz)
+{
+  _zoom -= dz * 0.001f;
+  UpdateProjection();
 }
 
 } // namespace ar

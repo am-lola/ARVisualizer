@@ -84,23 +84,16 @@ public:
     return _camera.GetViewMatrix();
   }
 
+  // Gets the projection matrix
   glm::mat4 GetProjectionMatrix() const
   {
-    return _projectionMatrix;
+    return _camera.GetProjectionMatrix();
   }
 
+  // Sets intrinsic parameters to adjust projection based on camera calibration data
   void SetCameraIntrinsics(double camera_matrix[3][3])
   {
-      for (int i = 0; i < 3; i++)
-      {
-        for (int j = 0; j < 3; j++)
-        {
-          _cameraMatrix[i][j] = camera_matrix[i][j];
-        }
-      }
-
-      _useCameraIntrinsics = true;
-      UpdateProjection();
+    _camera.SetIntrinsics(camera_matrix);
   }
 
   Delegate<void()> _renderGUIDelegate;
@@ -124,18 +117,7 @@ private:
 
   std::thread _renderThread;
 
-    /// TODO: Move this to Camera class
-  struct camera_parms {
-      float fov          = 45.0f;  // field of view, in degrees
-      float nearClip     = 0.1f;   // distance to near clipping plane
-      float farClip      = 10000.0f; // distance to far clipping plane
-  } _camera_params;
-
   GLuint _renderType = GL_TRIANGLES;
-
-  glm::mat3 _cameraMatrix;
-  glm::mat4 _projectionMatrix;
-  bool _useCameraIntrinsics = false;
 
     /// TODO: move this to its own class
   UniquePtr<unsigned char[]> _currentVideoFrame;
@@ -160,9 +142,6 @@ private:
 
   // Generates a unique ID used to reference meshes from external components
   unsigned int GenerateMeshHandle();
-
-  // Regenerates projection matrix
-  void UpdateProjection();
 
   // ! Call from _renderThread only
   // Updates projection as needed when the window changes size

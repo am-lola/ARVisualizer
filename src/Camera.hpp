@@ -17,14 +17,28 @@ class Camera
 public:
   Camera(WindowEvents& windowEvents);
 
+  // Updates the camera's current position
   void Update(float deltaTime);
+  // Updates the camera's projection matrix
+  void UpdateProjection();
+  // Sets camera's intrinsic projection parameters (from physical camera calibration)
+  void SetIntrinsics(double camera_matrix[3][3]);
+  // Renders the camera's GUI controls window
   void RenderGUI();
+  // Restores the camera position & orientation to default values
   void Reset();
 
+  // Retrieves the camera view matrix
   glm::mat4 GetViewMatrix() const;
+  // Retrieves the camera projection matrix
+  glm::mat4 GetProjectionMatrix() const;
 
+  // Sets the camera's position in space
   void SetPosition(const glm::vec3& position);
+  // Sets the camera's orientation
   void SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up);
+  // Sets the camera's aspect ratio (used for computing the projection matrix)
+  void SetAspectRatio(float ratio);
 
 private:
 
@@ -43,6 +57,19 @@ private:
   // @dy Y-distance mouse has moved since previous frame
   void Pan(double dx, double dy);
 
+  // Zooms camera in or out
+  void Zoom(double dz);
+
+  float _aspect   = 1.0f;    // aspect ratio
+  float _fov      = 45.0f;   // field of view, in degrees
+  float _nearClip = 0.1f;    // distance to near clipping plane
+  float _farClip  = 10000.0f; // distance to far clipping plane
+  float _zoom     = 1.0f;
+
+  glm::mat3 _cameraMatrix;    // camera intrinsic parameters
+  glm::mat4 _projectionMatrix;
+  bool _useCameraIntrinsics = false;
+
   glm::vec3 _position; // where the camera is
   glm::vec3 _forward;  // where the camera is looking
   glm::vec3 _right;    // right vector
@@ -52,6 +79,7 @@ private:
   glm::vec3 _basePosition = {0.0f, 0.0f, 0.0f};
   glm::vec3 _baseForward  = {0.0f, 0.0f, 1.0f};
   glm::vec3 _baseUp       = {0.0f, 1.0f, 0.0f};
+  float     _baseZoom     = 1.0f;
 
   double _prevMouseX = 0;
   double _prevMouseY = 0;
