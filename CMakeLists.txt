@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(am2b-ar)
+project(am2b-arvis)
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
@@ -66,7 +66,7 @@ if (ARVIS_BUILD_LIBRARY)
 
     include(CMakePackageConfigHelpers)
     configure_package_config_file(
-      "cmake/am2b-arConfig.cmake.in"
+      "cmake/am2b-arvisConfig.cmake.in"
       "${project_config}"
       INSTALL_DESTINATION "${config_install_dir}"
       PATH_VARS config_install_dir include_install_dir lib_install_dir

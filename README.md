@@ -4,23 +4,23 @@ A small visualization library
 
 ## Usage
 
-After building and installing the library (`make`, `sudo make install`, you should be able to use it without any trouble in other CMake-based projects. Use `find_package(am2b-ar CONFIG REQUIRED)` to get the paths necessary for building:
+After building and installing the library (`make`, `sudo make install`, you should be able to use it without any trouble in other CMake-based projects. Use `find_package(am2b-arvis CONFIG REQUIRED)` to get the paths necessary for building:
 
-    am2b-ar_LIBRARY      :  Path to the shared library object you need to link against
-    am2b-ar_LIBRARY_DIR  :  Path to the directory containing the shared library
-    am2b-ar_INCLUDE_DIR  :  Path to the header files you need to compile against
+    am2b-arvis_LIBRARY      :  Path to the shared library object you need to link against
+    am2b-arvis_LIBRARY_DIR  :  Path to the directory containing the shared library
+    am2b-arvis_INCLUDE_DIR  :  Path to the header files you need to compile against
 
-The ARVisualizer class can be found by including `<am2b-ar/ARVisualizer.hpp>`:
+The ARVisualizer class can be found by including `<am2b-arvis/ARVisualizer.hpp>`:
 
-    #include <am2b-ar/ARVisualizer.hpp>
-    
+    #include <am2b-arvis/ARVisualizer.hpp>
+
     int main(void)
     {
         ar::ARVisualizer visualizer;
         visualizer.Start();
-        
+
         visualizer.Add(ar::Sphere( ... ));
-        
+
         ...
     }
 
@@ -42,8 +42,6 @@ A script is provided in `/scripts/install_dependencies.sh` which can be used to 
 
     install_dependencies.sh
         Installs the minimum dependencies necessary to build the library
-    
+
     install_dependencies.sh all
         Installs all dependencies necessary to build the library, the samples, and the documentation
-
-
