@@ -87,7 +87,7 @@ public:
   // For best results, vertexPositions should describe a *convex* shape
   // Normals for each triangle are automatically generated, and are uniform across each face.
   template <typename MeshT>
-  static MeshT MakeTriangleFan(Vector<glm::vec3> vertexPositions);
+  static MeshT MakeTriangleFan(Vector<glm::vec3> vertexPositions, bool doubleSided = false);
 
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset

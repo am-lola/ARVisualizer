@@ -145,7 +145,7 @@ mesh_handle ARVisualizer::Add(Polygon polygon)
     points.push_back({ polygon.points[i], polygon.points[i+1], polygon.points[i+2] });
   }
 
-  return _renderer->Add3DMesh(MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points), std::make_shared<FlatColorMaterial>(polygon.color));
+  return _renderer->Add3DMesh(MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points, true), std::make_shared<FlatColorMaterial>(polygon.color));
 }
 
 mesh_handle ARVisualizer::Add(PolyMesh mesh)

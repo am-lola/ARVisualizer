@@ -452,7 +452,7 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangleMesh<Mesh<VertexP3N3>>(Vector<glm::vec
 }
 
 template <>
-Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions)
+Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3> vertexPositions, bool doubleSided)
 {
   Vector<VertexP3N3> vertices;
   Vector<GLuint> indices;
@@ -493,6 +493,16 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3
     curr_pos++;
     prev_idx = curr_idx;
     curr_idx = vertices.size(); // after first iteration, we only add one vertex per iteration
+  }
+
+  // if necessary, generate backfaces by duplicating tris with opposite winding order
+  if (doubleSided)
+  {
+    for (auto i = indices.size(); i-- > 0; )
+    {
+
+      indices.push_back(indices[i]);
+    }
   }
 
   Mesh<VertexP3N3> m = Mesh<VertexP3N3>(vertices, indices);
