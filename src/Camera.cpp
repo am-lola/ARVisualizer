@@ -2,7 +2,8 @@
 #include "common.hpp"
 #include "windowmanager/WindowEvents.hpp"
 
-#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp>
 #include <glm/gtc/constants.hpp>
 #include <GLFW/glfw3.h>
 
@@ -45,6 +46,121 @@ void Camera::Update(float deltaTime)
   _position += _forward * (_movementForward * _movementSpeed * deltaTime);
   _position += _right * (_movementSide * _movementSpeed * deltaTime);
   _position += _up * (_movementUp * _movementSpeed * deltaTime);
+
+  if(_rolling)
+  {
+    Roll(_rolling);
+  }
+}
+
+void Camera::UpdateProjection()
+{
+  if (_useCameraIntrinsics)
+  {
+    _projectionMatrix = glm::mat4(
+      _cameraMatrix[0][0] / _cameraMatrix[0][2], 0,        0,       0,
+      0, _cameraMatrix[1][1] / _cameraMatrix[1][2],        0,       0,
+      0, 0, -(_farClip + _nearClip) / (_farClip - _nearClip),    -1.0,
+      0, 0, (-2.0 * _farClip * _nearClip) / (_farClip - _nearClip), 0
+    );
+  }
+  else
+  {
+    _projectionMatrix = glm::perspective(
+       _fov * _zoom,
+       _aspect,
+       _nearClip,
+       _farClip
+     );
+  }
+}
+
+void Camera::SetIntrinsics(double camera_matrix[3][3])
+{
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      _cameraMatrix[i][j] = camera_matrix[i][j];
+    }
+  }
+
+  _useCameraIntrinsics = true;
+  UpdateProjection();
+}
+
+void Camera::RenderGUI()
+{
+  ImGui::Begin("Camera");
+
+  ImGui::Text("Pos: (%.2f, %.2f, %.2f)", _position.x, _position.y, _position.z);
+
+  ImGui::Separator();
+  ImGui::PushItemWidth(-100);
+
+  static float sensitivity;
+  static float movementSpeed;
+  static float orbitRadius;
+  sensitivity   = _sensitivity;
+  movementSpeed = _movementSpeed;
+  orbitRadius   = _orbitRadius;
+
+  ImGui::SliderFloat("Sensitivity", &sensitivity, 0.2f, 10.0f);
+  _sensitivity = sensitivity;
+  ImGui::SliderFloat("Movement Speed", &movementSpeed, 0.2f, 20.0f);
+  _movementSpeed = movementSpeed;
+  ImGui::SliderFloat("Orbit Radius", &orbitRadius, 0.5f, 100.0f);
+  _orbitRadius = orbitRadius;
+
+  if (ImGui::Button("Reset View"))
+    Reset();
+
+  ImGui::End();
+}
+
+void Camera::Reset()
+{
+  _position = _basePosition;
+  _forward  = _baseForward;
+  _up       = _baseUp;
+  _right    = glm::cross(_up, _forward);
+  _zoom     = _baseZoom;
+}
+
+glm::mat4 Camera::GetViewMatrix() const
+{
+  return glm::lookAt(
+      _position,
+      _forward + _position,
+      _up
+    );
+}
+
+glm::mat4 Camera::GetProjectionMatrix() const
+{
+  return _projectionMatrix;
+}
+
+void Camera::SetPosition(const glm::vec3& position)
+{
+  _position = position;
+  _basePosition = position;
+}
+
+void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
+{
+  _forward = forward;
+  _up = up;
+  _right = glm::cross(_up, _forward);
+
+  _baseForward = forward;
+  _baseUp = up;
+}
+
+void Camera::SetAspectRatio(float ratio)
+{
+  _aspect = ratio;
+  UpdateProjection();
 }
 
 void Camera::OnMouseMove(double xpos, double ypos)
@@ -58,27 +174,19 @@ void Camera::OnMouseMove(double xpos, double ypos)
   _prevMouseX = xpos;
   _prevMouseY = ypos;
 
-  if (!_mousePressed)
-    return;
+  if (_leftMousePressed && _rightMousePressed)
+  {
+    Orbit(deltaX, deltaY);
+  }
+  else if (_leftMousePressed)
+  {
+    Rotate(deltaX, deltaY);
+  }
+  else if (_rightMousePressed)
+  {
+    Pan(deltaX, deltaY);
+  }
 
-  const float pi = glm::pi<float>();
-  const float twoPi = pi * 2.0f;
-
-  _rot.x -= deltaX * _sensitivity * 0.01f;
-  _rot.y += deltaY * _sensitivity * 0.01f;
-
-  // Normalize yaw angle
-  if (_rot.x < -twoPi)
-    _rot.x += twoPi;
-  else if (_rot.x > twoPi)
-    _rot.x -= twoPi;
-
-  // Clamp pitch to +-90°. Add a small constant for numerical stability.
-  _rot.y = clamp(_rot.y, -pi/2.0f + 0.01f, pi/2.0f - 0.01f);
-
-  glm::mat3 mat = glm::orientate3(_rot);
-  _forward = mat[2];
-  _right = mat[0];
 }
 
 void Camera::OnMouseButton(int button, int action, int mods)
@@ -86,13 +194,28 @@ void Camera::OnMouseButton(int button, int action, int mods)
   if (action == GLFW_PRESS && (ImGui::IsAnyItemActive() || ImGui::IsMouseHoveringAnyWindow()))
     return;
 
-  if (button != 0)
-    return;
-
   if (action == GLFW_PRESS)
-    _mousePressed = true;
+  {
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+      _leftMousePressed = true;
+    }
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+    {
+      _rightMousePressed = true;
+    }
+  }
   else if (action == GLFW_RELEASE)
-    _mousePressed = false;
+  {
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+      _leftMousePressed = false;
+    }
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+    {
+      _rightMousePressed = false;
+    }
+  }
 }
 
 void Camera::OnKey(int key, int scancode, int action, int mods)
@@ -132,6 +255,18 @@ void Camera::OnKey(int key, int scancode, int action, int mods)
     case GLFW_KEY_Q:
       _movementUp -= keyDown;
       break;
+    case GLFW_KEY_R:
+      Reset();
+      break;
+    case GLFW_KEY_Z:
+      _rolling -= keyDown;
+      break;
+    case GLFW_KEY_Y:
+      _rolling -= keyDown;
+      break;
+    case GLFW_KEY_X:
+      _rolling += keyDown;
+      break;
     default:
       break;
   }
@@ -142,66 +277,71 @@ void Camera::OnScroll(double offset)
   if (ImGui::IsAnyItemActive() || ImGui::IsMouseHoveringAnyWindow())
     return;
 
-  // Control movement speed with the mouse wheel
-  const float deltaSpeed = (float)offset;
-  _movementSpeed = std::max(0.1f, _movementSpeed + deltaSpeed);
+  Zoom(offset);
 }
 
-glm::mat4 Camera::GetViewMatrix() const
+void Camera::Rotate(double dx, double dy)
 {
-  return glm::lookAt(
-      _position,
-      _forward + _position,
-      _up
-    );
+  float rot_hor = dx * _sensitivity * -0.01f;
+  float rot_ver = dy * _sensitivity *  0.01f;
+
+  if (rot_hor != 0)
+  {
+    // rotate around vertical axis
+    _forward = glm::rotate(_forward, rot_hor, _up);
+    // compute new right vector (necessary to keep horizontal movement & vertical rotation correct)
+    _right = glm::cross(_up, _forward);
+  }
+
+  if (rot_ver != 0)
+  {
+    // rotate around horizontal axis
+    glm::vec3 newForward = glm::rotate(_forward, rot_ver, _right);
+
+    // only take the new vertical rotation if it's within +/- 90 degrees of our vertical axis
+    if (glm::angle(glm::cross(newForward, _right), _up) < glm::half_pi<float>())
+    {
+      _forward = newForward;
+    }
+  }
+
 }
 
-void Camera::SetPosition(const glm::vec3& position)
+void Camera::Orbit(double dx, double dy)
 {
-  _position = position;
+  float rot_hor = dx * _sensitivity * -0.01f;
+  float rot_ver = dy * _sensitivity *  0.01f;
+  glm::vec3 orbitPoint = _forward * _orbitRadius;
+
+  Rotate(dx, dy);
+
+  // Correct position to rotate camera around orbitPoint
+  glm::vec3 delta = orbitPoint - (_forward*_orbitRadius);
+  _position += delta;
 }
 
-void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
+void Camera::Pan(double dx, double dy)
 {
-  _forward = forward;
-  _up = up;
-  _right = glm::cross(_forward, _up);
-
-  // TODO: Calculate _rot
-  // glm::mat3 mat(_right, _up, _forward);
+  // 'up' vector w.r.t. camera
+  glm::vec3 cameraUp = glm::cross(_forward, _right);
+  glm::vec3 translation = _movementSpeed * 0.001f * ((float)dx * _right + (float)dy * cameraUp);
+  _position += translation;
 }
 
-void Camera::Reset()
+void Camera::Roll(double dt)
 {
-  _position = glm::vec3(0.0f, 0.0f, 0.0f);
-  _forward  = glm::vec3(0.0f, 0.0f, 1.0f);
-  _right    = glm::vec3(1.0f, 0.0f, 0.0f);
-  _up       = glm::vec3(0.0f, 1.0f, 0.0f);
-  _rot      = glm::vec3(0.0f, 0.0f, 0.0f);
+  float rot = dt * _sensitivity *  0.01f;
+
+  // rotate
+  _up = glm::rotate(_up, rot, _forward);
+  // compute new right vector (necessary to keep horizontal movement & vertical rotation correct)
+  _right = glm::cross(_up, _forward);
 }
 
-void Camera::RenderGUI()
+void Camera::Zoom(double dz)
 {
-  ImGui::Begin("Camera");
-
-  ImGui::Text("Pos: (%.2f, %.2f, %.2f)", _position.x, _position.y, _position.z);
-  ImGui::Text("Rot: (%.2f, %.2f, %.2f)", _rot.x, _rot.y, _rot.z);
-  ImGui::Text("Movement speed: %.2f", _movementSpeed);
-
-  ImGui::Separator();
-
-  ImGui::PushItemWidth(-100);
-
-  static float sensitivity = 1.0f;
-
-  sensitivity = _sensitivity;
-  ImGui::SliderFloat("Sensitivity", &sensitivity, 0.2f, 10.0f);
-  _sensitivity = sensitivity;
-
-  if (ImGui::Button("Reset View"))
-    Reset();
-
-  ImGui::End();
+  _zoom -= dz * 0.001f;
+  UpdateProjection();
 }
 
-}
+} // namespace ar
