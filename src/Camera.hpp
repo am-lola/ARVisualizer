@@ -60,7 +60,7 @@ private:
   // Zooms camera in or out
   void Zoom(double dz);
 
-  float _aspect   = 1.0f;    // aspect ratio
+  float _aspect   = 1.3f;    // aspect ratio
   float _fov      = 45.0f;   // field of view, in degrees
   float _nearClip = 0.1f;    // distance to near clipping plane
   float _farClip  = 10000.0f; // distance to far clipping plane

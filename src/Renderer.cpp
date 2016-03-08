@@ -62,6 +62,7 @@ Renderer::Renderer(GLFWwindow* window)
   };
 
   // set a default projection matrix
+  _camera.SetAspectRatio((float)_windowWidth / (float)_windowHeight);
   _camera.UpdateProjection();
 }
 
