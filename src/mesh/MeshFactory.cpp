@@ -106,8 +106,7 @@ TexturedMesh<VertexP2T2> MeshFactory::MakeQuad<TexturedMesh<VertexP2T2>>(glm::ve
 
   MakeQuadMesh(width, height, &vertex_positions, &indices);
 
-  float tu, tv = 0;
-  for (int i = 0; i < vertex_positions.size(); i++)
+  for (size_t i = 0; i < vertex_positions.size(); i++)
   {
     verts.push_back({
       {vertex_positions[i].x, vertex_positions[i].y},
@@ -147,7 +146,7 @@ Mesh<VertexP3C4> MeshFactory::MakeQuad<Mesh<VertexP3C4>>(glm::vec3 center, glm::
 
   MakeQuadMesh(width, height, &vertex_positions, &indices);
 
-  for (int i = 0; i < vertex_positions.size(); i++)
+  for (size_t i = 0; i < vertex_positions.size(); i++)
   {
     verts.push_back({
       { vertex_positions[i].x, vertex_positions[i].y, vertex_positions[i].z },
@@ -210,9 +209,9 @@ Mesh<VertexP3N3> MeshFactory::MakeBox(glm::vec3 center, double xLength, double y
 
   MakeBoxMesh(xLength, yLength, zLength, &vertex_positions, &indices);
 
-  for (int i = 0; i < normals.size(); i++)
+  for (size_t i = 0; i < normals.size(); i++)
   {
-    for (int j = 0; j < 4; j++) // four vertices per face in the cube
+    for (size_t j = 0; j < 4; j++) // four vertices per face in the cube
     {
       verts.push_back({
         { vertex_positions[4*i + j].x, vertex_positions[4*i + j].y, vertex_positions[4*i + j].z },
@@ -418,7 +417,7 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangleMesh<Mesh<VertexP3N3>>(Vector<glm::vec
   // if we have the right number of normals, use them; if not generate some
   if (vertexPositions.size() == normals.size())
   {
-    for (int i = 0; i < vertexPositions.size(); i++)
+    for (size_t i = 0; i < vertexPositions.size(); i++)
     {
       vertices.push_back({
         { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
@@ -428,7 +427,7 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangleMesh<Mesh<VertexP3N3>>(Vector<glm::vec
   }
   else
   {
-    for (int i = 0; i < vertexPositions.size(); i++)
+    for (size_t i = 0; i < vertexPositions.size(); i++)
     {
       vertices.push_back({
         { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
@@ -437,7 +436,7 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangleMesh<Mesh<VertexP3N3>>(Vector<glm::vec
     }
 
     // generate flat normals for each triangle in the mesh according to their vertex ordering
-    for (int i = 0; i < indices.size(); i+=3)
+    for (size_t i = 0; i < indices.size(); i+=3)
     {
       glm::vec3 normal = glm::cross(glm::normalize(vertexPositions[indices[i+1]] - vertexPositions[indices[i]]),
                                     glm::normalize(vertexPositions[indices[i+2]] - vertexPositions[indices[i]]));
@@ -457,9 +456,9 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3
   Vector<VertexP3N3> vertices;
   Vector<GLuint> indices;
 
-  int root = 0;
-  int prev_pos = 1; int prev_idx = 1;
-  int curr_pos = 2; int curr_idx = 2;
+  unsigned int root = 0;
+  unsigned int prev_pos = 1; unsigned int prev_idx = 1;
+  unsigned int curr_pos = 2; unsigned int curr_idx = 2;
   while (curr_pos < vertexPositions.size())
   {
     glm::vec3 normal = glm::cross(glm::normalize(vertexPositions[prev_pos] - vertexPositions[root]),  // generate a uniform normal for each triangle
@@ -712,9 +711,9 @@ void MeshFactory::MakeUVSphereMesh(unsigned int resolution, Vector<glm::vec3>* v
   float dx = 1.0 / (float)(resolution - 1); // distance between vertices
   float dy = dx;
 
-  for (int i = 0; i < resolution; i++)
+  for (size_t i = 0; i < resolution; i++)
   {
-    for (int j = 0; j < resolution; j++)
+    for (size_t j = 0; j < resolution; j++)
     {
       double x = glm::sin( - glm::half_pi<float>() + glm::pi<float>() * i * dx);
       double y = glm::cos( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
@@ -725,9 +724,9 @@ void MeshFactory::MakeUVSphereMesh(unsigned int resolution, Vector<glm::vec3>* v
   }
 
   // generate a quad (as two tris) for each face on the sphere
-  for (int i = 0; i < resolution-1; i++)
+  for (size_t i = 0; i < resolution-1; i++)
   {
-    for (int j = 0; j < resolution-1; j++)
+    for (size_t j = 0; j < resolution-1; j++)
     {
       // First triangle
       r_indices.push_back(i * resolution + j);         // bottom-left
@@ -751,9 +750,9 @@ void MeshFactory::MakeCapsuleMesh(double length, double radius, unsigned int res
   float dy = dx;
 
   // first half -- centered at (-length/2,0,0)
-  for (int i = 0; i < resolution / 2; i++)
+  for (size_t i = 0; i < resolution / 2; i++)
   {
-    for (int j = 0; j < resolution; j++)
+    for (size_t j = 0; j < resolution; j++)
     {
       double x = glm::sin( - glm::half_pi<float>() + glm::pi<float>() * i * dx);
       double y = glm::cos( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
@@ -767,9 +766,9 @@ void MeshFactory::MakeCapsuleMesh(double length, double radius, unsigned int res
   }
 
   // second half -- centered at (+length/2,0,0)
-  for (int i = resolution / 2; i < resolution; i++)
+  for (size_t i = resolution / 2; i < resolution; i++)
   {
-    for (int j = 0; j < resolution; j++)
+    for (size_t j = 0; j < resolution; j++)
     {
       double x = glm::sin( - glm::half_pi<float>() + glm::pi<float>() * i * dx);
       double y = glm::cos( 2.0f * glm::pi<float>() * j * dy) * glm::sin( glm::pi<float>() * i * dx );
@@ -783,9 +782,9 @@ void MeshFactory::MakeCapsuleMesh(double length, double radius, unsigned int res
   }
 
   // generate a quad (as two tris) for each face (done as if this were a regular sphere)
-  for (int i = 0; i < resolution-1; i++)
+  for (size_t i = 0; i < resolution-1; i++)
   {
-    for (int j = 0; j < resolution-1; j++)
+    for (size_t j = 0; j < resolution-1; j++)
     {
       // First triangle
       r_indices.push_back(i * resolution + j);         // bottom-left
