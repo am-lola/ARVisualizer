@@ -135,6 +135,7 @@ glm::mat4 Camera::GetProjectionMatrix() const
 void Camera::SetPosition(const glm::vec3& position)
 {
   _position = position;
+  _basePosition = position;
 }
 
 void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
@@ -142,6 +143,9 @@ void Camera::SetForwardAndUp(const glm::vec3& forward, const glm::vec3& up)
   _forward = forward;
   _up = up;
   _right = glm::cross(_up, _forward);
+
+  _baseForward = forward;
+  _baseUp = up;
 }
 
 void Camera::SetAspectRatio(float ratio)
