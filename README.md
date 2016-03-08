@@ -13,22 +13,29 @@ After building and installing the library (`make`, `sudo make install`, you shou
 The ARVisualizer class can be found by including `<am2b-ar/ARVisualizer.hpp>`:
 
     #include <am2b-ar/ARVisualizer.hpp>
-    
+
     int main(void)
     {
         ar::ARVisualizer visualizer;
         visualizer.Start();
-        
+
         visualizer.Add(ar::Sphere( ... ));
-        
+
         ...
     }
 
-The visualizer supports some keyboard shortcuts which can be applied to any visualization instance:
+The visualizer supports some mouse and keyboard shortcuts which can be applied to any visualization instance:
 
-    '1' : Render meshes as shaded Triangles (default)
-    '2' : Render meshes as wireframes
-    '3' : Render meshes as points (one point per vertex)
+    Left Mouse       : Rotate camera around its current position
+    Right Mouse      : Pan camera (movement relative to image plane)
+    Left+Right Mouse : Rotate camera around a point in space (set with Orbit Radius in camera GUI)
+    Mouse Wheel      : Camera Zoom in and out
+    'W/S/A/D'        : Move camera horizontally
+    'Q/E'            : Move camera vertically
+    'Z/Y/X'          : Roll camera around its forward axis
+    '1'              : Render meshes as shaded Triangles (default)
+    '2'              : Render meshes as wireframes
+    '3'              : Render meshes as points (one point per vertex)
 
 # Dependencies
 
@@ -45,5 +52,3 @@ A script is provided in `/scripts/install_dependencies.sh` which can be used to 
     
     install_dependencies.sh all
         Installs all dependencies necessary to build the library, the samples, and the documentation
-
-
