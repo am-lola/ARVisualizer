@@ -52,6 +52,12 @@ private:
   // @dy Y-distance mouse has moved since previous frame
   void Rotate(double dx, double dy);
 
+  // Computes new camera position and orientation from mouse movement
+  // Rotate's camera around a point in space.
+  // @dx X-distance mouse has moved since previous frame
+  // @dy Y-distance mouse has moved since previous frame
+  void Orbit(double dx, double dy);
+
   // Computes new camera location from mouse movement
   // @dx X-distance mouse has moved since previous frame
   // @dy Y-distance mouse has moved since previous frame
@@ -86,6 +92,7 @@ private:
   bool _leftMousePressed  = false;
   bool _rightMousePressed = false;
 
+  float _orbitRadius = 20.0f;
   int _movementForward = 0;
   int _movementSide = 0;
   int _movementUp = 0;

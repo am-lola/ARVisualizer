@@ -95,13 +95,17 @@ void Camera::RenderGUI()
 
   static float sensitivity;
   static float movementSpeed;
+  static float orbitRadius;
   sensitivity   = _sensitivity;
   movementSpeed = _movementSpeed;
+  orbitRadius   = _orbitRadius;
 
   ImGui::SliderFloat("Sensitivity", &sensitivity, 0.2f, 10.0f);
   _sensitivity = sensitivity;
   ImGui::SliderFloat("Movement Speed", &movementSpeed, 0.2f, 20.0f);
   _movementSpeed = movementSpeed;
+  ImGui::SliderFloat("Orbit Radius", &orbitRadius, 0.5f, 100.0f);
+  _orbitRadius = orbitRadius;
 
   if (ImGui::Button("Reset View"))
     Reset();
@@ -165,11 +169,15 @@ void Camera::OnMouseMove(double xpos, double ypos)
   _prevMouseX = xpos;
   _prevMouseY = ypos;
 
-  if (_leftMousePressed)
+  if (_leftMousePressed && _rightMousePressed)
+  {
+    Orbit(deltaX, deltaY);
+  }
+  else if (_leftMousePressed)
   {
     Rotate(deltaX, deltaY);
   }
-  if (_rightMousePressed)
+  else if (_rightMousePressed)
   {
     Pan(deltaX, deltaY);
   }
@@ -282,6 +290,19 @@ void Camera::Rotate(double dx, double dy)
     }
   }
 
+}
+
+void Camera::Orbit(double dx, double dy)
+{
+  float rot_hor = dx * _sensitivity * -0.01f;
+  float rot_ver = dy * _sensitivity *  0.01f;
+  glm::vec3 orbitPoint = _forward * _orbitRadius;
+
+  Rotate(dx, dy);
+
+  // Correct position to rotate camera around orbitPoint
+  glm::vec3 delta = orbitPoint - (_forward*_orbitRadius);
+  _position += delta;
 }
 
 void Camera::Pan(double dx, double dy)
