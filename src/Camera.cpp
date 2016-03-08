@@ -46,6 +46,11 @@ void Camera::Update(float deltaTime)
   _position += _forward * (_movementForward * _movementSpeed * deltaTime);
   _position += _right * (_movementSide * _movementSpeed * deltaTime);
   _position += _up * (_movementUp * _movementSpeed * deltaTime);
+
+  if(_rolling)
+  {
+    Roll(_rolling);
+  }
 }
 
 void Camera::UpdateProjection()
@@ -252,6 +257,16 @@ void Camera::OnKey(int key, int scancode, int action, int mods)
       break;
     case GLFW_KEY_R:
       Reset();
+      break;
+    case GLFW_KEY_Z:
+      _rolling -= keyDown;
+      break;
+    case GLFW_KEY_Y:
+      _rolling -= keyDown;
+      break;
+    case GLFW_KEY_X:
+      _rolling += keyDown;
+      break;
     default:
       break;
   }
@@ -311,6 +326,16 @@ void Camera::Pan(double dx, double dy)
   glm::vec3 cameraUp = glm::cross(_forward, _right);
   glm::vec3 translation = _movementSpeed * 0.001f * ((float)dx * _right + (float)dy * cameraUp);
   _position += translation;
+}
+
+void Camera::Roll(double dt)
+{
+  float rot = dt * _sensitivity *  0.01f;
+
+  // rotate
+  _up = glm::rotate(_up, rot, _forward);
+  // compute new right vector (necessary to keep horizontal movement & vertical rotation correct)
+  _right = glm::cross(_up, _forward);
 }
 
 void Camera::Zoom(double dz)

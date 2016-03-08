@@ -63,6 +63,10 @@ private:
   // @dy Y-distance mouse has moved since previous frame
   void Pan(double dx, double dy);
 
+  // Rotates the camera around the forward axis
+  // @dt Amount (in radians) to rotate from current orientation
+  void Roll(double dt);
+
   // Zooms camera in or out
   void Zoom(double dz);
 
@@ -96,6 +100,7 @@ private:
   int _movementForward = 0;
   int _movementSide = 0;
   int _movementUp = 0;
+  int _rolling = 0;
   float _movementSpeed = 10.0f;
   float _sensitivity = 1.0f;
 };
