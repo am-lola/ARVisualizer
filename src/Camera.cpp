@@ -242,6 +242,8 @@ void Camera::OnKey(int key, int scancode, int action, int mods)
     case GLFW_KEY_Q:
       _movementUp -= keyDown;
       break;
+    case GLFW_KEY_R:
+      Reset();
     default:
       break;
   }
