@@ -26,7 +26,7 @@ namespace ar
     // Constant color for the whole mesh
     Color color;
 
-    PolyMesh(double* points, unsigned int count) : color(), numPoints(count), numIndices(0), indices(0), normals(0)
+    PolyMesh(double* points, unsigned int count) : numPoints(count), indices(0), numIndices(0), normals(0)
     {
       this->points = new float[count*3];
       for (size_t i = 0; i < count * 3; i++)
@@ -35,7 +35,7 @@ namespace ar
       }
     }
 
-    PolyMesh(double* points, unsigned int count, Color color) : color(color), numPoints(count), numIndices(0), indices(0), normals(0)
+    PolyMesh(double* points, unsigned int count, Color color) : numPoints(count), indices(0), numIndices(0), normals(0), color(color)
     {
       this->points = new float[count*3];
       for (size_t i = 0; i < count * 3; i++)
@@ -44,7 +44,7 @@ namespace ar
       }
     }
 
-    PolyMesh(double* points, unsigned int count, double* normals, Color color) : color(color), numPoints(count), numIndices(0), indices(0)
+    PolyMesh(double* points, unsigned int count, double* normals, Color color) : numPoints(count), indices(0), numIndices(0), color(color)
     {
       this->points = new float[count*3];
       this->normals = new float[count*3];
@@ -55,7 +55,7 @@ namespace ar
       }
     }
 
-    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount) : color(), numPoints(pointsCount), numIndices(indexCount), normals(0)
+    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount) : numPoints(pointsCount), numIndices(indexCount), normals(0)
     {
       this->points = new float[pointsCount*3];
       for (size_t i = 0; i < pointsCount * 3; i++)
@@ -70,7 +70,7 @@ namespace ar
       }
     }
 
-    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount, double* normals) : color(), numPoints(pointsCount), numIndices(indexCount)
+    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount, double* normals) : numPoints(pointsCount), numIndices(indexCount)
     {
       this->points = new float[pointsCount*3];
       this->normals = new float[pointsCount*3];
@@ -87,7 +87,7 @@ namespace ar
       }
     }
 
-    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount, Color color) : color(color), numPoints(pointsCount), numIndices(indexCount), normals(0)
+    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount, Color color) : numPoints(pointsCount), numIndices(indexCount), normals(0), color(color)
     {
       this->points = new float[pointsCount*3];
       for (size_t i = 0; i < pointsCount * 3; i++)
@@ -102,7 +102,7 @@ namespace ar
       }
     }
 
-    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount, double* normals, Color color) : color(color), numPoints(pointsCount), numIndices(indexCount)
+    PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount, double* normals, Color color) : numPoints(pointsCount), numIndices(indexCount), color(color)
     {
       this->points = new float[pointsCount*3];
       this->normals = new float[pointsCount*3];

@@ -17,10 +17,10 @@ class Mesh
 public:
   Mesh() : _id(0) {};
   Mesh(ShaderProgram* s) : _id(0), _shader(s) {};
-  Mesh(Vector<VertexT> v) : _id(0), _vertices(v), _dirty(true) {};
-  Mesh(Vector<VertexT> v, Vector<GLuint> i) : _id(0), _vertices(v), _indices(i), _dirty(true) {};
-  Mesh(Vector<VertexT> v, ShaderProgram* s) : _id(0), _vertices(v), _shader(s), _dirty(true) {};
-  Mesh(Vector<VertexT> v, Vector<GLuint> i, ShaderProgram* s) : _id(0), _vertices(v), _indices(i), _shader(s), _dirty(true) {};
+  Mesh(Vector<VertexT> v) : _id(0), _dirty(true), _vertices(v) {};
+  Mesh(Vector<VertexT> v, Vector<GLuint> i) : _id(0), _dirty(true), _vertices(v), _indices(i) {};
+  Mesh(Vector<VertexT> v, ShaderProgram* s) : _id(0), _dirty(true), _vertices(v), _shader(s) {};
+  Mesh(Vector<VertexT> v, Vector<GLuint> i, ShaderProgram* s) : _id(0), _dirty(true), _vertices(v), _indices(i), _shader(s) {};
 
   unsigned int ID() { return _id; };
   void SetID(unsigned int id) { _id = id; };
