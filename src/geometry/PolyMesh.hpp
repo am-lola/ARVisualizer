@@ -29,7 +29,7 @@ namespace ar
     PolyMesh(double* points, unsigned int count) : color(), numPoints(count), numIndices(0), indices(0), normals(0)
     {
       this->points = new float[count*3];
-      for (int i = 0; i < count * 3; i++)
+      for (size_t i = 0; i < count * 3; i++)
       {
         this->points[i] = points[i];
       }
@@ -38,7 +38,7 @@ namespace ar
     PolyMesh(double* points, unsigned int count, Color color) : color(color), numPoints(count), numIndices(0), indices(0), normals(0)
     {
       this->points = new float[count*3];
-      for (int i = 0; i < count * 3; i++)
+      for (size_t i = 0; i < count * 3; i++)
       {
         this->points[i] = points[i];
       }
@@ -48,7 +48,7 @@ namespace ar
     {
       this->points = new float[count*3];
       this->normals = new float[count*3];
-      for (int i = 0; i < count * 3; i++)
+      for (size_t i = 0; i < count * 3; i++)
       {
         this->points[i] = points[i];
         this->normals[i] = normals[i];
@@ -58,13 +58,13 @@ namespace ar
     PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount) : color(), numPoints(pointsCount), numIndices(indexCount), normals(0)
     {
       this->points = new float[pointsCount*3];
-      for (int i = 0; i < pointsCount * 3; i++)
+      for (size_t i = 0; i < pointsCount * 3; i++)
       {
         this->points[i] = points[i];
       }
 
       this->indices = new unsigned int[indexCount];
-      for (int i = 0; i < indexCount; i++)
+      for (size_t i = 0; i < indexCount; i++)
       {
         this->indices[i] = indices[i];
       }
@@ -74,14 +74,14 @@ namespace ar
     {
       this->points = new float[pointsCount*3];
       this->normals = new float[pointsCount*3];
-      for (int i = 0; i < pointsCount * 3; i++)
+      for (size_t i = 0; i < pointsCount * 3; i++)
       {
         this->points[i] = points[i];
         this->normals[i] = normals[i];
       }
 
       this->indices = new unsigned int[indexCount];
-      for (int i = 0; i < indexCount; i++)
+      for (size_t i = 0; i < indexCount; i++)
       {
         this->indices[i] = indices[i];
       }
@@ -90,13 +90,13 @@ namespace ar
     PolyMesh(double* points, unsigned int pointsCount, unsigned int* indices, unsigned int indexCount, Color color) : color(color), numPoints(pointsCount), numIndices(indexCount), normals(0)
     {
       this->points = new float[pointsCount*3];
-      for (int i = 0; i < pointsCount * 3; i++)
+      for (size_t i = 0; i < pointsCount * 3; i++)
       {
         this->points[i] = points[i];
       }
 
       this->indices = new unsigned int[indexCount];
-      for (int i = 0; i < indexCount; i++)
+      for (size_t i = 0; i < indexCount; i++)
       {
         this->indices[i] = indices[i];
       }
@@ -106,14 +106,14 @@ namespace ar
     {
       this->points = new float[pointsCount*3];
       this->normals = new float[pointsCount*3];
-      for (int i = 0; i < pointsCount * 3; i++)
+      for (size_t i = 0; i < pointsCount * 3; i++)
       {
         this->points[i] = points[i];
         this->normals[i] = normals[i];
       }
 
       this->indices = new unsigned int[indexCount];
-      for (int i = 0; i < indexCount; i++)
+      for (size_t i = 0; i < indexCount; i++)
       {
         this->indices[i] = indices[i];
       }

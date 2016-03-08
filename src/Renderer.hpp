@@ -57,7 +57,7 @@ public:
   bool IsRunning();
 
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
-  void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
+  void NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels);
 
   // Updates camera parameters with the given values
   void SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up);
@@ -121,7 +121,7 @@ private:
 
     /// TODO: move this to its own class
   UniquePtr<unsigned char[]> _currentVideoFrame;
-  int _videoWidth, _videoHeight;
+  unsigned int _videoWidth, _videoHeight;
   ShaderProgram _videoShader;
   std::atomic_bool _newVideoFrame {false};
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);

@@ -309,8 +309,6 @@ void Camera::Rotate(double dx, double dy)
 
 void Camera::Orbit(double dx, double dy)
 {
-  float rot_hor = dx * _sensitivity * -0.01f;
-  float rot_ver = dy * _sensitivity *  0.01f;
   glm::vec3 orbitPoint = _forward * _orbitRadius;
 
   Rotate(dx, dy);

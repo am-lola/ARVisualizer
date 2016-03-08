@@ -23,7 +23,7 @@ namespace ar
     Polygon(double* points, unsigned int count) : color()
     {
       this->points = new float[count*3];
-      for (int i = 0; i < count * 3; i++)
+      for (size_t i = 0; i < count * 3; i++)
       {
         this->points[i] = points[i];
       }
@@ -38,7 +38,7 @@ namespace ar
     Polygon(double* points, unsigned int count, Color color)
     {
       this->points = new float[count*3];
-      for (int i = 0; i < count * 3; i++)
+      for (size_t i = 0; i < count * 3; i++)
       {
         this->points[i] = points[i];
       }

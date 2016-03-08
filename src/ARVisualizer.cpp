@@ -140,7 +140,7 @@ mesh_handle ARVisualizer::Add(Polygon polygon)
 {
   if (!IsRunning()) { return 0; }
   Vector<glm::vec3> points;
-  for(int i = 0; i < polygon.numPoints * 3; i += 3)
+  for(size_t i = 0; i < polygon.numPoints * 3; i += 3)
   {
     points.push_back({ polygon.points[i], polygon.points[i+1], polygon.points[i+2] });
   }
@@ -156,7 +156,7 @@ mesh_handle ARVisualizer::Add(PolyMesh mesh)
   Vector<GLuint> indices;
 
   // get vertices & normals (if any)
-  for (int i = 0; i < mesh.numPoints * 3; i += 3)
+  for (size_t i = 0; i < mesh.numPoints * 3; i += 3)
   {
     vertices.push_back({ mesh.points[i], mesh.points[i+1], mesh.points[i+2] });
 
@@ -169,14 +169,14 @@ mesh_handle ARVisualizer::Add(PolyMesh mesh)
   // if indices were provided, collect them, otherwise assume all vertices are to be used in order
   if (mesh.numIndices > 0)
   {
-    for (int i = 0; i < mesh.numIndices; i++)
+    for (size_t i = 0; i < mesh.numIndices; i++)
     {
       indices.push_back(mesh.indices[i]);
     }
   }
   else
   {
-    for (int i = 0; i < mesh.numPoints; i++)
+    for (size_t i = 0; i < mesh.numPoints; i++)
     {
       indices.push_back(i);
     }
@@ -279,7 +279,7 @@ void ARVisualizer::Update(mesh_handle handle, Polygon polygon)
 {
   if (!IsRunning()) { return; }
   Vector<glm::vec3> points;
-  for(int i = 0; i < polygon.numPoints * 3; i += 3)
+  for(size_t i = 0; i < polygon.numPoints * 3; i += 3)
   {
     points.push_back({ polygon.points[i], polygon.points[i+1], polygon.points[i+2] });
   }
@@ -295,7 +295,7 @@ void ARVisualizer::Update(mesh_handle handle, PolyMesh mesh)
   Vector<GLuint> indices;
 
   // get vertices
-  for (int i = 0; i < mesh.numPoints * 3; i += 3)
+  for (size_t i = 0; i < mesh.numPoints * 3; i += 3)
   {
     vertices.push_back({ mesh.points[i], mesh.points[i+1], mesh.points[i+2] });
 
@@ -308,14 +308,14 @@ void ARVisualizer::Update(mesh_handle handle, PolyMesh mesh)
   // if indices were provided, collect them, otherwise assume all vertices are to be used in order
   if (mesh.numIndices > 0)
   {
-    for (int i = 0; i < mesh.numIndices; i++)
+    for (size_t i = 0; i < mesh.numIndices; i++)
     {
       indices.push_back(mesh.indices[i]);
     }
   }
   else
   {
-    for (int i = 0; i < mesh.numPoints; i++)
+    for (size_t i = 0; i < mesh.numPoints; i++)
     {
       indices.push_back(i);
     }

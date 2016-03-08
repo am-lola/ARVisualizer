@@ -110,7 +110,7 @@ bool Renderer::IsRunning()
   return _running;
 }
 
-void Renderer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
+void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels)
 {
   if (!_running)
   {
