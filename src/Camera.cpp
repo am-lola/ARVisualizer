@@ -290,7 +290,7 @@ void Camera::Rotate(double dx, double dy)
     // rotate around vertical axis
     _forward = glm::rotate(_forward, rot_hor, _up);
     // compute new right vector (necessary to keep horizontal movement & vertical rotation correct)
-    _right = glm::cross(_up, _forward);
+    _right = glm::normalize(glm::cross(_up, _forward));
   }
 
   if (rot_ver != 0)
