@@ -656,7 +656,7 @@ void Renderer::RenderOneFrame()
   * Third pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  EnableRenderPass(Blend_Add);
+  EnableRenderPass(Blend_Alpha);
   for (auto& m : _3DMeshes)
   {
     const auto& shader = m.GetShader();
