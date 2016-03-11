@@ -94,6 +94,8 @@ void Camera::RenderGUI()
   ImGui::Begin("Camera");
 
   ImGui::Text("Pos: (%.2f, %.2f, %.2f)", _position.x, _position.y, _position.z);
+  ImGui::Text("Fwd: (%.2f, %.2f, %.2f)",  _forward.x,  _forward.y,  _forward.z);
+  ImGui::Text(" Up: (%.2f, %.2f, %.2f)",       _up.x,       _up.y,       _up.z);
 
   ImGui::Separator();
   ImGui::PushItemWidth(-100);
