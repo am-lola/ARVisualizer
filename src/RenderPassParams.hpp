@@ -4,6 +4,7 @@
 namespace ar
 {
 
+// Flags used to set rendering parameters when drawing objects
 typedef enum
 {
   None        = 0x00,

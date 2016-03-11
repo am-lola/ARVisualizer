@@ -6,8 +6,10 @@
 namespace ar
 {
 
-// Provides an abstraction between incoming window input events and
-// objects which need to consume them
+/*
+ * Provides an abstraction between incoming window input events and
+ * objects which need to consume them
+ */
 class WindowEvents
 {
 public:

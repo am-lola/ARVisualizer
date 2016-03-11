@@ -14,16 +14,27 @@
 namespace ar
 {
 
-// The WindowManager class manages contact with GLFW for the purposes of creating
-//  and destroying windows and OpenGL contexts, which must always be done from the
-//  same thread that calls glfwInit.
-// To ensure we only ever have one thread calling into these sensitive parts of
-//  GLFW, WindowManager is implemented as a singleton which owns a background thread
-//  that makes all of the calls to GLFW. This ensures that client applications
-//  don't need to worry about which thread they call into ARVisualizer from.
+/*
+ * The WindowManager class manages contact with GLFW for the purposes of creating
+ *  and destroying windows and OpenGL contexts, which must always be done from the
+ *  same thread that calls glfwInit.
+ *
+ * To ensure we only ever have one thread calling into these sensitive parts of
+ *  GLFW, WindowManager is implemented as a singleton which owns a background thread
+ *  that makes all of the calls to GLFW. This background thread is the "main thread"
+ *  referred to in the GLFW documentation.
+ *
+ * Doing this ensures that client applications don't need to worry about which
+ *  thread they call into ARVisualizer from.
+ */
 class WindowManager
 {
 public:
+
+  // Retrieves current WindowManager instance.
+  //
+  // If WindowManager doesn't exist, yet, this will create it first
+  // @return Current WindowManager instance
   static WindowManager& Instance()
   {
     static WindowManager instance; // static initializer is magically thread-safe in C++11
@@ -31,9 +42,19 @@ public:
   };
 
   // Creates a new Window & OpenGL context, then hands it off to a new Renderer instance
+  // @windowWidth  Width, in pixels, of the new window
+  // @windowHeight Height, in pixels, of the new window
+  // @windowName   Name used for the title bar of the window
+  //
+  // @return The new renderer
   Renderer* NewRenderer(int windowWidth, int windowHeight, std::string windowName);
 
   // Destroys the given renderer and its corresponding window
+  // @renderer The Renderer to Destroy
+  // @window   The window <renderer> was using
+  //
+  // Destroys a Renderer, including joining of the render thread, and closes the
+  // renderer's window.
   void DeleteRenderer(Renderer* renderer, GLFWwindow* window);
 
 private:

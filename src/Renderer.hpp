@@ -43,37 +43,76 @@ typedef TexturedMesh<VertexP2T2> Mesh2D;
 class Renderer
 {
 public:
+  // Constructor
+  // @window The window holding the OpenGL context we should use
   Renderer(GLFWwindow* window);
 
   ~Renderer();
 
-  // creates a new thread, which makes the OpenGL context and begins rendering
+  // creates a new thread, which takes the OpenGL context and begins rendering
   void Start();
 
   // notifies the rendering thread to stop, and waits for it to exit
   void Stop();
 
-  // returns True if we're currently rendering
+  // Checks to see if the Renderer is currently rendering
+  //
+  // @return True if we're currently rendering.
+  //         False otherwise.
   bool IsRunning();
 
-  // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
-  void NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels);
+  // Updates video texture with (RGB24) data in pixels
+  // @width  Width, in pixels, of the image
+  // @height Height, in pixels, of the image
+  // @pixels Image data, ordered [r,g,b,r,g,b,...]
+  void NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels); // TODO: determine if any other pixel formats need to be supported
 
   // Updates camera parameters with the given values
+  // @position New camera position
+  // @forward  Vector pointing in the direction the camera is facing
+  // @up       Vector pointing "up" relative to the camera's viewpoint (usually orthogonal to forward)
   void SetCameraPose(glm::vec3 position, glm::vec3 forward, glm::vec3 up);
 
+  // Adds a new mesh to the scene
+  // @mesh     The mesh to add
+  // @material The material to apply to the mesh
+  //
+  // @return   An <ar::mesh_handle> for <mesh>
   unsigned int Add3DMesh(Mesh3D mesh, SharedPtr<Material> material);
 
+  // Adds a new pointcloud to the scene
+  // @pointData Pointcloud vertex data
+  // @numPoints Number of points in <pointData>
+  // @color     A constant color to apply to the cloud
+  //
+  // @return    An <ar::mesh_handle> for the new <PointCloud>
   unsigned int AddPointCloud(const void* pointData, size_t numPoints, Color color);
 
+  // Updates an existing <PointCloud>
+  // @handle    Handle referencing the cloud to update
+  // @pointData New vertex data to replace the existing points with
+  // @numPoints Number of points in <pointData>
+  // @color     New color to apply to the cloud
   void UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color);
 
+  // Updates an existing <Mesh3D>
+  // @handle   Handle referencing the mesh to update
+  // @mesh     New mesh data to replace the old mesh with
+  // @material <Material> to apply to the new mesh
   void Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material);
 
+  // Transforms an existing mesh object
+  // @handle    Handle referencing the object to transform
+  // @transform Transformation matrix to apply to the object
+  // @absolute  If False, transformation is applied relative to the object's current transformation.
+  //            If True, transformation replaces the object's current transformation.
   void UpdateTransform(unsigned int handle, glm::mat4 transform, bool absolute);
 
+  // Removes an existing mesh from the scene
+  // @handle Handle referencing the mesh to remove
   void RemoveMesh(unsigned int handle);
 
+  // Removes all objects previously added to the scene
   void RemoveAllMeshes();
 
   void DrawVoxels(const Voxel* voxels, size_t numVoxels);
@@ -91,6 +130,7 @@ public:
   }
 
   // Sets intrinsic parameters to adjust projection based on camera calibration data
+  // @camera_matrix 3x3 Camera Intrinsic matrix
   void SetCameraIntrinsics(double camera_matrix[3][3])
   {
     _camera.SetIntrinsics(camera_matrix);
