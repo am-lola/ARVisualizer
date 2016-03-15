@@ -5,7 +5,7 @@
 #include "Material.hpp"
 #include "mesh/Vertex.hpp"
 #include "common.hpp"
-#include "PointCloudVertexBuffer.hpp"
+#include "rendering/VertexBuffer.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -21,7 +21,7 @@ class PointCloud
 public:
 
   using VertexType = VertexT;
-  using VertexBufferType = PointCloudVertexBuffer<VertexType>;
+  using VertexBufferType = GenericVertexBuffer<VertexType>;
 
   PointCloud()
   {
@@ -30,6 +30,7 @@ public:
   void InitVertexBuffer()
   {
     _vertexBuffer = UniquePtr<VertexBufferType>(new VertexBufferType());
+    _vertexBuffer->InitGL();
   }
 
   unsigned int ID() { return _id; }
@@ -62,8 +63,7 @@ public:
 
   void SetPoints(const VertexType* points, size_t numPoints)
   {
-    _numPoints = numPoints;
-    _newPoints.assign(points, points + numPoints);
+    _points.assign(points, points + numPoints);
     _dirty = true;
   }
 
@@ -74,19 +74,19 @@ public:
       InitVertexBuffer();
     }
 
-    _vertexBuffer->SetVertices(_newPoints);
+    _vertexBuffer->SetVertices(_points);
     _dirty = false;
   }
 
   // Removes all points from the point cloud
   void ClearPoints()
   {
-    _numPoints = 0;
+    _points.clear();
     _vertexBuffer->ClearAll();
   }
 
-  inline bool ShouldDraw() const { return _shouldDraw && _numPoints > 0 && _vertexBuffer; }
-  inline size_t NumPoints() const { return _numPoints; }
+  inline bool ShouldDraw() const { return _shouldDraw && NumPoints() > 0 && _vertexBuffer; }
+  inline size_t NumPoints() const { return _points.size(); }
 
   void RenderGUI()
   {
@@ -96,7 +96,7 @@ public:
       return;
     }
 
-    ImGui::Text("Num points: %d", (int)_numPoints);
+    ImGui::Text("Num points: %d", (int)NumPoints());
     ImGui::Separator();
     ImGui::PushItemWidth(-100);
 
@@ -122,13 +122,14 @@ public:
   float _pointSize = 1.0f;
 
 private:
+  friend class PointCloudRenderer;
+
   unsigned int _id;
   bool _dirty = false;
   bool _pendingDelete = false;
 
   std::string _name;
-  Vector<VertexType> _newPoints;
-  size_t _numPoints = 0;
+  Vector<VertexType> _points;
   ShaderProgram* _shaderProgram;
   SharedPtr<Material> _material;
   glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin

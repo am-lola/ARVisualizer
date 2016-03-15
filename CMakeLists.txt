@@ -46,6 +46,10 @@ if (ARVIS_BUILD_LIBRARY)
         src/windowmanager/WindowEvents.*pp
         src/windowmanager/GLFWWindowEvents.*pp
         src/ui/ui.cpp
+        src/rendering/MeshRendering.*pp
+        src/rendering/VideoRendering.*pp
+        src/rendering/PointCloudRendering.*pp
+        src/rendering/VoxelRendering.*pp
         extern/imgui/imgui.cpp
         extern/imgui/imgui_draw.cpp
         extern/imgui/imgui_demo.cpp

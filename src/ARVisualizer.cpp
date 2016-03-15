@@ -59,14 +59,7 @@ void ARVisualizer::Stop()
 
 bool ARVisualizer::IsRunning()
 {
-  if (_renderer)
-  {
-    return _renderer->IsRunning();
-  }
-  else
-  {
-    return false;
-  }
+  return _renderer != nullptr;
 }
 
 void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)

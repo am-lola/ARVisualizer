@@ -13,6 +13,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <vector>
+#include <queue>
 #include <thread>
 #include <mutex>
 #include <atomic>
@@ -20,28 +21,78 @@
 #include "ShaderSources.g.hpp"
 #include "ShaderProgram.hpp"
 #include "Material.hpp"
-#include "mesh/VertexBuffer.hpp"
 #include "mesh/InstancedVertexBuffer.hpp"
 #include "mesh/Mesh.hpp"
-#include "pointcloud/PointCloud.hpp"
 #include "windowmanager/GLFWWindowEvents.hpp"
 #include "windowmanager/WindowManager.hpp"
 #include "ImguiRenderer.hpp"
 #include "Camera.hpp"
 #include "geometry/Voxel.hpp"
+#include "common.hpp"
+
+#include "rendering/MeshRendering.hpp"
+#include "rendering/VideoRendering.hpp"
+#include "rendering/PointCloudRendering.hpp"
+#include "rendering/VoxelRendering.hpp"
 
 namespace ar
 {
 
-// define vertex format for 2D & 3D shapes here for convenience
-typedef VertexP3N3 Vertex3D;
-typedef VertexP2T2 Vertex2D;
 typedef Mesh<Vertex3D> Mesh3D;
-typedef TexturedMesh<VertexP2T2> Mesh2D;
 
+class RenderCommand
+{
+public:
+  virtual ~RenderCommand() { }
+
+  // this executes on the rendering thread
+  virtual void execute() = 0;
+};
+
+class CommandQueue
+{
+public:
+
+  void Enqueue(RenderCommand* renderCommand)
+  {
+    MutexLockGuard guard(_mutex);
+    _renderCommands.push(renderCommand);
+  }
+
+  RenderCommand* Dequeue()
+  {
+    MutexLockGuard guard(_mutex);
+    RenderCommand* last = _renderCommands.front();
+    _renderCommands.pop();
+    return last;
+  }
+
+  size_t NumEnqueuedCommands()
+  {
+    MutexLockGuard guard(_mutex);
+    return _renderCommands.size();
+  }
+
+private:
+
+  std::mutex _mutex;
+  std::queue<RenderCommand*> _renderCommands;
+};
 
 class Renderer
 {
+private:
+
+  template <typename T>
+  class RenderCommandAddMesh;
+  class RenderCommandUpdateTransform;
+  class RenderCommandUpdateMesh;
+  class RenderCommandRemoveMesh;
+  class RenderCommandNotifyNewVideoFrame;
+  class RenderCommandAddPointCloud;
+  class RenderCommandUpdatePointCloud;
+  class RenderCommandDrawVoxels;
+
 public:
   // Constructor
   // @window The window holding the OpenGL context we should use
@@ -78,7 +129,7 @@ public:
   // @material The material to apply to the mesh
   //
   // @return   An <ar::mesh_handle> for <mesh>
-  unsigned int Add3DMesh(Mesh3D mesh, SharedPtr<Material> material);
+  unsigned int Add3DMesh(const Mesh3D& mesh, SharedPtr<Material> material);
 
   // Adds a new pointcloud to the scene
   // @pointData Pointcloud vertex data
@@ -99,14 +150,14 @@ public:
   // @handle   Handle referencing the mesh to update
   // @mesh     New mesh data to replace the old mesh with
   // @material <Material> to apply to the new mesh
-  void Update(unsigned int handle, Mesh3D mesh, SharedPtr<Material> material);
+  void Update(unsigned int handle, const Mesh3D& mesh, SharedPtr<Material> material);
 
   // Transforms an existing mesh object
   // @handle    Handle referencing the object to transform
   // @transform Transformation matrix to apply to the object
   // @absolute  If False, transformation is applied relative to the object's current transformation.
   //            If True, transformation replaces the object's current transformation.
-  void UpdateTransform(unsigned int handle, glm::mat4 transform, bool absolute);
+  void UpdateTransform(unsigned int handle, const glm::mat4& transform, bool absolute);
 
   // Removes an existing mesh from the scene
   // @handle Handle referencing the mesh to remove
@@ -138,12 +189,17 @@ public:
 
   Delegate<void()> _renderGUIDelegate;
 
+  inline void EnqueueRenderCommand(RenderCommand* command)
+  {
+    _renderCommandQueue.Enqueue(command);
+  }
+
 private:
+
+  CommandQueue _renderCommandQueue;
+
   std::atomic_bool _running {false};
   double _lastFrameTime = 0;
-
-  // used to synchronize between rendering thread and other threads contributing data and commands
-  std::mutex _mutex;
 
   // used to synchronize between all active rendering threads to work around IMGUI not playing nice with threads
   static std::mutex _renderGUILock;
@@ -152,6 +208,10 @@ private:
   GLFWwindow* _window;
   int _windowWidth, _windowHeight;
 
+  MeshRenderer _meshRenderer;
+  VideoRenderer _videoRenderer;
+  PointCloudRenderer _pointCloudRenderer;
+  VoxelRenderer _voxelRenderer;
   ImguiRenderer _imguiRenderer;
   Camera _camera;
 
@@ -159,26 +219,11 @@ private:
 
   GLuint _renderType = GL_TRIANGLES;
 
-    /// TODO: move this to its own class
-  UniquePtr<unsigned char[]> _currentVideoFrame;
-  unsigned int _videoWidth, _videoHeight;
-  ShaderProgram _videoShader;
-  std::atomic_bool _newVideoFrame {false};
   glm::vec3 light_dir = glm::vec3(-1.0f, 1.0f, 0.0f);
 
   ShaderProgram _defaultShader;
-  Vector<Mesh2D> _2DMeshes;
-  UniquePtr<VertexBuffer<Vertex2D> > _2DMeshBuffer;
 
-  Vector<Mesh3D> _3DMeshes;
-  Vector<Mesh3D> _new3DMeshes; // TODO: This is a temporary workaround and should be removed later
-  UniquePtr<VertexBuffer<Vertex3D> > _3DMeshBuffer;
 
-  Vector<PointCloud<VertexP4>> _pointClouds;
-  ShaderProgram _pointCloudShader;
-
-  ShaderProgram _voxelShader;
-  UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _voxelInstancedVertexBuffer;
 
   // Generates a unique ID used to reference meshes from external components
   unsigned int GenerateMeshHandle();
@@ -198,18 +243,6 @@ private:
   // ! Call from _renderThread only
   // handles OpenGL context binding and default rendering settings
   void Init_GL();
-
-  // ! Call from _renderThread only
-  // sets up vertex data for objects we know we need (e.g. a plane to render the video on)
-  void Init_geometry();   /// TODO: Move this to another class
-
-  // ! Call from _renderThread only
-  // allocates and initializes default textures
-  void Init_textures();   /// TODO: Move this to another class
-
-  // ! Call from _renderThread only
-  // sends the data in pixels to the texture unit on the GPU referenced by tex
-  void BufferTexture(int width, int height, GLuint tex, unsigned char* pixels);
 
   // ! Call from _renderThread only
   // Prepares OpenGL state for rendering with the given parameters

@@ -1,12 +1,11 @@
 #ifndef _MESH_H
 #define _MESH_H
-#include <vector>
-#include <memory>
 
 #include "ShaderProgram.hpp"
 #include "Material.hpp"
 #include "Vertex.hpp"
 #include "common.hpp"
+#include <glm/glm.hpp>
 
 namespace ar
 {
