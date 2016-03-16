@@ -16,30 +16,29 @@ namespace ar
 {
 
 template <typename VertexT>
-class PointCloud
+class PointCloud : public RenderResource
 {
 public:
 
   using VertexType = VertexT;
   using VertexBufferType = GenericVertexBuffer<VertexType>;
 
-  PointCloud()
+  PointCloud() = default;
+
+  virtual void Init() override
   {
+    _vertexBuffer.Init();
   }
 
-  void InitVertexBuffer()
+  virtual void Release() override
   {
-    _vertexBuffer = UniquePtr<VertexBufferType>(new VertexBufferType());
-    _vertexBuffer->InitGL();
+    _vertexBuffer.Release();
   }
 
-  unsigned int ID() { return _id; }
+  unsigned int ID() const { return _id; }
   void SetID(unsigned int id) { _id = id; _name = std::string("Point Cloud ") + std::to_string(_id); }
 
-  bool Dirty() { return _dirty; }
-
-  bool PendingDelete() { return _pendingDelete; };
-  void MarkForDeletion() { _pendingDelete = true; };
+  bool Dirty() const { return _dirty; }
 
   ShaderProgram* GetShader() { return _shaderProgram; }
   void SetShader(ShaderProgram* s)
@@ -56,7 +55,7 @@ public:
       _material->SetShader(_shaderProgram);
   };
 
-  VertexBufferType* GetVertexBuffer() { return _vertexBuffer.get(); }
+  VertexBufferType& GetVertexBuffer() { return _vertexBuffer; }
 
   glm::mat4 GetTransform() const  { return _transform; }
   void SetTransform(glm::mat4 transform) { _transform = transform; }
@@ -69,12 +68,10 @@ public:
 
   void UpdateBuffer()
   {
-    if (!_vertexBuffer)
-    {
-      InitVertexBuffer();
-    }
+    if (!_dirty)
+      return;
 
-    _vertexBuffer->SetVertices(_points);
+    _vertexBuffer.SetVertices(_points);
     _dirty = false;
   }
 
@@ -82,10 +79,10 @@ public:
   void ClearPoints()
   {
     _points.clear();
-    _vertexBuffer->ClearAll();
+    _vertexBuffer.ClearAll();
   }
 
-  inline bool ShouldDraw() const { return _shouldDraw && NumPoints() > 0 && _vertexBuffer; }
+  inline bool ShouldDraw() const { return _shouldDraw && NumPoints() > 0; }
   inline size_t NumPoints() const { return _points.size(); }
 
   void RenderGUI()
@@ -133,7 +130,7 @@ private:
   ShaderProgram* _shaderProgram;
   SharedPtr<Material> _material;
   glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
-  UniquePtr<VertexBufferType> _vertexBuffer;
+  VertexBufferType _vertexBuffer;
 
   bool _shouldDraw = true;
 };

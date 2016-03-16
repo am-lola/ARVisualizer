@@ -1,23 +1,22 @@
 #include "MeshRendering.hpp"
-#include "SceneInfo.hpp"
 
 namespace ar
 {
 
 MeshRenderer::MeshRenderer()
 {
-
 }
 
 void MeshRenderer::Init()
 {
-  _vertexBuffer.InitGL();
-  _indexBuffer.InitGL();
+  _vertexBuffer.Init();
+  _indexBuffer.Init();
 }
 
 void MeshRenderer::Release()
 {
-
+  _vertexBuffer.Release();
+  _indexBuffer.Release();
 }
 
 void MeshRenderer::Update()
@@ -58,7 +57,6 @@ void MeshRenderer::RenderPass(const SceneInfo& sceneInfo)
     glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
     m.GetMaterial()->Apply();
 
-    //_vertexBuffer.Draw(sceneInfo.renderType, m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset());
     glBindVertexArray(_vertexBuffer._vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer._vio);
 
@@ -94,6 +92,9 @@ void MeshRenderer::AddMesh(Mesh<Vertex3D>& mesh)
 
 void MeshRenderer::RemoveMesh(unsigned int handle)
 {
+  if (_handleIndexMap.find(handle) == _handleIndexMap.end())
+    return;
+
   const auto index = _handleIndexMap[handle];
   _handleIndexMap[_meshes.back().ID()] = index;
   _handleIndexMap.erase(handle);
@@ -106,14 +107,28 @@ void MeshRenderer::RemoveMesh(unsigned int handle)
   _removedMesh = true;
 }
 
+void MeshRenderer::RemoveAllMeshes()
+{
+  _meshes.clear();
+  _handleIndexMap.clear();
+
+  _removedMesh = true;
+}
+
 void MeshRenderer::UpdateMesh(unsigned int handle, const Mesh<Vertex3D>& mesh)
 {
+  if (_handleIndexMap.find(handle) == _handleIndexMap.end())
+    return;
+
   _meshes[_handleIndexMap[handle]] = mesh;
   _vertexBufferNeedsRebuild = true;
 }
 
 void MeshRenderer::SetMeshTransform(unsigned int handle, const glm::mat4& transform, bool absolute)
 {
+  if (_handleIndexMap.find(handle) == _handleIndexMap.end())
+    return;
+
   auto& mesh = _meshes[_handleIndexMap[handle]];
   mesh.SetTransform(absolute ? transform : transform * mesh.GetTransform());
 }

@@ -1,8 +1,6 @@
-#include "mesh/Mesh.hpp"
-#include "mesh/MeshFactory.hpp"
 #include "VideoRendering.hpp"
-#include "SceneInfo.hpp"
 #include "ShaderSources.g.hpp"
+#include "mesh/MeshFactory.hpp"
 
 namespace ar
 {
@@ -13,8 +11,8 @@ VideoRenderer::VideoRenderer()
 
 void VideoRenderer::Init()
 {
-  _vertexBuffer.InitGL();
-  _indexBuffer.InitGL();
+  _vertexBuffer.Init();
+  _indexBuffer.Init();
   _shader.loadAndLink(ShaderSources::sh_2D_passthru_vert, ShaderSources::sh_simpleTexture_frag);
 
   _videoWidth = 64; _videoHeight = 64;
@@ -37,6 +35,9 @@ void VideoRenderer::Init()
 
 void VideoRenderer::Release()
 {
+  _vertexBuffer.Release();
+  _indexBuffer.Release();
+
   _currentVideoFrame.reset();
 
   GLuint tex = _quadMesh.GetTexture();
@@ -71,7 +72,6 @@ void VideoRenderer::RenderPass(const SceneInfo& sceneInfo)
   glBindTexture(GL_TEXTURE_2D, _quadMesh.GetTexture());
   glUniform1i(shader->getUniform("tex"), 0);
 
-  //_vertexBuffer.Draw(_renderType, m.IndexCount(), m.GetVertexOffset(), m.GetIndexOffset())
   glBindVertexArray(_vertexBuffer._vao);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer._vio);
 

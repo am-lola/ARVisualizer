@@ -1,11 +1,9 @@
 #ifndef _ARMESH_RENDERING_H
 #define _ARMESH_RENDERING_H
 
-#include "RenderComponent.hpp"
+#include "RenderingCommon.hpp"
 #include "mesh/Mesh.hpp"
 #include "mesh/Vertex.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
 #include <glm/glm.hpp>
 #include <unordered_map>
 
@@ -29,6 +27,7 @@ public:
 
   void AddMesh(Mesh<Vertex3D>& mesh);
   void RemoveMesh(unsigned int handle);
+  void RemoveAllMeshes();
   void UpdateMesh(unsigned int handle, const Mesh<Vertex3D>& mesh);
 
 

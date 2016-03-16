@@ -2,6 +2,8 @@
 #define _VERTEXBUFFER_H
 
 #include "common.hpp"
+#include "RenderResource.hpp"
+#include "RenderDefinitions.hpp"
 
 #ifndef GL_GLEXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES
@@ -11,14 +13,13 @@
 namespace ar
 {
 
-class VertexBuffer
+class VertexBuffer : public RenderResource
 {
 public:
 
-  virtual void InitGL() = 0;
-  virtual void BufferData() = 0;
-
   virtual ~VertexBuffer() { }
+
+  virtual void BufferData() = 0;
 };
 
 /*
@@ -29,15 +30,9 @@ class GenericVertexBuffer : public VertexBuffer
 {
 public:
   GenericVertexBuffer() = default;
+  GenericVertexBuffer(BufferUsage usage) : _usage(usage) { }
 
-  // TODO: Don't put this in the destructor
-  ~GenericVertexBuffer()
-  {
-    glDeleteVertexArrays(1, &_vao);
-    glDeleteBuffers(1, &_vbo);
-  }
-
-  virtual void InitGL() override
+  virtual void Init() override
   {
     // the gl* calls below will all fail if a GL context doesn't exist
     if (glfwGetCurrentContext() == nullptr)
@@ -62,24 +57,29 @@ public:
     _dirty = false;
   }
 
-  bool Dirty() { return _dirty; };
+  virtual void Release() override
+  {
+    glDeleteVertexArrays(1, &_vao);
+    glDeleteBuffers(1, &_vbo);
+  }
+
+  inline bool IsDirty() const { return _dirty; };
 
   // Adds the given vertices to the buffer
   // Returns the offset to the first new vertex
   int AddVertices(const Vector<VertexT>& vertices)
   {
-    int offset = _vertices.size();
+    size_t offset = _vertices.size();
 
     // append new vertices to the end of our existing list
     _vertices.insert(std::end(_vertices), std::begin(vertices), std::end(vertices));
     _dirty = true;
 
-    return offset;
+    return (int)offset;
   }
 
   void SetVertices(const Vector<VertexT>& vertices)
   {
-    //std::cout << "setting\n";
     _vertices = vertices;
     _dirty = true;
   }
@@ -92,22 +92,21 @@ public:
       return;
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexT) * _vertices.size(), &_vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexT) * _vertices.size(), &_vertices[0], GetGLUsage(_usage));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     _dirty = false;
   }
 
   // removes ALL vertex and index data from the buffer
-  void ClearAll()
+  virtual void ClearAll()
   {
     _vertices.clear();
     _dirty = true;
   }
 
-//private:
-
   bool _dirty = false;
+  BufferUsage _usage = BufferUsage::Static;
   GLuint _vao; // vertex array object
   GLuint _vbo; // vertex buffer object
   Vector<VertexT> _vertices;

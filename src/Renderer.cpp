@@ -36,6 +36,7 @@ public:
   virtual void execute() override
   {
     _renderer->_meshRenderer.SetMeshTransform(_handle, _transform, _absolute);
+    _renderer->_pointCloudRenderer.SetPointCloudTransform(_handle, _transform, _absolute);
   }
 
   Renderer* _renderer;
@@ -73,10 +74,28 @@ public:
   virtual void execute() override
   {
     _renderer->_meshRenderer.RemoveMesh(_handle);
+    _renderer->_pointCloudRenderer.RemovePointCloud(_handle);
   }
 
   Renderer* _renderer;
   unsigned int _handle;
+};
+
+class Renderer::RenderCommandRemoveAllMeshes : public RenderCommand
+{
+public:
+  RenderCommandRemoveAllMeshes(Renderer* renderer)
+    : _renderer(renderer)
+  { }
+
+  virtual void execute() override
+  {
+    _renderer->_meshRenderer.RemoveAllMeshes();
+    _renderer->_pointCloudRenderer.RemoveAllPointClouds();
+    _renderer->_voxelRenderer.ClearVoxels();
+  }
+
+  Renderer* _renderer;
 };
 
 class Renderer::RenderCommandNotifyNewVideoFrame : public RenderCommand
@@ -334,6 +353,8 @@ void Renderer::RemoveMesh(unsigned int handle)
 
 void Renderer::RemoveAllMeshes()
 {
+  RenderCommandRemoveAllMeshes* command = new RenderCommandRemoveAllMeshes(this);
+  EnqueueRenderCommand(command);
 }
 
 /// TODO: make this more robust

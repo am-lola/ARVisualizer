@@ -1,13 +1,10 @@
 #ifndef _ARPPOINTCLOUD_RENDERING_HPP
 #define _ARPPOINTCLOUD_RENDERING_HPP
 
-#include "RenderComponent.hpp"
-#include "ShaderProgram.hpp"
+#include "RenderingCommon.hpp"
 #include "mesh/Vertex.hpp"
 #include "pointcloud/PointCloud.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
-#include "common.hpp"
+
 #include <glm/glm.hpp>
 #include <unordered_map>
 
@@ -22,19 +19,20 @@ public:
   virtual void Init() override;
   virtual void Release() override;
   virtual void Update() override;
-  virtual void RenderPass(const class SceneInfo& sceneInfo) override;
+  virtual void RenderPass(const SceneInfo& sceneInfo) override;
   virtual void RenderGUI() override;
 
 
   void AddPointCloud(UniquePtr<PointCloud<VertexP4>> pointCloud, Color color);
   void UpdatePointCloud(unsigned int handle, Vector<VertexP4>& points, Color color);
+  void SetPointCloudTransform(unsigned int handle, const glm::mat4& transform, bool absolute);
+  void RemovePointCloud(unsigned int handle);
+  void RemoveAllPointClouds();
 
 private:
 
   Vector<UniquePtr<PointCloud<VertexP4>>> _pointClouds;
   ShaderProgram _pointCloudShader;
-
-  GenericVertexBuffer<VertexP4> _vertexBuffer;
 
   std::unordered_map<unsigned int, size_t> _handleIndexMap;
 };

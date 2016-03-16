@@ -1,10 +1,9 @@
 #ifndef _ARVOXEL_RENDERING_HPP
 #define _ARVOXEL_RENDERING_HPP
 
-#include "RenderComponent.hpp"
-#include "ShaderProgram.hpp"
+#include "RenderingCommon.hpp"
+#include "InstancedVertexBuffer.hpp"
 #include "mesh/Vertex.hpp"
-#include "mesh/InstancedVertexBuffer.hpp"
 #include "geometry/Voxel.hpp"
 
 namespace ar
@@ -22,11 +21,13 @@ public:
   virtual void RenderPass(const class SceneInfo& sceneInfo) override;
 
   void SetVoxels(const Vector<Voxel>& voxels);
+  void ClearVoxels();
 
 private:
 
   ShaderProgram _shader;
-  UniquePtr<InstancedVertexBuffer<VertexP3N3, VertexP3C4S>> _instancedVertexBuffer;
+  InstancedVertexBuffer<VertexP3N3, VertexP3C4S> _instancedVertexBuffer;
+  GenericIndexBuffer _indexBuffer;
 };
 
 }

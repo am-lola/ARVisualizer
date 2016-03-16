@@ -1,11 +1,10 @@
 #ifndef _ARVIDEO_RENDERING_HPP
 #define _ARVIDEO_RENDERING_HPP
 
-#include "RenderComponent.hpp"
-#include "mesh/Vertex.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
+#include "RenderingCommon.hpp"
 #include "ShaderProgram.hpp"
+#include "mesh/Vertex.hpp"
+#include "mesh/Mesh.hpp"
 
 namespace ar
 {

@@ -1,7 +1,9 @@
-#ifndef _INDEXBUFFER_H
-#define _INDEXBUFFER_H
+#ifndef _ARINDEXBUFFER_HPP
+#define _ARINDEXBUFFER_HPP
 
 #include "common.hpp"
+#include "RenderResource.hpp"
+#include "RenderDefinitions.hpp"
 
 #ifndef GL_GLEXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES
@@ -11,14 +13,12 @@
 namespace ar
 {
 
-class IndexBuffer
+class IndexBuffer : public RenderResource
 {
 public:
-
-  virtual void InitGL() = 0;
-  virtual void BufferData() = 0;
-
   virtual ~IndexBuffer() { }
+
+  virtual void BufferData() = 0;
 };
 
 /*
@@ -29,13 +29,9 @@ class GenericIndexBuffer : public IndexBuffer
 public:
 
   GenericIndexBuffer() = default;
+  GenericIndexBuffer(BufferUsage usage) : _usage(usage) { }
 
-  ~GenericIndexBuffer()
-  {
-    glDeleteBuffers(1, &_vio);
-  }
-
-  virtual void InitGL() override
+  virtual void Init() override
   {
     if (glfwGetCurrentContext() == nullptr)
     {
@@ -45,15 +41,26 @@ public:
     glGenBuffers(1, &_vio);
   }
 
+  virtual void Release() override
+  {
+    glDeleteBuffers(1, &_vio);
+  }
+
   int AddIndices(const Vector<GLuint>& indices)
   {
-    int offset = _indices.size();
+    size_t offset = _indices.size();
 
     // append new indices to the end of our existing list
     _indices.insert(std::end(_indices), std::begin(indices), std::end(indices));
     _dirty = true;
 
-    return offset;
+    return (int)offset;
+  }
+
+  void SetIndices(const Vector<GLuint>& indices)
+  {
+    _indices = indices;
+    _dirty = true;
   }
 
   virtual void BufferData() override
@@ -62,7 +69,7 @@ public:
       return;
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _vio);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * _indices.size(), &_indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * _indices.size(), &_indices[0], GetGLUsage(_usage));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     _dirty = false;
@@ -75,12 +82,12 @@ public:
     _dirty = true;
   }
 
-
-  Vector<GLuint> _indices;
-  GLuint _vio;
   bool _dirty = false;
+  BufferUsage _usage = BufferUsage::Static;
+  GLuint _vio;
+  Vector<GLuint> _indices;
 };
 
 } // namespace ar
 
-#endif // _INDEXBUFFER_H
+#endif // _ARINDEXBUFFER_HPP

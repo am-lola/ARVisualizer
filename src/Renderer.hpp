@@ -21,7 +21,6 @@
 #include "ShaderSources.g.hpp"
 #include "ShaderProgram.hpp"
 #include "Material.hpp"
-#include "mesh/InstancedVertexBuffer.hpp"
 #include "mesh/Mesh.hpp"
 #include "windowmanager/GLFWWindowEvents.hpp"
 #include "windowmanager/WindowManager.hpp"
@@ -88,6 +87,7 @@ private:
   class RenderCommandUpdateTransform;
   class RenderCommandUpdateMesh;
   class RenderCommandRemoveMesh;
+  class RenderCommandRemoveAllMeshes;
   class RenderCommandNotifyNewVideoFrame;
   class RenderCommandAddPointCloud;
   class RenderCommandUpdatePointCloud;
