@@ -75,6 +75,18 @@ int main(void)
   };
   ar::Polygon poly = ar::Polygon(polypts, 8, ar::Color(0.2, 0.7, 0));
 
+  double lineA[3] = { 1.0, 0.0, 0.0 };
+  double lineB[3] = { 1.6, 2.0, 0.0 };
+  ar::LineSegment lineSegment = ar::LineSegment(lineA, lineB, 0.003f, ar::Color( 0.9, 0.1, 0 ));
+
+  double linePathPoints[] = {
+    0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+    0.0, 1.0, 1.0,
+    0.5, 1.5, 3.0,
+  };
+  ar::LinePath linePath = ar::LinePath(linePathPoints, 4, 0.005f);
+
   // tell the visualizer about our fancy new shapes
   visualizer->Add(poly);
   visualizer->Add(capsule);
@@ -85,6 +97,8 @@ int main(void)
   visualizer->Add(tri2);
   visualizer->Add(cube);
   visualizer->Add(box);
+  visualizer->Add(lineSegment);
+  visualizer->Add(linePath);
 
   // Keep rendering until the user wants to quit
   std::cout << "Press enter to exit..." << std::endl;

@@ -508,6 +508,52 @@ Mesh<VertexP3N3> MeshFactory::MakeTriangleFan<Mesh<VertexP3N3>>(Vector<glm::vec3
   return m;
 }
 
+LineMesh MeshFactory::MakeLineMesh(const Vector<glm::vec3>& vertexPositions)
+{
+  // Need at least two points
+  if (vertexPositions.size() <= 1)
+    return LineMesh();
+
+  Vector<VertexLine> vertices;
+  Vector<GLuint> indices;
+  const size_t size = vertexPositions.size();
+  for (size_t i = 0; i < size - 1; i++)
+  {
+    const size_t next = i + 1;
+
+    // One vertex pair for for point i
+    {
+      vertices.push_back({
+                           { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
+                           { vertexPositions[next].x, vertexPositions[next].y, vertexPositions[next].z },
+                           1.0f
+                         });
+      vertices.push_back(vertices.back());
+    }
+
+    // One vertex pair for point i+1
+    {
+      vertices.push_back({
+                           { vertexPositions[next].x, vertexPositions[next].y, vertexPositions[next].z },
+                           { vertexPositions[i].x, vertexPositions[i].y, vertexPositions[i].z },
+                           -1.0f
+                         });
+      vertices.push_back(vertices.back());
+    }
+  }
+
+  for (unsigned int i = 0; i < (unsigned int)size - 1; i++)
+  {
+    indices.push_back(i*4);
+    indices.push_back(i*4+1);
+    indices.push_back(i*4+2);
+    indices.push_back(i*4+2);
+    indices.push_back(i*4+1);
+    indices.push_back(i*4+3);
+  }
+
+  return LineMesh(vertices, indices);
+}
 
 glm::mat4 MeshFactory::MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation)
 {

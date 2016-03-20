@@ -166,6 +166,8 @@ public:
   template <typename MeshT>
   static MeshT MakeTriangleFan(Vector<glm::vec3> vertexPositions, bool doubleSided = false);
 
+  static LineMesh MakeLineMesh(const Vector<glm::vec3>& vertexPositions);
+
 protected:
   // creates a transformation matrix to change orientation between from_rotation and to_rotation with a translation of offset
   static glm::mat4 MakeTransform(glm::vec3 offset, glm::vec3 from_rotation, glm::vec3 to_rotation);

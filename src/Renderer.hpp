@@ -33,11 +33,10 @@
 #include "rendering/VideoRendering.hpp"
 #include "rendering/PointCloudRendering.hpp"
 #include "rendering/VoxelRendering.hpp"
+#include "rendering/LineRendering.hpp"
 
 namespace ar
 {
-
-typedef Mesh<Vertex3D> Mesh3D;
 
 class RenderCommand
 {
@@ -84,8 +83,10 @@ private:
 
   template <typename T>
   class RenderCommandAddMesh;
+  class RenderCommandAddLineMesh;
   class RenderCommandUpdateTransform;
   class RenderCommandUpdateMesh;
+  class RenderCommandUpdateLineMesh;
   class RenderCommandRemoveMesh;
   class RenderCommandRemoveAllMeshes;
   class RenderCommandNotifyNewVideoFrame;
@@ -139,6 +140,12 @@ public:
   // @return    An <ar::mesh_handle> for the new <PointCloud>
   unsigned int AddPointCloud(const void* pointData, size_t numPoints, Color color);
 
+  // Updates an existing <LineMesh>
+  // @handle   Handle referencing the mesh to update
+  // @mesh     New mesh data to replace the old mesh with
+  // @material <Material> to apply to the new mesh
+  unsigned int AddLineMesh(const LineMesh& mesh, SharedPtr<Material> material);
+
   // Updates an existing <PointCloud>
   // @handle    Handle referencing the cloud to update
   // @pointData New vertex data to replace the existing points with
@@ -150,7 +157,13 @@ public:
   // @handle   Handle referencing the mesh to update
   // @mesh     New mesh data to replace the old mesh with
   // @material <Material> to apply to the new mesh
-  void Update(unsigned int handle, const Mesh3D& mesh, SharedPtr<Material> material);
+  void UpdateMesh(unsigned int handle, const Mesh3D& mesh, SharedPtr<Material> material);
+
+  // Updates an existing <LineMesh>
+  // @handle   Handle referencing the mesh to update
+  // @mesh     New mesh data to replace the old mesh with
+  // @material <Material> to apply to the new mesh
+  void UpdateLineMesh(unsigned int handle, const LineMesh& mesh, SharedPtr<Material> material);
 
   // Transforms an existing mesh object
   // @handle    Handle referencing the object to transform
@@ -208,7 +221,8 @@ private:
   GLFWwindow* _window;
   int _windowWidth, _windowHeight;
 
-  MeshRenderer _meshRenderer;
+  MeshRenderer<Vertex3D> _meshRenderer;
+  LineRenderer _lineRenderer;
   VideoRenderer _videoRenderer;
   PointCloudRenderer _pointCloudRenderer;
   VoxelRenderer _voxelRenderer;

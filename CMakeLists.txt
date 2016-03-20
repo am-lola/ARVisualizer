@@ -50,6 +50,7 @@ if (ARVIS_BUILD_LIBRARY)
         src/rendering/VideoRendering.*pp
         src/rendering/PointCloudRendering.*pp
         src/rendering/VoxelRendering.*pp
+        src/rendering/LineRendering.*pp
         extern/imgui/imgui.cpp
         extern/imgui/imgui_draw.cpp
         extern/imgui/imgui_demo.cpp
@@ -88,6 +89,7 @@ if (ARVIS_BUILD_LIBRARY)
       src/geometry/Capsule.hpp
       src/geometry/Color.hpp
       src/geometry/Ellipsoid.hpp
+      src/geometry/Line.hpp
       src/geometry/PointCloudData.hpp
       src/geometry/Polygon.hpp
       src/geometry/PolyMesh.hpp

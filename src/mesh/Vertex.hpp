@@ -9,6 +9,30 @@
 namespace ar
 {
 
+struct VertexLine
+{
+  GLfloat position[3];
+  GLfloat otherPosition[3];
+  GLfloat otherDir;
+
+  static GLuint EnableVertexAttribArray(GLuint attribOffset = 0)
+  {
+    glVertexAttribPointer(attribOffset, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexLine),
+                          (const GLvoid*)offsetof(VertexLine, position));
+    glVertexAttribPointer(attribOffset + 1, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexLine),
+                          (const GLvoid*)offsetof(VertexLine, otherPosition));
+    glVertexAttribPointer(attribOffset + 2, 1, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexLine),
+                          (const GLvoid*)offsetof(VertexLine, otherDir));
+    glEnableVertexAttribArray(attribOffset);
+    glEnableVertexAttribArray(attribOffset + 1);
+    glEnableVertexAttribArray(attribOffset + 2);
+    return 3;
+  }
+};
+
 // A vertex with two position coordinates (XY)
 struct VertexP2
 {

@@ -10,19 +10,40 @@ class Renderer::RenderCommandAddMesh : public RenderCommand
 public:
 
   RenderCommandAddMesh(Renderer* renderer, unsigned int handle, const Mesh<T>& _mesh, SharedPtr<Material> _material)
-    : _renderer(renderer), _handle(handle), _mesh(_mesh), _material(_material)
+    : _renderer(renderer), _handle(handle), _mesh(new Mesh<T>(_mesh)), _material(_material)
   { }
 
   virtual void execute() override
   {
-    _mesh.SetMaterial(_material);
-    _mesh.SetID(_handle);
+    _mesh->SetMaterial(_material);
+    _mesh->SetID(_handle);
     _renderer->_meshRenderer.AddMesh(_mesh);
   }
 
   Renderer* _renderer;
   unsigned int _handle;
-  Mesh<T> _mesh;
+  Mesh<T>* _mesh;
+  SharedPtr<Material> _material;
+};
+
+class Renderer::RenderCommandAddLineMesh : public RenderCommand
+{
+public:
+
+  RenderCommandAddLineMesh(Renderer* renderer, unsigned int handle, const LineMesh& _mesh, SharedPtr<Material> _material)
+    : _renderer(renderer), _handle(handle), _mesh(new LineMesh(_mesh)), _material(_material)
+  { }
+
+  virtual void execute() override
+  {
+    _mesh->SetMaterial(_material);
+    _mesh->SetID(_handle);
+    _renderer->_lineRenderer.AddMesh(_mesh);
+  }
+
+  Renderer* _renderer;
+  unsigned int _handle;
+  LineMesh* _mesh;
   SharedPtr<Material> _material;
 };
 
@@ -49,18 +70,39 @@ class Renderer::RenderCommandUpdateMesh : public RenderCommand
 {
 public:
   RenderCommandUpdateMesh(Renderer* renderer, unsigned int handle, const Mesh3D& mesh, SharedPtr<Material> material)
-    : _renderer(renderer), _handle(handle), _mesh(mesh), _material(material)
+    : _renderer(renderer), _handle(handle), _mesh(new Mesh3D(mesh)), _material(material)
   { }
 
   virtual void execute() override
   {
-    _mesh.SetMaterial(_material);
+    _mesh->SetMaterial(_material);
+    _mesh->SetID(_handle);
     _renderer->_meshRenderer.UpdateMesh(_handle, _mesh);
   }
 
   Renderer* _renderer;
   unsigned int _handle;
-  Mesh3D _mesh;
+  Mesh3D* _mesh;
+  SharedPtr<Material> _material;
+};
+
+class Renderer::RenderCommandUpdateLineMesh : public RenderCommand
+{
+public:
+  RenderCommandUpdateLineMesh(Renderer* renderer, unsigned int handle, const LineMesh& mesh, SharedPtr<Material> material)
+    : _renderer(renderer), _handle(handle), _mesh(new LineMesh(mesh)), _material(material)
+  { }
+
+  virtual void execute() override
+  {
+    _mesh->SetMaterial(_material);
+    _mesh->SetID(_handle);
+    _renderer->_lineRenderer.UpdateMesh(_handle, _mesh);
+  }
+
+  Renderer* _renderer;
+  unsigned int _handle;
+  LineMesh* _mesh;
   SharedPtr<Material> _material;
 };
 
@@ -74,6 +116,7 @@ public:
   virtual void execute() override
   {
     _renderer->_meshRenderer.RemoveMesh(_handle);
+    _renderer->_lineRenderer.RemoveMesh(_handle);
     _renderer->_pointCloudRenderer.RemovePointCloud(_handle);
   }
 
@@ -91,6 +134,7 @@ public:
   virtual void execute() override
   {
     _renderer->_meshRenderer.RemoveAllMeshes();
+    _renderer->_lineRenderer.RemoveAllMeshes();
     _renderer->_pointCloudRenderer.RemoveAllPointClouds();
     _renderer->_voxelRenderer.ClearVoxels();
   }
@@ -324,16 +368,33 @@ unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints, Co
   return handle;
 }
 
+unsigned int Renderer::AddLineMesh(const LineMesh& mesh, SharedPtr<Material> material)
+{
+  const unsigned int handle = GenerateMeshHandle();
+
+  RenderCommandAddLineMesh* command = new RenderCommandAddLineMesh(this, handle, mesh, material);
+  EnqueueRenderCommand(command);
+
+  return handle;
+}
+
 void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color)
 {
   RenderCommandUpdatePointCloud* command = new RenderCommandUpdatePointCloud(this, handle, pointData, numPoints, color);
   EnqueueRenderCommand(command);
 }
 
-void Renderer::Update(unsigned int handle, const Mesh3D& mesh, SharedPtr<Material> material)
+void Renderer::UpdateMesh(unsigned int handle, const Mesh3D& mesh, SharedPtr<Material> material)
 {
   if (handle == 0) { return; }
   RenderCommandUpdateMesh* command = new RenderCommandUpdateMesh(this, handle, mesh, material);
+  EnqueueRenderCommand(command);
+}
+
+void Renderer::UpdateLineMesh(unsigned int handle, const LineMesh& mesh, SharedPtr<Material> material)
+{
+  if (handle == 0) { return; }
+  RenderCommandUpdateLineMesh* command = new RenderCommandUpdateLineMesh(this, handle, mesh, material);
   EnqueueRenderCommand(command);
 }
 
@@ -379,6 +440,7 @@ void Renderer::Init()
   _videoRenderer.Init();
   _pointCloudRenderer.Init();
   _voxelRenderer.Init();
+  _lineRenderer.Init();
 
   _imguiRenderer.Init();
 
@@ -486,6 +548,7 @@ void Renderer::Update()
   _pointCloudRenderer.Update();
   _meshRenderer.Update();
   _voxelRenderer.Update();
+  _lineRenderer.Update();
 }
 
 void Renderer::RenderOneFrame()
@@ -495,6 +558,9 @@ void Renderer::RenderOneFrame()
   sceneInfo.viewMatrix = GetViewMatrix();
   sceneInfo.projectionMatrix = GetProjectionMatrix();
   sceneInfo.lightDir = light_dir;
+  sceneInfo.nearClip = _camera._nearClip;
+  sceneInfo.farClip = _camera._farClip;
+  sceneInfo.aspect = _camera._aspect;
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -522,6 +588,9 @@ void Renderer::RenderOneFrame()
   EnableRenderPass(Blend_Alpha);
   _meshRenderer.RenderPass(sceneInfo);
 
+  EnableRenderPass(Blend_None | EnableDepth);
+  _lineRenderer.RenderPass(sceneInfo);
+
   // cleanup
   glBindTexture(GL_TEXTURE_2D, 0);
   glUseProgram(0);
@@ -548,6 +617,7 @@ void Renderer::RenderGUI()
   _meshRenderer.RenderGUI();
   _videoRenderer.RenderGUI();
   _voxelRenderer.RenderGUI();
+  _lineRenderer.RenderGUI();
 
   _renderGUIDelegate();
 
@@ -561,6 +631,7 @@ void Renderer::Shutdown()
   _voxelRenderer.Release();
   _meshRenderer.Release();
   _pointCloudRenderer.Release();
+  _lineRenderer.Release();
 
   _imguiRenderer.Shutdown();
 

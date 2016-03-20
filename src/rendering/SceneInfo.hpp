@@ -12,6 +12,9 @@ struct SceneInfo
   glm::mat4 viewMatrix;
   glm::mat4 projectionMatrix;
   glm::vec3 lightDir;
+  float nearClip;
+  float farClip;
+  float aspect;
 };
 
 }

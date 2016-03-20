@@ -14,6 +14,7 @@
 #include "geometry/PolyMesh.hpp"
 #include "geometry/PointCloudData.hpp"
 #include "geometry/Voxel.hpp"
+#include "geometry/Line.hpp"
 
 namespace ar
 {
@@ -142,6 +143,12 @@ public:
   // @return Handle which can be used to update or remove the object in the future
   mesh_handle Add(Ellipsoid ellipsoid);
 
+  // Adds a <Line> to the scene
+  // @Line Struct describing the line
+  //
+  // @return Handle which can be used to update or remove the object in the future
+  mesh_handle Add(LinePath linePath);
+
   // Adds a PointCloud to the scene
   // @pointcloud Struct describing the PointCloud
   //
@@ -192,6 +199,11 @@ public:
   // @handle <mesh_handle> for the object to be updated
   // @ellipsoid <Ellipsoid> to replace the object with
   void Update(mesh_handle handle, Ellipsoid ellipsoid);
+
+  // Updates an existing object to match the given shape
+  // @handle <mesh_handle> for the object to be updated
+  // @linePath <LinePath> to replace the object with
+  void Update(mesh_handle handle, LinePath linePath);
 
   // Updates an existing object to match the given shape
   // @handle <mesh_handle> for the object to be updated
