@@ -16,12 +16,6 @@ public:
 
   virtual void InitResource() override
   {
-    // the gl* calls below will all fail if a GL context doesn't exist
-    if (glfwGetCurrentContext() == NULL)
-    {
-      throw std::runtime_error("VertexBuffer cannot be created without an OpenGL Context");
-    }
-
     // generate buffers
     glGenVertexArrays(1, &(Base::_vao));
     glGenBuffers(1, &(Base::_vbo));

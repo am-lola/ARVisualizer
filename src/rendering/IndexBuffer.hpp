@@ -33,11 +33,6 @@ public:
 
   virtual void InitResource() override
   {
-    if (glfwGetCurrentContext() == nullptr)
-    {
-      throw std::runtime_error("VertexBuffer cannot be created without an OpenGL Context");
-    }
-
     glGenBuffers(1, &_vio);
   }
 
