@@ -114,6 +114,15 @@ void Camera::RenderGUI()
   ImGui::SliderFloat("Orbit Radius", &orbitRadius, 0.5f, 100.0f);
   _orbitRadius = orbitRadius;
 
+  ImGui::Separator();
+  static int e = 0;
+  ImGui::Text("Scroll Wheel:");
+  ImGui::RadioButton("FOV", &e, 0); ImGui::SameLine();
+  ImGui::RadioButton("Speed", &e, 1);
+  _scrollWheelFunction = e == 0 ? ScrollWheelFunction::ChangeFOV : ScrollWheelFunction::ChangeMovementSpeed;
+
+  ImGui::Separator();
+
   if (ImGui::Button("Reset View"))
     Reset();
 
@@ -279,7 +288,15 @@ void Camera::OnScroll(double offset)
   if (ImGui::IsAnyItemActive() || ImGui::IsMouseHoveringAnyWindow())
     return;
 
-  Zoom(offset);
+  if (_scrollWheelFunction == ScrollWheelFunction::ChangeFOV)
+  {
+    Zoom(offset);
+  }
+  else
+  {
+    // Control movement speed with the mouse wheel
+    AlterMovementSpeed(offset);
+  }
 }
 
 void Camera::Rotate(double dx, double dy)
@@ -342,6 +359,19 @@ void Camera::Zoom(double dz)
 {
   _zoom -= dz * 0.001f;
   UpdateProjection();
+}
+
+void Camera::AlterMovementSpeed(double dz)
+{
+  float deltaSpeed = (float)dz;
+
+  // Change the movement speed exponentially
+  if (deltaSpeed > 0.0f)
+    deltaSpeed = _movementSpeed * deltaSpeed;
+  else
+    deltaSpeed = _movementSpeed / (2 * deltaSpeed);
+
+  _movementSpeed = clamp(_movementSpeed + deltaSpeed, 0.1f, 64.0f);
 }
 
 } // namespace ar

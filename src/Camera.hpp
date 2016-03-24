@@ -14,6 +14,12 @@ class WindowEvents;
 // Basic WASD+Mouse FPS camera
 class Camera
 {
+  enum class ScrollWheelFunction
+  {
+    ChangeFOV,
+    ChangeMovementSpeed
+  };
+
 public:
   Camera(WindowEvents& windowEvents);
 
@@ -42,6 +48,8 @@ public:
 
 private:
 
+  friend class Renderer;
+
   void OnMouseMove(double xpos, double ypos);
   void OnMouseButton(int button, int action, int mods);
   void OnKey(int key, int scancode, int action, int mods);
@@ -69,6 +77,9 @@ private:
 
   // Zooms camera in or out
   void Zoom(double dz);
+
+  // Changes the movement speed
+  void AlterMovementSpeed(double dz);
 
   float _aspect   = 1.3f;    // aspect ratio
   float _fov      = 45.0f;   // field of view, in degrees
@@ -103,6 +114,8 @@ private:
   int _rolling = 0;
   float _movementSpeed = 10.0f;
   float _sensitivity = 1.0f;
+
+  ScrollWheelFunction _scrollWheelFunction = ScrollWheelFunction::ChangeFOV;
 };
 
 }
