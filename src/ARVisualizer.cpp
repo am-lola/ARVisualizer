@@ -50,10 +50,11 @@ void ARVisualizer::Start(const char* name, int width, int height)
 
 void ARVisualizer::Stop()
 {
-  if (_renderer)
+  if (_renderer != nullptr)
   {
-    _renderer->Stop();
-    _renderer = nullptr;
+    Renderer* renderer = _renderer;
+    _renderer = nullptr; // Set to nullptr to get IsRunning() to return false right away...
+    renderer->Stop();    // ...because this waits for the render thread to finish
   }
 }
 
