@@ -14,7 +14,7 @@ class InstancedVertexBuffer : public GenericVertexBuffer<VertexT>
 
 public:
 
-  virtual void Init() override
+  virtual void InitResource() override
   {
     // the gl* calls below will all fail if a GL context doesn't exist
     if (glfwGetCurrentContext() == NULL)
@@ -53,7 +53,7 @@ public:
     glBindVertexArray(0);
   }
 
-  virtual void Release() override
+  virtual void ReleaseResource() override
   {
     Base::Release();
     glDeleteBuffers(1, &_ibo);

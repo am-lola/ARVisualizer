@@ -25,12 +25,12 @@ public:
 
   PointCloud() = default;
 
-  virtual void Init() override
+  virtual void InitResource() override
   {
     _vertexBuffer.Init();
   }
 
-  virtual void Release() override
+  virtual void ReleaseResource() override
   {
     _vertexBuffer.Release();
   }

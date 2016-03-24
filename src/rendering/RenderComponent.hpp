@@ -8,7 +8,7 @@ class RenderComponent
 {
 public:
 
-  virtual ~RenderComponent() { }
+  virtual ~RenderComponent() = default;
 
   virtual void Init() = 0;
   virtual void Release() = 0;

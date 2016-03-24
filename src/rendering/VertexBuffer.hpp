@@ -32,7 +32,7 @@ public:
   GenericVertexBuffer() = default;
   GenericVertexBuffer(BufferUsage usage) : _usage(usage) { }
 
-  virtual void Init() override
+  virtual void InitResource() override
   {
     // the gl* calls below will all fail if a GL context doesn't exist
     if (glfwGetCurrentContext() == nullptr)
@@ -57,7 +57,7 @@ public:
     _dirty = false;
   }
 
-  virtual void Release() override
+  virtual void ReleaseResource() override
   {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
@@ -88,6 +88,9 @@ public:
   // Must ONLY be called from the thread owning the OpenGL Context!
   virtual void BufferData() override
   {
+    if (!_initialized)
+      throw std::runtime_error("The vertex buffer was not initialized.");
+
     if (!_dirty)
       return;
 

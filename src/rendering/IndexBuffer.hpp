@@ -16,7 +16,7 @@ namespace ar
 class IndexBuffer : public RenderResource
 {
 public:
-  virtual ~IndexBuffer() { }
+  virtual ~IndexBuffer() = default;
 
   virtual void BufferData() = 0;
 };
@@ -31,7 +31,7 @@ public:
   GenericIndexBuffer() = default;
   GenericIndexBuffer(BufferUsage usage) : _usage(usage) { }
 
-  virtual void Init() override
+  virtual void InitResource() override
   {
     if (glfwGetCurrentContext() == nullptr)
     {
@@ -41,7 +41,7 @@ public:
     glGenBuffers(1, &_vio);
   }
 
-  virtual void Release() override
+  virtual void ReleaseResource() override
   {
     glDeleteBuffers(1, &_vio);
   }
@@ -65,6 +65,9 @@ public:
 
   virtual void BufferData() override
   {
+    if (!_initialized)
+      throw std::runtime_error("The index buffer was not initialized.");
+
     if (!_dirty)
       return;
 
