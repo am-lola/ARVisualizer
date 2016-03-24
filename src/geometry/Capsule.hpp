@@ -14,7 +14,7 @@ namespace ar
     Color color;
 
     // Creates a capsule. Centers are expected to be ordered: x, y, z
-    Capsule(double* center1, double* center2, double radius) : color()
+    Capsule(const double* center1, const double* center2, double radius) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -26,7 +26,7 @@ namespace ar
     }
 
     // Creates a capsule. Centers are expected to be ordered: x, y, z
-    Capsule(double* center1, double* center2, double radius, Color color)
+    Capsule(const double* center1, const double* center2, double radius, Color color)
     {
       for (int i = 0; i < 3; i++)
       {

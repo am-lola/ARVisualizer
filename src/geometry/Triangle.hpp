@@ -14,7 +14,7 @@ namespace ar
     Color color;
 
     // Creates a triangle. Expects vertex_positions in the order: x1, y1, z1, x2, y2, z2, ...
-    Triangle(double* vertex_positions) : color()
+    Triangle(const double* vertex_positions) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -36,7 +36,7 @@ namespace ar
     }
 
     // Creates a triangle. Expects vertex_positions in the order: x1, y1, z1, x2, y2, z2, ...
-    Triangle(double* vertex_positions, Color color)
+    Triangle(const double* vertex_positions, Color color)
     {
       this->color = color;
 

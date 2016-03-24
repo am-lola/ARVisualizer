@@ -13,7 +13,7 @@ namespace ar
     Color color;
 
     // Creates a sphere. Center is expected to be ordered: x, y, z
-    Sphere(double* center, double radius) : color()
+    Sphere(const double* center, double radius) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -24,7 +24,7 @@ namespace ar
     }
 
     // Creates a sphere. Center is expected to be ordered: x, y, z
-    Sphere(double* center, double radius, Color color)
+    Sphere(const double* center, double radius, Color color)
     {
       for (int i = 0; i < 3; i++)
       {

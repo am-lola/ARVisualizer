@@ -14,7 +14,7 @@ namespace ar
     float sizeZ;
     Color color;
 
-    Box(double* center, double sizeX, double sizeY, double sizeZ) : color()
+    Box(const double* center, double sizeX, double sizeY, double sizeZ) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -27,7 +27,7 @@ namespace ar
     }
 
 
-    Box(double* center, double sizeX, double sizeY, double sizeZ, Color color)
+    Box(const double* center, double sizeX, double sizeY, double sizeZ, Color color)
     {
       for (int i = 0; i < 3; i++)
       {
@@ -48,7 +48,7 @@ namespace ar
     float size;
     Color color;
 
-    Cube(double* center, double size) : color()
+    Cube(const double* center, double size) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -59,7 +59,7 @@ namespace ar
     }
 
 
-    Cube(double* center, double size, Color color)
+    Cube(const double* center, double size, Color color)
     {
       for (int i = 0; i < 3; i++)
       {

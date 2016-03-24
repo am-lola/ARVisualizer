@@ -20,7 +20,7 @@ namespace ar
     // Constructor
     // @points 3D coordinates, arranged [x,y,z,x,y,z,...]
     // @count  Total number of 3D points
-    Polygon(double* points, unsigned int count) : color()
+    Polygon(const double* points, unsigned int count) : color()
     {
       this->points = new float[count*3];
       for (size_t i = 0; i < count * 3; i++)
@@ -35,7 +35,7 @@ namespace ar
     // @points 3D coordinates, arranged [x,y,z,x,y,z,...]
     // @count  Total number of 3D points
     // @color  Color of the mesh
-    Polygon(double* points, unsigned int count, Color color)
+    Polygon(const double* points, unsigned int count, Color color)
     {
       this->points = new float[count*3];
       for (size_t i = 0; i < count * 3; i++)

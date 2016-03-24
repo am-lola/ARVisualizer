@@ -15,7 +15,7 @@ namespace ar
     Color color;
 
     // Creates a quad. Center & normal are expected to be ordered: x, y, z
-    Quad(double* center, double* normal) : width(0.0f), height(0.0f), color()
+    Quad(const double* center, const double* normal) : width(0.0f), height(0.0f), color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -25,7 +25,7 @@ namespace ar
     }
 
     // Creates a quad. Center & normal are expected to be ordered: x, y, z
-    Quad(double* center, double* normal, double width, double height) : color()
+    Quad(const double* center, const double* normal, double width, double height) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -38,7 +38,7 @@ namespace ar
     }
 
     // Creates a quad. Center & normal are expected to be ordered: x, y, z
-    Quad(double* center, double* normal, double width, double height, Color color)
+    Quad(const double* center, const double* normal, double width, double height, Color color)
     {
       for (int i = 0; i < 3; i++)
       {

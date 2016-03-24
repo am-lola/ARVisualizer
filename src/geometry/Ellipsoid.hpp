@@ -15,7 +15,7 @@ namespace ar
     float radius;
     Color color;
 
-    Ellipsoid(double* center, double* transform, double radius) : color()
+    Ellipsoid(const double* center, const double* transform, double radius) : color()
     {
       for (int i = 0; i < 3; i++)
       {
@@ -30,7 +30,7 @@ namespace ar
     }
 
 
-    Ellipsoid(double* center, double* transform, double radius, Color color)
+    Ellipsoid(const double* center, const double* transform, double radius, Color color)
     {
       for (int i = 0; i < 3; i++)
       {
