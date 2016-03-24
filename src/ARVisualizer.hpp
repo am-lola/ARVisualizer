@@ -217,6 +217,11 @@ public:
   //            If false, the transform will be added to the object's current transform.
   void Update(mesh_handle handle, ar::Transform transform, bool absolute);
 
+  // Set an objects visibility
+  // @handle <mesh_handle> for the object
+  // @visible True if the object should be visible
+  void SetVisibility(mesh_handle handle, bool visible);
+
   // Removes an object from the scene
   // @handle <mesh_handle> for the object to be removed
   void Remove(mesh_handle handle);

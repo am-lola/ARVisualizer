@@ -2,6 +2,7 @@
 #define _ARSCENEINFO_H
 
 #include <glm/glm.hpp>
+#include <unordered_map>
 
 namespace ar
 {
@@ -15,6 +16,12 @@ struct SceneInfo
   float nearClip;
   float farClip;
   float aspect;
+  std::unordered_map<unsigned int, bool>* visibilityMap;
+
+  bool shouldDraw(unsigned handle) const
+  {
+    return visibilityMap->find(handle) == visibilityMap->end() || visibilityMap->at(handle) == true;
+  }
 };
 
 }

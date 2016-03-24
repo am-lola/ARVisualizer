@@ -26,6 +26,9 @@ void LineRenderer::RenderPass(const SceneInfo& sceneInfo)
 
   for (const auto& m : _meshes)
   {
+    if (!sceneInfo.shouldDraw(m->ID()))
+      continue;
+
     const LineMesh* mesh = static_cast<LineMesh*>(m.get());
 
     const glm::mat4 mv = sceneInfo.viewMatrix * mesh->GetTransform();

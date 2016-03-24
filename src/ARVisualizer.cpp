@@ -418,6 +418,12 @@ void ARVisualizer::Update(mesh_handle handle, ar::Transform transform, bool abso
   _renderer->UpdateTransform(handle, transformMat, absolute);
 }
 
+void ARVisualizer::SetVisibility(mesh_handle handle, bool visible)
+{
+  if (!IsRunning()) { return; }
+  _renderer->SetVisibility(handle, visible);
+}
+
 void ARVisualizer::Remove(mesh_handle handle)
 {
   if (!IsRunning()) { return; }

@@ -17,6 +17,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <unordered_map>
 #include "RenderPassParams.hpp"
 #include "ShaderSources.g.hpp"
 #include "ShaderProgram.hpp"
@@ -93,6 +94,7 @@ private:
   class RenderCommandAddPointCloud;
   class RenderCommandUpdatePointCloud;
   class RenderCommandDrawVoxels;
+  class RenderCommandSetVisibility;
 
 public:
   // Constructor
@@ -172,6 +174,10 @@ public:
   //            If True, transformation replaces the object's current transformation.
   void UpdateTransform(unsigned int handle, const glm::mat4& transform, bool absolute);
 
+  // Sets the visibility of an object
+  // @visible True if the object should be visible
+  void SetVisibility(unsigned int handle, bool visible);
+
   // Removes an existing mesh from the scene
   // @handle Handle referencing the mesh to remove
   void RemoveMesh(unsigned int handle);
@@ -220,6 +226,8 @@ private:
   GLFWWindowEvents _windowEvents;
   GLFWwindow* _window;
   int _windowWidth, _windowHeight;
+
+  std::unordered_map<unsigned int, bool> _visibilityMap;
 
   MeshRenderer<Vertex3D> _meshRenderer;
   LineRenderer _lineRenderer;
@@ -277,6 +285,10 @@ private:
   // ! Call from _renderThread only
   // renders the GUI
   void RenderGUI();
+
+  // ! Call from _renderThread only
+  // renders the GUI for stats
+  void RenderStatsGUI();
 
   // ! Call from _renderThread only
   // Final cleanup which needs to be done (from the render thread) when we stop rendering

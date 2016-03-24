@@ -14,8 +14,6 @@ class IUIWindow
 {
 public:
 
-  virtual ~IUIWindow() { }
-
   virtual ui_element_handle AddButton(const char* label) = 0;
   virtual ui_element_handle AddSliderFloat(const char* label, float min, float max, float value = 0.0f) = 0;
   virtual ui_element_handle AddSliderFloat2(const char* label, float min, float max, const float* values = NULL) = 0;
@@ -53,9 +51,12 @@ public:
 
   virtual void UpdateText(ui_element_handle handle, const char* fmt, ...) = 0;
 
-private:
+protected:
 
   friend class UserInterface;
+  virtual ~IUIWindow() { }
+
+private:
   virtual void drawElements() = 0;
 };
 

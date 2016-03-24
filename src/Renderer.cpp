@@ -115,6 +115,10 @@ public:
 
   virtual void execute() override
   {
+    auto it = _renderer->_visibilityMap.find(_handle);
+    if (it != _renderer->_visibilityMap.end())
+      _renderer->_visibilityMap.erase(it);
+
     _renderer->_meshRenderer.RemoveMesh(_handle);
     _renderer->_lineRenderer.RemoveMesh(_handle);
     _renderer->_pointCloudRenderer.RemovePointCloud(_handle);
@@ -133,10 +137,11 @@ public:
 
   virtual void execute() override
   {
+    _renderer->_visibilityMap.clear();
     _renderer->_meshRenderer.RemoveAllMeshes();
     _renderer->_lineRenderer.RemoveAllMeshes();
-    _renderer->_pointCloudRenderer.RemoveAllPointClouds();
-    _renderer->_voxelRenderer.ClearVoxels();
+    //_renderer->_pointCloudRenderer.RemoveAllPointClouds();
+    //_renderer->_voxelRenderer.ClearVoxels();
   }
 
   Renderer* _renderer;
@@ -234,6 +239,24 @@ public:
 
   Renderer* _renderer;
   Vector<Voxel> _voxels;
+};
+
+class Renderer::RenderCommandSetVisibility : public RenderCommand
+{
+public:
+  RenderCommandSetVisibility(Renderer* renderer, unsigned int handle, bool visible)
+    : _renderer(renderer), _handle(handle), _visible(visible)
+  {
+  }
+
+  virtual void execute() override
+  {
+    _renderer->_visibilityMap[_handle] = _visible;
+  }
+
+  Renderer* _renderer;
+  unsigned int _handle;
+  bool _visible;
 };
 
 // used to synchronize between all active rendering threads to work around IMGUI not playing nice with threads
@@ -405,6 +428,13 @@ void Renderer::UpdateTransform(unsigned int handle, const glm::mat4& transform, 
   EnqueueRenderCommand(command);
 }
 
+void Renderer::SetVisibility(unsigned int handle, bool visible)
+{
+  if (handle == 0) { return; }
+  RenderCommandSetVisibility* command = new RenderCommandSetVisibility(this, handle, visible);
+  EnqueueRenderCommand(command);
+}
+
 void Renderer::RemoveMesh(unsigned int handle)
 {
   if (handle == 0) { return; } // zero is reserved as a non-unique default ID
@@ -561,6 +591,7 @@ void Renderer::RenderOneFrame()
   sceneInfo.nearClip = _camera._nearClip;
   sceneInfo.farClip = _camera._farClip;
   sceneInfo.aspect = _camera._aspect;
+  sceneInfo.visibilityMap = &_visibilityMap;
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -585,7 +616,7 @@ void Renderer::RenderOneFrame()
   * Third pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  EnableRenderPass(Blend_Alpha);
+  EnableRenderPass(Blend_Add);
   _meshRenderer.RenderPass(sceneInfo);
 
   EnableRenderPass(Blend_None | EnableDepth);
@@ -619,10 +650,37 @@ void Renderer::RenderGUI()
   _voxelRenderer.RenderGUI();
   _lineRenderer.RenderGUI();
 
+  RenderStatsGUI();
+
   _renderGUIDelegate();
 
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
+}
+
+void Renderer::RenderStatsGUI()
+{
+  static constexpr int bufferSize = 128;
+  static float values[bufferSize] = { 0.0f };
+  static int offset = 0;
+  static float lastTime;
+
+  const float timeDiff = ImGui::GetTime() - lastTime;
+  lastTime = ImGui::GetTime();
+  offset = (offset + 1) % bufferSize;
+  values[offset] = timeDiff;
+
+  static bool opened = true;
+
+  if (opened)
+  {
+    if (ImGui::Begin("Stats", &opened))
+    {
+      ImGui::PushItemWidth(-80);
+      ImGui::PlotLines("Frame time", values, bufferSize, offset, nullptr, 0.0f, 0.1f, ImVec2(0, 60));
+    }
+    ImGui::End();
+  }
 }
 
 void Renderer::Shutdown()

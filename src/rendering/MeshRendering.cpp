@@ -49,6 +49,9 @@ void MeshRenderer<VertexT>::RenderPass(const SceneInfo& sceneInfo)
 {
   for (auto& m : _meshes)
   {
+    if (!sceneInfo.shouldDraw(m->ID()))
+      continue;
+
     const auto& shader = m->GetShader();
     shader->enable();
 
