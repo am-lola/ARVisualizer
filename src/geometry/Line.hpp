@@ -2,7 +2,7 @@
 #define _ARLINE_H
 
 #include "Color.hpp"
-#include "CircularBuffer.hpp"
+#include "../CircularBuffer.hpp"
 
 namespace ar
 {
