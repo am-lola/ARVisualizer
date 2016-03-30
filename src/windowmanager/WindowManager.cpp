@@ -21,7 +21,6 @@ WindowManager::~WindowManager()
     for (auto& r : _renderers)
     {
       r->Stop();
-      delete(r);
     }
 
     SendCommand(new IWMCommand(SHUTDOWN));
