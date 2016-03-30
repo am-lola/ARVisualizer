@@ -49,7 +49,7 @@ public:
 
   virtual void ReleaseResource() override
   {
-    Base::Release();
+    Base::ReleaseResource();
     glDeleteBuffers(1, &_ibo);
   }
 
