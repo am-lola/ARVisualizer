@@ -693,6 +693,8 @@ void Renderer::Shutdown()
 
   _imguiRenderer.Shutdown();
 
+  _defaultShader.destroy();
+
   glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
 }
 

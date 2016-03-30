@@ -74,9 +74,20 @@ class ShaderProgram
     // Destructor
     ~ShaderProgram()
     {
-      // Delete the shader program from the graphics card memory to
-      // free all the resources it's been using
+
+    }
+
+    // Delete the shader program from the graphics card memory to
+    // free all the resources it's been using
+    void destroy()
+    {
       glDeleteProgram(programId);
+
+      programId = 0;
+      shaderCount = 0;
+
+      attributeLocList.clear();
+      uniformLocList.clear();
     }
 
     void loadAndLink(const std::string vertex_source, const std::string fragment_source)
