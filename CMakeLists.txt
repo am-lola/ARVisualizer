@@ -14,6 +14,9 @@ option(ARVIS_BUILD_SAMPLES "Build sample applications" TRUE)
 option(ARVIS_BUILD_DOCS    "Build Project Documentation" FALSE)
 option(GLFW_STATIC_LINKAGE "Link GLFW3 statically" TRUE)
 
+# Build everything with C++11
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 # Figure out whether we should be linking against the static or shared version of GLFW3
 if (GLFW_STATIC_LINKAGE)
   set(AR_GLFW_LIBS ${GLFW_STATIC_LIBRARIES})
@@ -58,7 +61,7 @@ if (ARVIS_BUILD_LIBRARY)
 
     add_library(arvisualizer SHARED ${libarvis_src})
     add_dependencies(arvisualizer shader_gen)
-    set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+    set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     target_link_libraries(arvisualizer ${AR_GLFW_LIBS})
 
     # install target for the visualization library
@@ -110,7 +113,7 @@ endif()
 
 if (ARVIS_BUILD_SAMPLES)
     # PCL Is required for the grabber sample
-    find_package(PCL 1.2 REQUIRED)
+    find_package(PCL 1.7 REQUIRED)
     include_directories(${PCL_INCLUDE_DIRS})
     add_executable(sample_pcl_grabber samples/pcl_grabber/main.cpp)
     target_link_libraries(sample_pcl_grabber arvisualizer ${PCL_LIBRARIES})
@@ -132,7 +135,6 @@ if (ARVIS_BUILD_SAMPLES)
 
     add_executable(sample_user_interface samples/user_interface/main.cpp)
     target_link_libraries(sample_user_interface arvisualizer)
-    set_target_properties(sample_user_interface PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 # Documentation
