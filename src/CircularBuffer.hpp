@@ -52,15 +52,11 @@ public:
     init(size);
   }
 
-#if __cplusplus >= 201103L
-
   CircularBuffer(const CircularBuffer& rhs) = default;
   CircularBuffer& operator=(const CircularBuffer& rhs) = default;
 
   CircularBuffer(CircularBuffer&& rhs) = default;
   CircularBuffer& operator=(CircularBuffer&& rhs) = default;
-
-#endif
 
   void swap(CircularBuffer& rhs)
   {
