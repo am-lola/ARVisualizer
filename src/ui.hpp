@@ -34,7 +34,7 @@ public:
   virtual ui_element_handle AddDragInt4(const char* label, int min, int max, float speed = 0.0f, const int* values = NULL) = 0;
   virtual ui_element_handle AddCheckBox(const char* label, bool checked = false) = 0;
   virtual ui_element_handle AddFloatRange(const char* label, float speed = 1.0f, float min = 0.0f, float max = 0.0f, float lower = 0.0f, float upper = 0.0f) = 0;
-  virtual ui_element_handle AddInputText(const char* label) = 0;
+  virtual ui_element_handle AddInputText(const char* label, const char* text = NULL) = 0;
   virtual ui_element_handle AddText(const char* fmt, ...) = 0;
 
   virtual void AddSeparator() = 0;

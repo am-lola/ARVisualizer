@@ -155,7 +155,7 @@ public:
   virtual ui_element_handle AddDragInt4(const char* label, int min, int max, float speed = 0.0f, const int* values = NULL) override;
   virtual ui_element_handle AddCheckBox(const char* label, bool checked = false) override;
   virtual ui_element_handle AddFloatRange(const char* label, float speed = 1.0f, float min = 0.0f, float max = 0.0f, float lower = 0.0f, float upper = 0.0f) override;
-  virtual ui_element_handle AddInputText(const char* label) override;
+  virtual ui_element_handle AddInputText(const char* label, const char* text = NULL) override;
   virtual ui_element_handle AddText(const char* fmt, ...) override;
 
   virtual void AddSeparator() override;
@@ -295,8 +295,11 @@ void UIFloatRange::draw()
 
 void UIInputText::draw()
 {
-  static char buffer[512] { 0 };
-  if (ImGui::InputText(_label.c_str(), buffer, 512))
+  static constexpr int bufferSize = 512;
+  static char buffer[bufferSize] { 0 };
+  if (!_text.empty())
+    strncpy(buffer, _text.c_str(), bufferSize);
+  if (ImGui::InputText(_label.c_str(), buffer, bufferSize))
     _text = buffer;
 }
 
@@ -544,12 +547,14 @@ ui_element_handle UIWindow::AddFloatRange(const char* label, float speed, float 
   return getLastElementHandle();
 }
 
-ui_element_handle UIWindow::AddInputText(const char* label)
+ui_element_handle UIWindow::AddInputText(const char* label, const char* text)
 {
   MutexLockGuard lockGuard(_mutex);
 
   UIInputText* inputText = new UIInputText();
   inputText->_label = label;
+  if (text != nullptr)
+    inputText->_text = text;
   _elements.emplace_back(inputText);
   return getLastElementHandle();
 }
