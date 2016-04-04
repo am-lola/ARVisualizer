@@ -215,6 +215,8 @@ public:
 
 private:
 
+  friend class ARVisualizer;
+
   CommandQueue _renderCommandQueue;
 
   std::atomic_bool _running {false};

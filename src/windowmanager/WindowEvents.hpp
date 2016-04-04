@@ -23,6 +23,7 @@ public:
   void NotifyKeyboardCharCallback(unsigned int codepoint);
   void NotifyWindowSizeCallback(int width, int height);
   void NotifyFrameBufferSizeCallback(int width, int height);
+  void NotifyWindowCloseCallback();
 
   // Don't know if it's useful to keep these getters around...
   Delegate<void(int,int,int)>& GetMouseButtonDelegate() { return _mouseButtonDelegate; }
@@ -33,6 +34,7 @@ public:
   Delegate<void(int,int,int,int)>& GetKeyboardKeyDelegate() { return _keyboardKeyDelegate; }
   Delegate<void(unsigned int)>& GetKeyboardCharDelegate() { return _keyboardCharDelegate; }
   Delegate<void(double,double)>& GetScrollDelegate() { return _scrollDelegate; }
+  Delegate<void()>& GetWindowCloseDelegate() { return _windowCloseDelegate; }
 
 private:
   Delegate<void(int,int,int)> _mouseButtonDelegate;
@@ -43,6 +45,7 @@ private:
   Delegate<void(int,int,int,int)> _keyboardKeyDelegate;
   Delegate<void(unsigned int)> _keyboardCharDelegate;
   Delegate<void(double,double)> _scrollDelegate;
+  Delegate<void()> _windowCloseDelegate;
 };
 
 } // namespace ar

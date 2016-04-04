@@ -43,4 +43,9 @@ void WindowEvents::NotifyFrameBufferSizeCallback(int width, int height)
   _frameBufferResizedDelegate(width, height);
 }
 
+void WindowEvents::NotifyWindowCloseCallback()
+{
+  _windowCloseDelegate();
+}
+
 } // namespace ar

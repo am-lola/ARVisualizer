@@ -27,6 +27,7 @@ private:
   static void glfw_char_callback( GLFWwindow *window, unsigned int codepoint );
   static void glfw_windowsize_callback( GLFWwindow *window, int width, int height );
   static void glfw_framebuffersize_callback( GLFWwindow *window, int width, int height );
+  static void glfw_windowclose_callback( GLFWwindow *window );
 };
 
 } // namespace ar

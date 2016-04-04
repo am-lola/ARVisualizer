@@ -2,7 +2,7 @@
 #define _DELEGATE_H
 
 #include <functional>
-#include "common.hpp"
+#include <vector>
 
 namespace ar
 {
@@ -15,7 +15,7 @@ class Delegate<TReturn(TArgs...)>
 {
 private:
   using FuncType = std::function<TReturn(TArgs...)>;
-  Vector<FuncType> _funcs;
+  std::vector<FuncType> _funcs;
 
 public:
 
@@ -26,9 +26,9 @@ public:
     return *this;
   }
 
-  Vector<TReturn> operator()(TArgs... args)
+  std::vector<TReturn> operator()(TArgs... args)
   {
-    Vector<TReturn> result;
+    std::vector<TReturn> result;
     result.reserve(_funcs.size());
     for (const auto& fn : _funcs)
     {
@@ -48,7 +48,7 @@ class Delegate<void(TArgs...)>
 {
 private:
   using FuncType = std::function<void(TArgs...)>;
-  Vector<FuncType> _funcs;
+  std::vector<FuncType> _funcs;
 
 public:
 

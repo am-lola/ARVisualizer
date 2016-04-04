@@ -15,6 +15,8 @@
 #include "geometry/PointCloudData.hpp"
 #include "geometry/Voxel.hpp"
 #include "geometry/Line.hpp"
+#include "Delegate.hpp"
+#include <atomic>
 
 namespace ar
 {
@@ -66,7 +68,7 @@ public:
   // Checks if the visualizer has been started successfully
   //
   // @return True if the visualizer has been started, False otherwise
-  bool IsRunning();
+  bool IsRunning() const;
 
   // Updates video texture with (RGB24) data in pixels    // TODO: determine if any other pixel formats need to be supported
   // @width  width, in pixels, of the image
@@ -239,7 +241,29 @@ public:
   // @name Name of the GUI window
   IUIWindow* AddUIWindow(const char* name, float initialWidth, float initialHeight);
 
+  // Alternative 1 for handling window close - polling.
+  // @return True if the user wants to close the current window
+  bool RequestedClose() const;
+
+  /*
+   * Alternative 2 for handling window close - direct callback.
+   * Add a (lambda) function to this delegate to handle a WindowClose event for the current window.
+   *
+   * **Example**
+   * ```c++
+   * WindowCloseDelegate() += []()
+   * {
+   *   // handle the event here
+   * };
+   * ```
+   */
+  inline Delegate<void()>& WindowCloseDelegate() { return _windowCloseDelegate; }
+
 private:
+
+  Delegate<void()> _windowCloseDelegate;
+  // set to true when the WindowCloseDelegate delegate was called
+  std::atomic_bool _requestedClose;
   Renderer* _renderer;
   UserInterface* _ui;
 

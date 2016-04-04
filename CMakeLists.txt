@@ -86,6 +86,7 @@ if (ARVIS_BUILD_LIBRARY)
       src/ARVisualizer.hpp
       src/ui.hpp
       src/CircularBuffer.hpp
+      src/Delegate.hpp
       DESTINATION ${include_install_dir}
     )
     install(FILES

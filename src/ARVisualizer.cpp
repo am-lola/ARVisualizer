@@ -9,7 +9,7 @@ namespace ar
 {
 
 ARVisualizer::ARVisualizer()
-  : _ui(new UserInterface)
+  : _requestedClose(false), _ui(new UserInterface)
 {
   _renderer = nullptr;
 }
@@ -46,6 +46,12 @@ void ARVisualizer::Start(const char* name, int width, int height)
   {
     this->renderExternGUI();
   };
+
+  _renderer->_windowEvents.GetWindowCloseDelegate() += [this]()
+  {
+    _requestedClose = true;
+    this->_windowCloseDelegate();
+  };
 }
 
 void ARVisualizer::Stop()
@@ -56,9 +62,11 @@ void ARVisualizer::Stop()
     _renderer = nullptr; // Set to nullptr to get IsRunning() to return false right away...
     renderer->Stop();    // ...because this waits for the render thread to finish
   }
+
+  _requestedClose = false;
 }
 
-bool ARVisualizer::IsRunning()
+bool ARVisualizer::IsRunning() const
 {
   return _renderer != nullptr;
 }
@@ -456,6 +464,12 @@ IUIWindow* ARVisualizer::AddUIWindow(const char* name, float initialWidth, float
 void ARVisualizer::renderExternGUI()
 {
   _ui->draw();
+}
+
+bool ARVisualizer::RequestedClose() const
+{
+  if (!IsRunning()) { return false; }
+  return _requestedClose;
 }
 
 } // namespace ar
