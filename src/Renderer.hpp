@@ -219,7 +219,7 @@ private:
 
   CommandQueue _renderCommandQueue;
 
-  std::atomic_bool _running {false};
+  std::atomic_bool _running;
   double _lastFrameTime = 0;
 
   // used to synchronize between all active rendering threads to work around IMGUI not playing nice with threads
@@ -267,6 +267,8 @@ private:
   // ! Call from _renderThread only
   // handles OpenGL context binding and default rendering settings
   void Init_GL();
+
+  void InitGUI();
 
   // ! Call from _renderThread only
   // Prepares OpenGL state for rendering with the given parameters

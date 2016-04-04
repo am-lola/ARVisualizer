@@ -263,7 +263,7 @@ public:
 std::mutex Renderer::_renderGUILock;
 
 Renderer::Renderer(GLFWwindow* window)
-  : _windowEvents(window), _imguiRenderer(window), _camera(_windowEvents)
+  : _running(false), _windowEvents(window), _imguiRenderer(window), _camera(_windowEvents)
 {
   _window = window;
   glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
@@ -462,6 +462,8 @@ void Renderer::Init()
   // setup OpenGL context and open a window for rendering
   Init_GL();
 
+  InitGUI();
+
   // load shaders
   _defaultShader.loadAndLink(ShaderSources::sh_simpleNormal_vert, ShaderSources::sh_simpleLit_frag);
 
@@ -488,6 +490,71 @@ void Renderer::Init_GL()
   glBlendEquation(GL_FUNC_ADD);
   glClearColor(0, 0, 0, 0);
   glPointSize(5.0f);
+}
+
+void Renderer::InitGUI()
+{
+  // Set theme (adapted from https://github.com/simongeilfus/Cinder-ImGui)
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.WindowPadding            = ImVec2(10, 10);
+  style.WindowMinSize            = ImVec2(160, 20);
+  style.FramePadding             = ImVec2(4, 3);
+  style.ItemSpacing              = ImVec2(8, 4);
+  style.ItemInnerSpacing         = ImVec2(6, 4);
+  style.Alpha			         = 0.95f;
+  style.WindowFillAlphaDefault   = 1.0f;
+  style.WindowRounding           = 4.0f;
+  style.FrameRounding            = 2.0f;
+  style.IndentSpacing            = 6.0f;
+  style.ItemInnerSpacing		 = ImVec2(2, 4);
+  style.ColumnsMinSpacing        = 50.0f;
+  style.GrabMinSize		         = 14.0f;
+  style.GrabRounding		     = 16.0f;
+  style.ScrollbarSize		     = 12.0f;
+  style.ScrollbarRounding	     = 16.0f;
+  style.Colors[ImGuiCol_Text]                  = ImVec4(0.86f, 0.93f, 0.89f, 0.88f);
+  style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.86f, 0.93f, 0.89f, 0.28f);
+  style.Colors[ImGuiCol_WindowBg]              = ImVec4(0.06f, 0.09f, 0.12f, 0.90f);
+  style.Colors[ImGuiCol_ChildWindowBg]         = ImVec4(0.20f, 0.22f, 0.27f, 0.58f);
+  style.Colors[ImGuiCol_Border]                = ImVec4(1.00f, 1.00f, 1.00f, 0.20f);
+  style.Colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+  style.Colors[ImGuiCol_FrameBg]               = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+  style.Colors[ImGuiCol_FrameBgHovered]        = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+  style.Colors[ImGuiCol_FrameBgActive]         = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_TitleBg]               = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+  style.Colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(0.20f, 0.22f, 0.27f, 0.75f);
+  style.Colors[ImGuiCol_TitleBgActive]         = ImVec4(0.24f, 0.26f, 0.31f, 1.00f);
+  style.Colors[ImGuiCol_MenuBarBg]             = ImVec4(0.20f, 0.22f, 0.27f, 0.47f);
+  style.Colors[ImGuiCol_ScrollbarBg]           = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+  style.Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.47f, 0.77f, 0.83f, 0.21f);
+  style.Colors[ImGuiCol_ScrollbarGrabHovered]  = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+  style.Colors[ImGuiCol_ScrollbarGrabActive]   = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_ComboBg]               = ImVec4(0.20f, 0.22f, 0.27f, 1.00f);
+  style.Colors[ImGuiCol_CheckMark]             = ImVec4(0.71f, 0.22f, 0.27f, 1.00f);
+  style.Colors[ImGuiCol_SliderGrab]            = ImVec4(0.47f, 0.77f, 0.83f, 0.14f);
+  style.Colors[ImGuiCol_SliderGrabActive]      = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_Button]                = ImVec4(0.22f, 0.24f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_ButtonHovered]         = ImVec4(0.92f, 0.18f, 0.29f, 0.86f);
+  style.Colors[ImGuiCol_ButtonActive]          = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_Header]                = ImVec4(0.92f, 0.18f, 0.29f, 0.76f);
+  style.Colors[ImGuiCol_HeaderHovered]         = ImVec4(0.92f, 0.18f, 0.29f, 0.86f);
+  style.Colors[ImGuiCol_HeaderActive]          = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_Column]                = ImVec4(0.47f, 0.77f, 0.83f, 0.32f);
+  style.Colors[ImGuiCol_ColumnHovered]         = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+  style.Colors[ImGuiCol_ColumnActive]          = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_ResizeGrip]            = ImVec4(0.47f, 0.77f, 0.83f, 0.04f);
+  style.Colors[ImGuiCol_ResizeGripHovered]     = ImVec4(0.92f, 0.18f, 0.29f, 0.78f);
+  style.Colors[ImGuiCol_ResizeGripActive]      = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_CloseButton]           = ImVec4(0.86f, 0.93f, 0.89f, 0.16f);
+  style.Colors[ImGuiCol_CloseButtonHovered]    = ImVec4(0.86f, 0.93f, 0.89f, 0.39f);
+  style.Colors[ImGuiCol_CloseButtonActive]     = ImVec4(0.86f, 0.93f, 0.89f, 1.00f);
+  style.Colors[ImGuiCol_PlotLines]             = ImVec4(0.86f, 0.93f, 0.89f, 0.63f);
+  style.Colors[ImGuiCol_PlotLinesHovered]      = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_PlotHistogram]         = ImVec4(0.86f, 0.93f, 0.89f, 0.63f);
+  style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(0.92f, 0.18f, 0.29f, 1.00f);
+  style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.92f, 0.18f, 0.29f, 0.43f);
+  style.Colors[ImGuiCol_TooltipBg]             = ImVec4(0.25f, 0.53f, 0.56f, 1.00f);
+  style.Colors[ImGuiCol_ModalWindowDarkening]  = ImVec4(0.20f, 0.22f, 0.27f, 0.73f);
 }
 
 void Renderer::OnWindowResized(int newWidth, int newHeight)
@@ -667,16 +734,16 @@ void Renderer::RenderStatsGUI()
 
   const float timeDiff = ImGui::GetTime() - lastTime;
   lastTime = ImGui::GetTime();
-  offset = (offset + 1) % bufferSize;
   values[offset] = timeDiff;
+  offset = (offset + 1) % bufferSize;
 
   static bool opened = true;
 
   if (opened)
   {
-    if (ImGui::Begin("Stats", &opened))
+    if (ImGui::Begin("Renderer Stats", &opened))
     {
-      ImGui::PushItemWidth(-80);
+      ImGui::PushItemWidth(-100);
       ImGui::PlotLines("Frame time", values, bufferSize, offset, nullptr, 0.0f, 0.1f, ImVec2(0, 60));
     }
     ImGui::End();
@@ -695,7 +762,7 @@ void Renderer::Shutdown()
 
   _defaultShader.destroy();
 
-  glfwMakeContextCurrent(NULL); // unbind OpenGL context from this thread
+  glfwMakeContextCurrent(nullptr); // unbind OpenGL context from this thread
 }
 
 void Renderer::DrawVoxels(const Voxel* voxels, size_t numVoxels)
