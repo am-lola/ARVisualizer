@@ -13,6 +13,7 @@ int main(void)
   // We're passing an optional initial window size when first loaded. On subsequent loads, the UI configuration will be saved in imgui.ini
   ar::IUIWindow* testWindow = visualizer->AddUIWindow("Test Window", 350.0f, 0.0f); // 0.0f for height = determine automatically
   ar::IUIWindow* valuesWindow = visualizer->AddUIWindow("Values", 200.0f, 0.0f);
+  ar::IUIWindow* statsWindow = visualizer->AddUIWindow("Test Stats", 200.0f, 0.0f);
 
   ar::ui_element_handle buttonExit = testWindow->AddButton("Close application");
   // Call SameLine() to put the next element on the same line
@@ -52,7 +53,7 @@ int main(void)
   ar::ui_element_handle checkBox = testWindow->AddCheckBox("Checkbox");
   testWindow->SameLine();
   ar::ui_element_handle checkBox2 = testWindow->AddCheckBox("Checkbox 2", true);
-  ar::ui_element_handle inputText = testWindow->AddInputText("InputText");
+  ar::ui_element_handle inputText = testWindow->AddInputText("InputText", "Text");
   ar::ui_element_handle sliderAngle = testWindow->AddSliderAngle("SliderAngle", -180.0f, 180.0f);
   ar::ui_element_handle floatRange = testWindow->AddFloatRange("FloatRange", 0.5f);
 
@@ -94,15 +95,20 @@ int main(void)
   ar::ui_element_handle sliderAngle_Text = valuesWindow->AddText("");
   ar::ui_element_handle floatRange_Text = valuesWindow->AddText("");
 
+  // Stats window
+  ar::ui_element_handle plotSliderFloat1 = statsWindow->AddPlot("SliderFloat1", 0.0f, 10.0f, 100, 60.0f);
 
-  while (!testWindow->GetButtonState(buttonExit))
+  while (!testWindow->GetButtonState(buttonExit) && !visualizer->RequestedClose())
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(33));
 
     {
       float values[4];
 
-      valuesWindow->UpdateText(sliderFloat1_Text, "%.3f", testWindow->GetSliderFloatValue(sliderFloat1));
+      values[0] = testWindow->GetSliderFloatValue(sliderFloat1);
+      valuesWindow->UpdateText(sliderFloat1_Text, "%.3f", values[0]);
+
+      statsWindow->PushPlotValue(plotSliderFloat1, values[0]);
 
       testWindow->GetSliderFloatValues(sliderFloat2, values);
       valuesWindow->UpdateText(sliderFloat2_Text, "%.3f %.3f", values[0], values[1]);

@@ -119,6 +119,23 @@ public:
   Type _type;
 };
 
+class UIPlot : public UIBaseElement
+{
+public:
+
+  virtual void draw() override;
+
+  inline int size() { return static_cast<int>(_buffer.size()); }
+
+  std::string _label;
+  float _rangeMin;
+  float _rangeMax;
+  float _height;
+
+  int _offset;
+  Vector<float> _buffer;
+};
+
 struct UIElement
 {
   UIElement(UIBaseElement* element) : _element(element) { }
@@ -157,6 +174,9 @@ public:
   virtual ui_element_handle AddFloatRange(const char* label, float speed = 1.0f, float min = 0.0f, float max = 0.0f, float lower = 0.0f, float upper = 0.0f) override;
   virtual ui_element_handle AddInputText(const char* label, const char* text = nullptr) override;
   virtual ui_element_handle AddText(const char* fmt, ...) override;
+
+  virtual ui_element_handle AddPlot(const char* label, float rangeMin, float rangeMax, int bufferSize = 128, float height = 0.0f) override;
+  virtual void PushPlotValue(ui_element_handle handle, float value) override;
 
   virtual void AddSeparator() override;
   virtual void SameLine() override;
@@ -319,6 +339,11 @@ void UIAuxiliaryElement::draw()
       ImGui::Separator();
       break;
   }
+}
+
+void UIPlot::draw()
+{
+  ImGui::PlotLines(_label.c_str(), _buffer.data(), static_cast<int>(_buffer.size()), _offset, nullptr, _rangeMin, _rangeMax, ImVec2(0, _height));
 }
 
 
@@ -577,6 +602,31 @@ ui_element_handle UIWindow::AddText(const char* fmt, ...)
 
   _elements.emplace_back(uiText);
   return getLastElementHandle();
+}
+
+ui_element_handle UIWindow::AddPlot(const char* label, float rangeMin, float rangeMax, int bufferSize, float height)
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIPlot* plot = new UIPlot();
+  plot->_label = label;
+  plot->_rangeMin = rangeMin;
+  plot->_rangeMax = rangeMax;
+  plot->_height = height;
+  plot->_offset = 0;
+  plot->_buffer.resize(bufferSize);
+  _elements.emplace_back(plot);
+  return getLastElementHandle();
+}
+
+void UIWindow::PushPlotValue(ui_element_handle handle, float value)
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIPlot* plot = dynamic_cast<UIPlot*>(_elements[handle]._element.get());
+
+  plot->_buffer[plot->_offset] = value;
+  plot->_offset = (plot->_offset + 1) % plot->size();
 }
 
 void UIWindow::UpdateText(ui_element_handle handle, const char* fmt, ...)
