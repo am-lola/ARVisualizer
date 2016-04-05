@@ -270,12 +270,12 @@ Renderer::Renderer(GLFWwindow* window)
 
   _windowEvents.GetFrameBufferResizedDelegate() += [this](int w, int h)
   {
-    this->OnWindowResized(w, h);
+    this->OnFramebufferResized(w, h);
   };
 
   _windowEvents.GetWindowResizedDelegate() += [this](int w, int h)
   {
-    this->OnFramebufferResized(w, h);
+    this->OnWindowResized(w, h);
   };
 
   // Listen for keyboard input
@@ -565,7 +565,6 @@ void Renderer::OnWindowResized(int newWidth, int newHeight)
 
 void Renderer::OnFramebufferResized(int newWidth, int newHeight)
 {
-  glViewport(0, 0, newWidth, newHeight);
   _camera.SetAspectRatio((float)newWidth / (float)newHeight);
 }
 
@@ -660,6 +659,7 @@ void Renderer::RenderOneFrame()
   sceneInfo.aspect = _camera._aspect;
   sceneInfo.visibilityMap = &_visibilityMap;
 
+  glViewport(0, 0, _windowWidth, _windowHeight);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   /*************
