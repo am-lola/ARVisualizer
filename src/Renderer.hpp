@@ -255,7 +255,9 @@ private:
 
   ShaderProgram _defaultShader;
 
-
+  RenderPassParams _meshRenderPassParams;
+  // temporary: light should affect alpha
+  bool _lightAlpha;
 
   // Generates a unique ID used to reference meshes from external components
   unsigned int GenerateMeshHandle();

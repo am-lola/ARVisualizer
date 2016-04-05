@@ -268,6 +268,9 @@ Renderer::Renderer(GLFWwindow* window)
   _window = window;
   glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
 
+  _meshRenderPassParams = Blend_Alpha | EnableDepth;
+  _lightAlpha = false;
+
   _windowEvents.GetFrameBufferResizedDelegate() += [this](int w, int h)
   {
     this->OnFramebufferResized(w, h);
@@ -658,6 +661,7 @@ void Renderer::RenderOneFrame()
   sceneInfo.farClip = _camera._farClip;
   sceneInfo.aspect = _camera._aspect;
   sceneInfo.visibilityMap = &_visibilityMap;
+  sceneInfo.lightAlpha = _lightAlpha;
 
   glViewport(0, 0, _windowWidth, _windowHeight);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -683,7 +687,7 @@ void Renderer::RenderOneFrame()
   * Third pass:
   *   render all 3D objects on top of the previous 2D shapes
   *************/
-  EnableRenderPass(Blend_Add);
+  EnableRenderPass(_meshRenderPassParams);
   _meshRenderer.RenderPass(sceneInfo);
 
   EnableRenderPass(Blend_None | EnableDepth);
@@ -718,6 +722,38 @@ void Renderer::RenderGUI()
   _lineRenderer.RenderGUI();
 
   RenderStatsGUI();
+
+  if (ImGui::Begin("Camera"))
+  {
+    ImGui::Separator();
+    static int currentItem;
+    ImGui::Combo("Blend mode", &currentItem, "Add\0Mul\0Alpha\0None\0");
+
+    switch(currentItem)
+    {
+      case 0:
+        _meshRenderPassParams = Blend_Add;
+        break;
+      case 1:
+        _meshRenderPassParams = Blend_Mul;
+        break;
+      case 2:
+        _meshRenderPassParams = Blend_Alpha;
+        break;
+      case 3:
+        _meshRenderPassParams = Blend_None;
+        break;
+    }
+
+    static bool enableDepth;
+    ImGui::Checkbox("Enable depth", &enableDepth);
+    ImGui::Checkbox("Light alpha", &_lightAlpha);
+
+    if (enableDepth)
+      _meshRenderPassParams |= EnableDepth;
+  }
+
+  ImGui::End();
 
   _renderGUIDelegate();
 

@@ -60,6 +60,8 @@ void MeshRenderer<VertexT>::RenderPass(const SceneInfo& sceneInfo)
     glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, &(sceneInfo.viewMatrix[0][0]));
     glUniform3fv(shader->getUniform("light_dir"), 1, &(sceneInfo.lightDir[0]));
 
+    glUniform1i(shader->getUniform("lightAlpha"), (int)sceneInfo.lightAlpha);
+
     // object-specific uniforms
     glm::mat4 mvp = sceneInfo.projectionMatrix * sceneInfo.viewMatrix * m->GetTransform();
     glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);

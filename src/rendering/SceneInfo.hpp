@@ -17,6 +17,7 @@ struct SceneInfo
   float farClip;
   float aspect;
   std::unordered_map<unsigned int, bool>* visibilityMap;
+  bool lightAlpha;
 
   bool shouldDraw(unsigned handle) const
   {
