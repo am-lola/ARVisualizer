@@ -775,7 +775,8 @@ bool Renderer::ProjectPointToNDC(const glm::vec3& point, glm::vec4& outProjected
 {
   outProjected = GetProjectionMatrix() * GetViewMatrix() * glm::vec4(point, 1.0f);
   const bool behind = outProjected.w < _camera._nearClip;
-  outProjected /= outProjected.w;
+  if (!behind)
+    outProjected /= outProjected.w;
   return !behind;
 }
 
