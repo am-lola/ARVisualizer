@@ -41,17 +41,20 @@ void ARVisualizer::Start(int width, int height)
 
 void ARVisualizer::Start(const char* name, int width, int height)
 {
-  _renderer = WindowManager::Instance().NewRenderer(width, height, name);
-  _renderer->_renderGUIDelegate += [this]()
+  if (!_renderer)
   {
-    this->renderExternGUI();
-  };
+    _renderer = WindowManager::Instance().NewRenderer(width, height, name);
+    _renderer->_renderGUIDelegate += [this]()
+    {
+      this->renderExternGUI();
+    };
 
-  _renderer->_windowEvents.GetWindowCloseDelegate() += [this]()
-  {
-    _requestedClose = true;
-    this->_windowCloseDelegate();
-  };
+    _renderer->_windowEvents.GetWindowCloseDelegate() += [this]()
+    {
+      _requestedClose = true;
+      this->_windowCloseDelegate();
+    };
+  }
 }
 
 void ARVisualizer::Stop()
