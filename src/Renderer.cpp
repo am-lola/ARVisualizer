@@ -771,4 +771,28 @@ void Renderer::DrawVoxels(const Voxel* voxels, size_t numVoxels)
   EnqueueRenderCommand(command);
 }
 
+bool Renderer::ProjectPointToNDC(const glm::vec3& point, glm::vec4& outProjected) const
+{
+  outProjected = GetProjectionMatrix() * GetViewMatrix() * glm::vec4(point, 1.0f);
+  const bool behind = outProjected.w < _camera._nearClip;
+  outProjected /= outProjected.w;
+  return !behind;
+}
+
+bool Renderer::ProjectPointToPixel(const glm::vec3& point, glm::vec2& outPixel) const
+{
+  glm::vec4 pointNDC;
+  if (!ProjectPointToNDC(point, pointNDC))
+    return false;
+
+  int vp[4];
+  glGetIntegerv(GL_VIEWPORT, vp);
+  const int width = vp[2];
+  const int height = vp[3];
+
+  outPixel.x = ( pointNDC.x * 0.5f + 0.5f) * static_cast<float>(width);
+  outPixel.y = (-pointNDC.y * 0.5f + 0.5f) * static_cast<float>(height);
+  return true;
+}
+
 } // namespace ar

@@ -233,13 +233,21 @@ public:
 
   void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
 
-  // Adds a GUI window to the current windw
+  // Adds a GUI window to the current window
   // @name Name of the GUI window
   IUIWindow* AddUIWindow(const char* name);
 
   // Adds a GUI window to the current window
   // @name Name of the GUI window
   IUIWindow* AddUIWindow(const char* name, float initialWidth, float initialHeight);
+
+  // Adds a transparent, non-interactable window that is fixed on the projection of a 3D point.
+  // Call IUIWindow::Set3DPosition to update this point.
+  // @point3D Initial 3D point
+  IUIWindow* AddOverlayWindow(const double* point3D);
+
+  // Removes a window
+  void RemoveWindow(IUIWindow* window);
 
   // Alternative 1 for handling window close - polling.
   // @return True if the user wants to close the current window

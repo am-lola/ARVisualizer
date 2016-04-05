@@ -213,6 +213,14 @@ public:
     _renderCommandQueue.Enqueue(command);
   }
 
+  // Project a point into NDC.
+  // @return false if the point is behind the near plane, true otherwise.
+  bool ProjectPointToNDC(const glm::vec3& point, glm::vec4& outProjected) const;
+
+  // Project a point to pixel coordinates.
+  // @return false if the point is behind the near plane, true otherwise.
+  bool ProjectPointToPixel(const glm::vec3& point, glm::vec2& outPixel) const;
+
 private:
 
   friend class ARVisualizer;

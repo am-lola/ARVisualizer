@@ -7,7 +7,9 @@
 namespace ar
 {
 
-IUIWindow* createUIWindow(const char* name, float initialWidth, float initialHeight);
+class Renderer;
+
+IUIWindow* createUIWindow(const char* name, float initialWidth, float initialHeight, Renderer* renderer);
 
 class UserInterface
 {
@@ -21,11 +23,18 @@ public:
     }
   }
 
-  IUIWindow* AddWindow(const char* name, float initialWidth = 0.0f, float initialHeight = 0.0f)
+  IUIWindow* AddWindow(Renderer* renderer, const char* name, float initialWidth = 0.0f, float initialHeight = 0.0f)
   {
-    IUIWindow* window = createUIWindow(name, initialWidth, initialHeight);
+    IUIWindow* window = createUIWindow(name, initialWidth, initialHeight, renderer);
     _windows.push_back(window);
     return window;
+  }
+
+  void RemoveWindow(IUIWindow* window)
+  {
+    // TODO: Could be more optimized
+    _windows.erase(std::find(_windows.begin(), _windows.end(), window));
+    delete window;
   }
 
   void draw()

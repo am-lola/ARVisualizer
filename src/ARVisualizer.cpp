@@ -453,12 +453,30 @@ void ARVisualizer::DrawVoxels(const Voxel* voxels, unsigned long numVoxels)
 
 IUIWindow* ARVisualizer::AddUIWindow(const char* name)
 {
-  return _ui->AddWindow(name);
+  return _ui->AddWindow(_renderer, name);
 }
 
 IUIWindow* ARVisualizer::AddUIWindow(const char* name, float initialWidth, float initialHeight)
 {
-  return _ui->AddWindow(name, initialWidth, initialHeight);
+  return _ui->AddWindow(_renderer, name, initialWidth, initialHeight);
+}
+
+IUIWindow* ARVisualizer::AddOverlayWindow(const double* point3D)
+{
+  // TODO: Improve the handle generation (and make thread safe!)
+  static int handle = 0;
+  char name[32];
+  snprintf(name, 128, "overlay##%d", handle);
+  ++handle;
+
+  IUIWindow* window = _ui->AddWindow(_renderer, name);
+  window->Set3DPosition(point3D);
+  return window;
+}
+
+void ARVisualizer::RemoveWindow(IUIWindow* window)
+{
+  _ui->RemoveWindow(window);
 }
 
 void ARVisualizer::renderExternGUI()

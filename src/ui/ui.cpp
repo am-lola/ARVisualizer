@@ -1,5 +1,6 @@
 #include "ui.hpp"
 #include "common.hpp"
+#include "Renderer.hpp"
 #include <imgui.h>
 
 namespace ar
@@ -148,8 +149,8 @@ class UIWindow : public IUIWindow
 {
 public:
 
-  UIWindow(const char* name, float initSizeX, float initSizeY)
-    : _name(name), _initSize(initSizeX, initSizeY) { }
+  UIWindow(const char* name, float initSizeX, float initSizeY, Renderer* renderer)
+    : _name(name), _initSize(initSizeX, initSizeY), _renderer(renderer) { }
   virtual ~UIWindow() { }
 
   virtual ui_element_handle AddButton(const char* label) override;
@@ -192,6 +193,11 @@ public:
 
   virtual void UpdateText(ui_element_handle handle, const char* fmt, ...) override;
 
+  virtual void Set3DPosition(const double* position) override
+  {
+    _isOverlay = true;
+    _position3D = glm::vec3((float)position[0], (float)position[1], (float)position[2]);
+  }
 private:
 
   virtual void drawElements() override
@@ -201,10 +207,42 @@ private:
     if (_initSize.x > 0.0f || _initSize.y > 0.0f)
       ImGui::SetNextWindowSize(_initSize, ImGuiSetCond_FirstUseEver);
 
-    if (!ImGui::Begin(_name.c_str()))
+    ImGuiWindowFlags windowFlags = 0;
+    float windowBgAlpha = -0.1f;
+    if (_isOverlay)
+    {
+      windowFlags |= ImGuiWindowFlags_NoTitleBar;
+      windowFlags |= ImGuiWindowFlags_NoResize;
+      windowFlags |= ImGuiWindowFlags_NoMove;
+      windowFlags |= ImGuiWindowFlags_NoScrollbar;
+      windowFlags |= ImGuiWindowFlags_NoCollapse;
+      windowFlags |= ImGuiWindowFlags_NoSavedSettings;
+      windowFlags |= ImGuiWindowFlags_NoInputs;
+      windowFlags |= ImGuiWindowFlags_NoFocusOnAppearing;
+      windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+      windowFlags |= ImGuiWindowFlags_AlwaysAutoResize;
+      windowBgAlpha = 0.0f;
+    }
+
+    if (!ImGui::Begin(_name.c_str(), nullptr, ImVec2(), windowBgAlpha, windowFlags))
     {
       ImGui::End();
       return;
+    }
+
+    if (_isOverlay)
+    {
+      glm::vec2 pixelPos;
+      if (!_renderer->ProjectPointToPixel(_position3D, pixelPos))
+      {
+        // Don't show the window when we can't get a projection, e.g. when the position is behind the near plane
+        ImGui::End();
+        return;
+      }
+
+      ImGui::SetWindowPos(ImVec2(pixelPos.x, pixelPos.y));
+      // Pure white text for maximum contrast
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
     ImGui::PushItemWidth(-100);
@@ -218,6 +256,11 @@ private:
 
     ImGui::PopItemWidth();
 
+    if (_isOverlay)
+    {
+      ImGui::PopStyleColor();
+    }
+
     ImGui::End();
   }
 
@@ -229,13 +272,18 @@ private:
   std::string _name;
   ImVec2 _initSize;
 
+  bool _isOverlay = false;
+  glm::vec3 _position3D;
+
+  Renderer* _renderer;
+
   mutable std::mutex _mutex;
   Vector<UIElement> _elements;
 };
 
-IUIWindow* createUIWindow(const char* name, float initialWidth, float initialHeight)
+IUIWindow* createUIWindow(const char* name, float initialWidth, float initialHeight, Renderer* renderer)
 {
-  return new UIWindow(name, initialWidth, initialHeight);
+  return new UIWindow(name, initialWidth, initialHeight, renderer);
 }
 
 void UIButton::draw()

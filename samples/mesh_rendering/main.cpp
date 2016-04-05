@@ -100,6 +100,12 @@ int main(void)
   visualizer->Add(lineSegment);
   visualizer->Add(linePath);
 
+  ar::IUIWindow* overlay1 = visualizer->AddOverlayWindow(cubeCenter);
+  ar::IUIWindow* overlay2 = visualizer->AddOverlayWindow(boxCenter);
+
+  overlay1->AddText("Cube: %.2f %.2f %.2f", cubeCenter[0], cubeCenter[1], cubeCenter[2]);
+  overlay2->AddText("Box: %.2f %.2f %.2f", boxCenter[0], boxCenter[1], boxCenter[2]);
+
   // Keep rendering until the user wants to quit
   std::cout << "Press enter to exit..." << std::endl;
   std::cin.get();

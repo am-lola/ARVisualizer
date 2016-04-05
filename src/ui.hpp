@@ -52,6 +52,8 @@ public:
 
   virtual void UpdateText(ui_element_handle handle, const char* fmt, ...) = 0;
 
+  virtual void Set3DPosition(const double* position) = 0;
+
 protected:
 
   friend class UserInterface;
