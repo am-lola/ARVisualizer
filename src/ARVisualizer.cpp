@@ -303,7 +303,7 @@ void ARVisualizer::Update(mesh_handle handle, Polygon polygon)
     points.push_back({ polygon.points[i], polygon.points[i+1], polygon.points[i+2] });
   }
 
-  _renderer->UpdateMesh(handle, MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points), std::make_shared<FlatColorMaterial>(polygon.color));
+  _renderer->UpdateMesh(handle, MeshFactory::MakeTriangleFan<Mesh<Vertex3D>>(points, true), std::make_shared<FlatColorMaterial>(polygon.color));
 }
 
 void ARVisualizer::Update(mesh_handle handle, PolyMesh mesh)
