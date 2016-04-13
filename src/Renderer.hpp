@@ -89,7 +89,7 @@ private:
   class RenderCommandUpdateMesh;
   class RenderCommandUpdateLineMesh;
   class RenderCommandRemoveMesh;
-  class RenderCommandRemoveAllMeshes;
+  class RenderCommandRemoveAll;
   class RenderCommandNotifyNewVideoFrame;
   class RenderCommandAddPointCloud;
   class RenderCommandUpdatePointCloud;
@@ -184,6 +184,8 @@ public:
 
   // Removes all objects previously added to the scene
   void RemoveAllMeshes();
+
+  void RemoveAllVoxels();
 
   void DrawVoxels(const Voxel* voxels, size_t numVoxels);
 

@@ -106,9 +106,9 @@ int main(void)
   overlay1->AddText("Cube: %.2f %.2f %.2f", cubeCenter[0], cubeCenter[1], cubeCenter[2]);
   overlay2->AddText("Box: %.2f %.2f %.2f", boxCenter[0], boxCenter[1], boxCenter[2]);
 
-  // Keep rendering until the user wants to quit
-  std::cout << "Press enter to exit..." << std::endl;
-  std::cin.get();
+  // Block this thread until the user wants to close the window
+  visualizer->WaitForClose();
+
   std::cout << "Shutting down..." << std::endl;
 
   // cleanup

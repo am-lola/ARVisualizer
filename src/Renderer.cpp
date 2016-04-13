@@ -128,23 +128,31 @@ public:
   unsigned int _handle;
 };
 
-class Renderer::RenderCommandRemoveAllMeshes : public RenderCommand
+class Renderer::RenderCommandRemoveAll : public RenderCommand
 {
 public:
-  RenderCommandRemoveAllMeshes(Renderer* renderer)
-    : _renderer(renderer)
+  RenderCommandRemoveAll(Renderer* renderer, bool removeMeshes, bool removeVoxels)
+    : _renderer(renderer), _removeMeshes(removeMeshes), _removeVoxels(removeVoxels)
   { }
 
   virtual void execute() override
   {
-    _renderer->_visibilityMap.clear();
-    _renderer->_meshRenderer.RemoveAllMeshes();
-    _renderer->_lineRenderer.RemoveAllMeshes();
-    //_renderer->_pointCloudRenderer.RemoveAllPointClouds();
-    //_renderer->_voxelRenderer.ClearVoxels();
+    if (_removeMeshes)
+    {
+      _renderer->_visibilityMap.clear();
+      _renderer->_meshRenderer.RemoveAllMeshes();
+      _renderer->_lineRenderer.RemoveAllMeshes();
+      //_renderer->_pointCloudRenderer.RemoveAllPointClouds();
+    }
+    if (_removeVoxels)
+    {
+      _renderer->_voxelRenderer.ClearVoxels();
+    }
   }
 
   Renderer* _renderer;
+  bool _removeMeshes;
+  bool _removeVoxels;
 };
 
 class Renderer::RenderCommandNotifyNewVideoFrame : public RenderCommand
@@ -447,7 +455,13 @@ void Renderer::RemoveMesh(unsigned int handle)
 
 void Renderer::RemoveAllMeshes()
 {
-  RenderCommandRemoveAllMeshes* command = new RenderCommandRemoveAllMeshes(this);
+  RenderCommandRemoveAll* command = new RenderCommandRemoveAll(this, true, false);
+  EnqueueRenderCommand(command);
+}
+
+void Renderer::RemoveAllVoxels()
+{
+  RenderCommandRemoveAll* command = new RenderCommandRemoveAll(this, false, true);
   EnqueueRenderCommand(command);
 }
 
@@ -677,9 +691,10 @@ void Renderer::RenderOneFrame()
   * Second pass:
   *   render point cloud
   *************/
-  EnableRenderPass(Blend_Add);
+  EnableRenderPass(Blend_None | EnableDepth);
   _pointCloudRenderer.RenderPass(sceneInfo);
 
+  // Render voxels
   EnableRenderPass(Blend_None | EnableDepth);
   _voxelRenderer.RenderPass(sceneInfo);
 

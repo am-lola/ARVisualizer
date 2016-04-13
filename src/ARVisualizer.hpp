@@ -17,6 +17,7 @@
 #include "geometry/Line.hpp"
 #include "Delegate.hpp"
 #include <atomic>
+#include <condition_variable>
 
 namespace ar
 {
@@ -229,7 +230,8 @@ public:
   void Remove(mesh_handle handle);
 
   // Removes all objects from the scene
-  void RemoveAll();
+  void RemoveAllMeshes();
+  void RemoveAllVoxels();
 
   void DrawVoxels(const Voxel* voxels, unsigned long numVoxels);
 
@@ -267,11 +269,17 @@ public:
    */
   inline Delegate<void()>& WindowCloseDelegate() { return _windowCloseDelegate; }
 
+  // Block the calling thread until the user wants to close the window
+  void WaitForClose();
+
 private:
 
   Delegate<void()> _windowCloseDelegate;
   // set to true when the WindowCloseDelegate delegate was called
   std::atomic_bool _requestedClose;
+  std::condition_variable _condVar;
+  std::mutex _mutex;
+
   Renderer* _renderer;
   UserInterface* _ui;
 

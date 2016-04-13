@@ -51,7 +51,12 @@ void ARVisualizer::Start(const char* name, int width, int height)
 
     _renderer->_windowEvents.GetWindowCloseDelegate() += [this]()
     {
+      std::unique_lock<std::mutex> lock(_mutex);
       _requestedClose = true;
+      _condVar.notify_all();
+
+      lock.unlock();
+
       this->_windowCloseDelegate();
     };
   }
@@ -442,10 +447,16 @@ void ARVisualizer::Remove(mesh_handle handle)
   _renderer->RemoveMesh(handle);
 }
 
-void ARVisualizer::RemoveAll()
+void ARVisualizer::RemoveAllMeshes()
 {
   if (!IsRunning()) { return; }
   _renderer->RemoveAllMeshes();
+}
+
+void ARVisualizer::RemoveAllVoxels()
+{
+  if (!IsRunning()) { return; }
+  _renderer->RemoveAllVoxels();
 }
 
 void ARVisualizer::DrawVoxels(const Voxel* voxels, unsigned long numVoxels)
@@ -491,6 +502,15 @@ bool ARVisualizer::RequestedClose() const
 {
   if (!IsRunning()) { return false; }
   return _requestedClose;
+}
+
+void ARVisualizer::WaitForClose()
+{
+  if (!IsRunning() || _requestedClose)
+    return;
+
+  std::unique_lock<std::mutex> lock(_mutex);
+  _condVar.wait(lock, [this]() { return (bool)_requestedClose; });
 }
 
 } // namespace ar

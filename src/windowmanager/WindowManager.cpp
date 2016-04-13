@@ -33,7 +33,7 @@ WindowManager::~WindowManager()
 Renderer* WindowManager::NewRenderer(int windowWidth, int windowHeight, std::string windowName)
 {
   std::unique_lock<std::mutex> cmdLock(_commandLock);
-  Renderer* renderer = NULL;
+  Renderer* renderer = nullptr;
 
   CreateRendererParams* rendererParams = new CreateRendererParams();
   rendererParams->windowHeight = windowHeight;
@@ -44,7 +44,7 @@ Renderer* WindowManager::NewRenderer(int windowWidth, int windowHeight, std::str
   SendCommand(rendererParams);
 
   // Wait for the renderer to be created to ensure the caller never gets a bad pointer
-  _commandComplete.wait(cmdLock, [rendererPtr=&renderer]{return *rendererPtr != NULL;});
+  _commandComplete.wait(cmdLock, [rendererPtr=&renderer]{ return *rendererPtr != nullptr; });
 
   return renderer;
 }
@@ -156,8 +156,8 @@ GLFWwindow* WindowManager::mgrMakeWindow(CreateRendererParams* params)
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Open window & create OpenGL context
-  GLFWwindow* win = glfwCreateWindow(params->windowWidth, params->windowHeight, params->windowName.c_str(), NULL, NULL);
-  if (!win)
+  GLFWwindow* win = glfwCreateWindow(params->windowWidth, params->windowHeight, params->windowName.c_str(), nullptr, nullptr);
+  if (win == nullptr)
   {
     glfwTerminate();
     throw std::runtime_error("Failed to open GLFW Window!");

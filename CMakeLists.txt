@@ -114,7 +114,7 @@ endif()
 
 if (ARVIS_BUILD_SAMPLES)
     # PCL Is required for the grabber sample
-    find_package(PCL 1.7 REQUIRED)
+    find_package(PCL 1.7 REQUIRED COMPONENTS common io)
     include_directories(${PCL_INCLUDE_DIRS})
     add_executable(sample_pcl_grabber samples/pcl_grabber/main.cpp)
     target_link_libraries(sample_pcl_grabber arvisualizer ${PCL_LIBRARIES})
