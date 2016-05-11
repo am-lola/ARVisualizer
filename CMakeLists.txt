@@ -61,7 +61,7 @@ if (ARVIS_BUILD_LIBRARY)
 
     add_library(arvisualizer SHARED ${libarvis_src})
     add_dependencies(arvisualizer shader_gen)
-    set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
     target_link_libraries(arvisualizer ${AR_GLFW_LIBS})
 
     # install target for the visualization library

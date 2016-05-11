@@ -57,6 +57,8 @@ int main(void)
   ar::ui_element_handle sliderAngle = testWindow->AddSliderAngle("SliderAngle", -180.0f, 180.0f);
   ar::ui_element_handle floatRange = testWindow->AddFloatRange("FloatRange", 0.5f);
 
+  const char* comboBoxItems[3] = { "Item 1", "Item 2", "Item 3" };
+  ar::ui_element_handle comboBox = testWindow->AddComboBox("ComboBox", comboBoxItems, 3, 1);
 
   // Add text elements to another window to show the values of the elements in the first window
 
@@ -94,6 +96,7 @@ int main(void)
   ar::ui_element_handle inputText_Text = valuesWindow->AddText("");
   ar::ui_element_handle sliderAngle_Text = valuesWindow->AddText("");
   ar::ui_element_handle floatRange_Text = valuesWindow->AddText("");
+  ar::ui_element_handle comboBox_Text = valuesWindow->AddText("");
 
   // Stats window
   ar::ui_element_handle plotSliderFloat1 = statsWindow->AddPlot("SliderFloat1", 0.0f, 10.0f, 100, 60.0f);
@@ -165,6 +168,9 @@ int main(void)
     float lower, upper;
     testWindow->GetFloatRangeValues(floatRange, lower, upper);
     valuesWindow->UpdateText(floatRange_Text, "%.3f %.3f", lower, upper);
+
+    const int selectedItem = testWindow->GetSelectedComboBoxItem(comboBox);
+    valuesWindow->UpdateText(comboBox_Text, "%d", selectedItem);
   }
 
   std::cout << "Shutting down..." << std::endl;

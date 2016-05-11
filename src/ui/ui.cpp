@@ -84,6 +84,17 @@ public:
   float _upperValue;
 };
 
+class UIComboBox : public UIBaseElement
+{
+public:
+
+  virtual void draw() override;
+
+  std::string _label;
+  Vector<std::string> _items;
+  int _currentItem;
+};
+
 class UIInputText : public UIBaseElement
 {
 public:
@@ -173,6 +184,7 @@ public:
   virtual ui_element_handle AddDragInt4(const char* label, int min, int max, float speed = 0.0f, const int* values = nullptr) override;
   virtual ui_element_handle AddCheckBox(const char* label, bool checked = false) override;
   virtual ui_element_handle AddFloatRange(const char* label, float speed = 1.0f, float min = 0.0f, float max = 0.0f, float lower = 0.0f, float upper = 0.0f) override;
+  virtual ui_element_handle AddComboBox(const char* label, const char** items, int itemsCount, int selectedItem = 0) override;
   virtual ui_element_handle AddInputText(const char* label, const char* text = nullptr) override;
   virtual ui_element_handle AddText(const char* fmt, ...) override;
 
@@ -189,6 +201,7 @@ public:
   virtual void GetSliderIntValues(ui_element_handle handle, int* values) const override;
   virtual bool GetCheckBoxState(ui_element_handle handle) const override;
   virtual void GetFloatRangeValues(ui_element_handle handle, float& lower, float& upper) const override;
+  virtual int GetSelectedComboBoxItem(ui_element_handle handle) const override;
   virtual std::string GetInputTextValue(ui_element_handle handle) const override;
 
   virtual void UpdateText(ui_element_handle handle, const char* fmt, ...) override;
@@ -359,6 +372,15 @@ void UICheckBox::draw()
 void UIFloatRange::draw()
 {
   ImGui::DragFloatRange2(_label.c_str(), &_lowerValue, &_upperValue, _speed, _min, _max);
+}
+
+void UIComboBox::draw()
+{
+  const char* items[32]; // 32 items max
+  for (size_t i = 0; i < _items.size(); i++)
+    items[i] = _items[i].c_str();
+
+  ImGui::Combo(_label.c_str(), &_currentItem, items, static_cast<int>(_items.size()));
 }
 
 void UIInputText::draw()
@@ -620,6 +642,20 @@ ui_element_handle UIWindow::AddFloatRange(const char* label, float speed, float 
   return getLastElementHandle();
 }
 
+ui_element_handle UIWindow::AddComboBox(const char* label, const char** items, int itemsCount, int selectedItem)
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIComboBox* comboBox = new UIComboBox();
+  comboBox->_label = label;
+  for (int i = 0; i < itemsCount; i++)
+    comboBox->_items.emplace_back(items[i]);
+
+  comboBox->_currentItem = 0;
+  _elements.emplace_back(comboBox);
+  return getLastElementHandle();
+}
+
 ui_element_handle UIWindow::AddInputText(const char* label, const char* text)
 {
   MutexLockGuard lockGuard(_mutex);
@@ -768,6 +804,14 @@ void UIWindow::GetFloatRangeValues(ui_element_handle handle, float& lower, float
   UIFloatRange* floatRange = dynamic_cast<UIFloatRange*>(_elements[handle]._element.get());
   lower = floatRange->_lowerValue;
   upper = floatRange->_upperValue;
+}
+
+int UIWindow::GetSelectedComboBoxItem(ui_element_handle handle) const
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIComboBox* comboBox = dynamic_cast<UIComboBox*>(_elements[handle]._element.get());
+  return comboBox->_currentItem;
 }
 
 std::string UIWindow::GetInputTextValue(ui_element_handle handle) const
