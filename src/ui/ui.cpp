@@ -651,7 +651,7 @@ ui_element_handle UIWindow::AddComboBox(const char* label, const char** items, i
   for (int i = 0; i < itemsCount; i++)
     comboBox->_items.emplace_back(items[i]);
 
-  comboBox->_currentItem = 0;
+  comboBox->_currentItem = selectedItem;
   _elements.emplace_back(comboBox);
   return getLastElementHandle();
 }
