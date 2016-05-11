@@ -1,5 +1,4 @@
 #version 330 core
-//#define WITH_COLOR
 
 /****************
   VERTEX shader

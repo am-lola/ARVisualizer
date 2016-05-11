@@ -267,15 +267,8 @@ mesh_handle ARVisualizer::Add(PointCloudData pointcloud)
 {
   if (!IsRunning()) { return 0; }
 
-  switch (pointcloud.type)
-  {
-    case PCL_PointXYZ:
-      break;
-    case PCL_PointXYZRGBA:
-      throw std::runtime_error("PCL_PointXYZRGBA is not supported yet.");
-  }
-
-  return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints, pointcloud.color);
+  const bool colored = pointcloud.type == PCL_PointXYZRGBA;
+  return _renderer->AddPointCloud(pointcloud.pointData, pointcloud.numPoints, colored, pointcloud.color);
 }
 
 void ARVisualizer::Update(mesh_handle handle, Triangle t)
@@ -419,7 +412,8 @@ void ARVisualizer::Update(mesh_handle handle, PointCloudData pointcloud)
 {
   if (!IsRunning()) { return; }
 
-  _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints, pointcloud.color);
+  const bool colored = pointcloud.type == PCL_PointXYZRGBA;
+  _renderer->UpdatePointCloud(handle, pointcloud.pointData, pointcloud.numPoints, colored, pointcloud.color);
 }
 
 void ARVisualizer::Update(mesh_handle handle, ar::Transform transform, bool absolute)
@@ -479,7 +473,7 @@ IUIWindow* ARVisualizer::AddOverlayWindow(const double* point3D)
 {
   // TODO: Improve the handle generation (and make thread safe!)
   static int handle = 0;
-  char name[32];
+  char name[128];
   snprintf(name, 128, "overlay##%d", handle);
   ++handle;
 

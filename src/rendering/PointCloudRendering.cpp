@@ -11,6 +11,10 @@ PointCloudRenderer::PointCloudRenderer()
 void PointCloudRenderer::Init()
 {
   _pointCloudShader.loadAndLink(ShaderSources::sh_pointCloud_vert, ShaderSources::sh_flatShaded_frag);
+  // super hacky #define insert
+  std::string str = ShaderSources::sh_pointCloud_vert;
+  str.insert(str.find("\n", str.find("#version")), "\n#define WITH_COLOR\n");
+  _pointCloudColorShader.loadAndLink(str, ShaderSources::sh_flatShaded_frag);
 }
 
 void PointCloudRenderer::Release()
@@ -25,10 +29,7 @@ void PointCloudRenderer::Release()
 void PointCloudRenderer::Update()
 {
   for (auto& cloud : _pointClouds)
-  {
     cloud->UpdateBuffer();
-    cloud->GetVertexBuffer().BufferData();
-  }
 }
 
 void PointCloudRenderer::RenderPass(const SceneInfo& sceneInfo)
@@ -51,8 +52,8 @@ void PointCloudRenderer::RenderPass(const SceneInfo& sceneInfo)
       glGetFloatv(GL_POINT_SIZE, &storedPointSize);
       glPointSize(cloud->_pointSize);
 
-      glBindVertexArray(cloud->_vertexBuffer._vao);
-      glDrawArrays(GL_POINTS, 0, cloud->_vertexBuffer._vertices.size());
+      glBindVertexArray(cloud->GetVAO());
+      glDrawArrays(GL_POINTS, 0, cloud->NumPoints());
       glBindVertexArray(0);
 
       glPointSize(storedPointSize);
@@ -68,10 +69,10 @@ void PointCloudRenderer::RenderGUI()
   }
 }
 
-void PointCloudRenderer::AddPointCloud(UniquePtr<PointCloud<VertexP4>> pointCloud, Color color)
+void PointCloudRenderer::AddPointCloud(UniquePtr<BasePointCloud> pointCloud, bool colored, Color color)
 {
   pointCloud->Init();
-  pointCloud->SetShader(&_pointCloudShader);
+  pointCloud->SetShader(colored ? &_pointCloudColorShader : &_pointCloudShader);
   pointCloud->SetMaterial(std::make_shared<FlatColorMaterial>(color));
 
   _handleIndexMap[pointCloud->ID()] = _pointClouds.size();
@@ -83,9 +84,27 @@ void PointCloudRenderer::UpdatePointCloud(unsigned int handle, Vector<VertexP4>&
   if (_handleIndexMap.find(handle) == _handleIndexMap.end())
     return;
 
-  auto& pc = _pointClouds[_handleIndexMap[handle]];
+  auto base_pc = _pointClouds[_handleIndexMap[handle]].get();
+  auto pc = dynamic_cast<PointCloud<VertexP4>*>(base_pc);
+  if (pc == nullptr)
+    throw std::runtime_error("The point cloud for given handle has wrong type. Don't update a point cloud with a different type!");
+
   // TODO: Set color
   //pc->GetMaterial()->
+  std::swap(pc->_points, points);
+  pc->_dirty = true;
+}
+
+void PointCloudRenderer::UpdatePointCloud(unsigned int handle, Vector<Vertex_PCL_PointXYZRGBA>& points)
+{
+  if (_handleIndexMap.find(handle) == _handleIndexMap.end())
+    return;
+
+  auto pc = dynamic_cast<PointCloud<Vertex_PCL_PointXYZRGBA>*>(_pointClouds[_handleIndexMap[handle]].get());
+  if (pc == nullptr)
+    throw std::runtime_error("The point cloud for given handle has wrong type. Don't update a point cloud with a different type!");
+
+  // TODO: error if pc == nullptr
   std::swap(pc->_points, points);
   pc->_dirty = true;
 }

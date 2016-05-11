@@ -140,7 +140,7 @@ public:
   // @color     A constant color to apply to the cloud
   //
   // @return    An <ar::mesh_handle> for the new <PointCloud>
-  unsigned int AddPointCloud(const void* pointData, size_t numPoints, Color color);
+  unsigned int AddPointCloud(const void* pointData, size_t numPoints, bool colored,  Color color);
 
   // Updates an existing <LineMesh>
   // @handle   Handle referencing the mesh to update
@@ -153,7 +153,7 @@ public:
   // @pointData New vertex data to replace the existing points with
   // @numPoints Number of points in <pointData>
   // @color     New color to apply to the cloud
-  void UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color);
+  void UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, bool colored, Color color);
 
   // Updates an existing <Mesh3D>
   // @handle   Handle referencing the mesh to update

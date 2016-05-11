@@ -1,5 +1,6 @@
 #include "Renderer.hpp"
 #include "rendering/SceneInfo.hpp"
+#include "mesh/MeshFactory.hpp"
 
 namespace ar
 {
@@ -186,25 +187,36 @@ public:
 class Renderer::RenderCommandAddPointCloud : public RenderCommand
 {
 public:
-  RenderCommandAddPointCloud(Renderer* renderer, unsigned int handle, const void* pointData, size_t numPoints, Color color)
-    : _renderer(renderer), _handle(handle), _color(color)
+  RenderCommandAddPointCloud(Renderer* renderer, unsigned int handle, const void* pointData, size_t numPoints, bool colored, Color color)
+    : _renderer(renderer), _handle(handle), _colored(colored), _color(color)
   {
-    _pointCloud.reset(new PointCloud<VertexP4>);
-
-    const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
-
-    _pointCloud->SetPoints(verts, numPoints);
-    _pointCloud->SetID(handle);
+    if (!colored)
+    {
+      const auto verts = reinterpret_cast<const VertexP4*>(pointData);
+      auto pc = new PointCloud<VertexP4>;
+      pc->SetPoints(verts, numPoints);
+      pc->SetID(handle);
+      _pointCloud.reset(pc);
+    }
+    else
+    {
+      const auto verts = reinterpret_cast<const Vertex_PCL_PointXYZRGBA*>(pointData);
+      auto pc = new PointCloud<Vertex_PCL_PointXYZRGBA>;
+      pc->SetPoints(verts, numPoints);
+      pc->SetID(handle);
+      _pointCloud.reset(pc);
+    }
   }
 
   virtual void execute() override
   {
-    _renderer->_pointCloudRenderer.AddPointCloud(std::move(_pointCloud), _color);
+    _renderer->_pointCloudRenderer.AddPointCloud(std::move(_pointCloud), _colored, _color);
   }
 
   Renderer* _renderer;
   unsigned int _handle;
-  UniquePtr<PointCloud<VertexP4>> _pointCloud;
+  UniquePtr<BasePointCloud> _pointCloud;
+  bool _colored;
   Color _color;
 };
 
@@ -212,22 +224,34 @@ public:
 class Renderer::RenderCommandUpdatePointCloud : public RenderCommand
 {
 public:
-  RenderCommandUpdatePointCloud(Renderer* renderer, unsigned int handle, const void* pointData, size_t numPoints, Color color)
-    : _renderer(renderer), _handle(handle), _color(color)
+  RenderCommandUpdatePointCloud(Renderer* renderer, unsigned int handle, const void* pointData, size_t numPoints, bool colored, Color color)
+    : _renderer(renderer), _handle(handle), _colored(colored), _color(color)
   {
-
-    const PointCloud<VertexP4>::VertexType* verts = reinterpret_cast<const PointCloud<VertexP4>::VertexType*>(pointData);
-    _points.assign(verts, verts + numPoints);
+    if (!colored)
+    {
+      const auto* verts = reinterpret_cast<const VertexP4*>(pointData);
+      _points.assign(verts, verts + numPoints);
+    }
+    else
+    {
+      const auto* verts = reinterpret_cast<const Vertex_PCL_PointXYZRGBA*>(pointData);
+      _pointsColored.assign(verts, verts + numPoints);
+    }
   }
 
   virtual void execute() override
   {
-    _renderer->_pointCloudRenderer.UpdatePointCloud(_handle, _points, _color);
+    if (!_colored)
+      _renderer->_pointCloudRenderer.UpdatePointCloud(_handle, _points, _color);
+    else
+      _renderer->_pointCloudRenderer.UpdatePointCloud(_handle, _pointsColored);
   }
 
   Renderer* _renderer;
   unsigned int _handle;
   Vector<VertexP4> _points;
+  Vector<Vertex_PCL_PointXYZRGBA> _pointsColored;
+  bool _colored;
   Color _color;
 };
 
@@ -394,10 +418,10 @@ unsigned int Renderer::Add3DMesh(const Mesh3D& mesh, SharedPtr<Material> materia
   return handle;
 }
 
-unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints, Color color)
+unsigned int Renderer::AddPointCloud(const void* pointData, size_t numPoints, bool colored, Color color)
 {
   const unsigned int handle = GenerateMeshHandle();
-  RenderCommandAddPointCloud* command = new RenderCommandAddPointCloud(this, handle, pointData, numPoints, color);
+  RenderCommandAddPointCloud* command = new RenderCommandAddPointCloud(this, handle, pointData, numPoints, colored, color);
   EnqueueRenderCommand(command);
   return handle;
 }
@@ -412,9 +436,9 @@ unsigned int Renderer::AddLineMesh(const LineMesh& mesh, SharedPtr<Material> mat
   return handle;
 }
 
-void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, Color color)
+void Renderer::UpdatePointCloud(unsigned int handle, const void* pointData, size_t numPoints, bool colored, Color color)
 {
-  RenderCommandUpdatePointCloud* command = new RenderCommandUpdatePointCloud(this, handle, pointData, numPoints, color);
+  RenderCommandUpdatePointCloud* command = new RenderCommandUpdatePointCloud(this, handle, pointData, numPoints, colored, color);
   EnqueueRenderCommand(command);
 }
 

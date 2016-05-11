@@ -15,8 +15,62 @@
 namespace ar
 {
 
+class BasePointCloud : public RenderResource
+{
+public:
+
+  BasePointCloud() = default;
+
+  unsigned int ID() const { return _id; }
+  void SetID(unsigned int id) { _id = id; _name = std::string("Point Cloud ") + std::to_string(_id); }
+
+  bool Dirty() const { return _dirty; }
+
+  ShaderProgram* GetShader() { return _shaderProgram; }
+  void SetShader(ShaderProgram* s)
+  {
+    _shaderProgram = s;
+    if (_material != nullptr)
+      _material->SetShader(s);
+  }
+
+  SharedPtr<Material> GetMaterial() { return _material; };
+  void SetMaterial(SharedPtr<Material> m)
+  {
+    _material = m;
+    if (_shaderProgram != nullptr)
+      _material->SetShader(_shaderProgram);
+  }
+
+  glm::mat4 GetTransform() const  { return _transform; }
+  void SetTransform(glm::mat4 transform) { _transform = transform; }
+
+  virtual bool ShouldDraw() const = 0;
+  virtual size_t NumPoints() const = 0;
+  virtual void UpdateBuffer() = 0;
+  virtual GLuint GetVAO() = 0;
+  virtual void RenderGUI() = 0;
+
+  float _fadeDepth = 5.0f;
+  float _pointSize = 3.5f;
+
+protected:
+
+  friend class PointCloudRenderer;
+
+  unsigned int _id;
+  bool _dirty = false;
+  bool _pendingDelete = false;
+
+  std::string _name;
+  ShaderProgram* _shaderProgram;
+  SharedPtr<Material> _material;
+  glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
+  bool _shouldDraw = true;
+};
+
 template <typename VertexT>
-class PointCloud : public RenderResource
+class PointCloud : public BasePointCloud
 {
 public:
 
@@ -35,30 +89,7 @@ public:
     _vertexBuffer.Release();
   }
 
-  unsigned int ID() const { return _id; }
-  void SetID(unsigned int id) { _id = id; _name = std::string("Point Cloud ") + std::to_string(_id); }
-
-  bool Dirty() const { return _dirty; }
-
-  ShaderProgram* GetShader() { return _shaderProgram; }
-  void SetShader(ShaderProgram* s)
-  {
-    _shaderProgram = s;
-    if (_material != nullptr)
-      _material->SetShader(s);
-  }
-
-  SharedPtr<Material> GetMaterial() { return _material; };
-  void SetMaterial(SharedPtr<Material> m) {
-    _material = m;
-    if (_shaderProgram != nullptr)
-      _material->SetShader(_shaderProgram);
-  };
-
   VertexBufferType& GetVertexBuffer() { return _vertexBuffer; }
-
-  glm::mat4 GetTransform() const  { return _transform; }
-  void SetTransform(glm::mat4 transform) { _transform = transform; }
 
   void SetPoints(const VertexType* points, size_t numPoints)
   {
@@ -66,13 +97,19 @@ public:
     _dirty = true;
   }
 
-  void UpdateBuffer()
+  virtual void UpdateBuffer() override
   {
     if (!_dirty)
       return;
 
     _vertexBuffer.SetVertices(_points);
+    _vertexBuffer.BufferData();
     _dirty = false;
+  }
+
+  virtual GLuint GetVAO()
+  {
+    return _vertexBuffer._vao;
   }
 
   // Removes all points from the point cloud
@@ -82,10 +119,10 @@ public:
     _vertexBuffer.ClearAll();
   }
 
-  inline bool ShouldDraw() const { return _shouldDraw && NumPoints() > 0; }
-  inline size_t NumPoints() const { return _points.size(); }
+  virtual bool ShouldDraw() const override { return _shouldDraw && NumPoints() > 0; }
+  virtual size_t NumPoints() const override { return _points.size(); }
 
-  void RenderGUI()
+  virtual void RenderGUI() override
   {
     if (!ImGui::Begin(_name.c_str()))
     {
@@ -115,24 +152,12 @@ public:
     ImGui::End();
   }
 
-  float _fadeDepth = 5.0f;
-  float _pointSize = 1.0f;
-
 private:
+
   friend class PointCloudRenderer;
 
-  unsigned int _id;
-  bool _dirty = false;
-  bool _pendingDelete = false;
-
-  std::string _name;
   Vector<VertexType> _points;
-  ShaderProgram* _shaderProgram;
-  SharedPtr<Material> _material;
-  glm::mat4 _transform = glm::mat4(1.0); // transformation of this object from the origin
   VertexBufferType _vertexBuffer;
-
-  bool _shouldDraw = true;
 };
 
 }

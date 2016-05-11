@@ -13,38 +13,47 @@ namespace ar
 
   struct PointCloudData
   {
-    // Points xyzw (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats).
+    // For PCL_PointXYZ: Points xyzw floats (w is ignored, easier because pcl::PointXYZ is aligned to 4 floats)
+    // For PCL_PointXYZRGBA: Points xyzw floats + 4 uint8 bgra + 12 bytes padding
     const void* pointData;
 
     // Number of points in the array.
     unsigned long numPoints;
 
-    // Point format
-    PointCloudDataType type;
+    // Point format (const to discourage changing the type at some later point)
+    const PointCloudDataType type;
 
     // Constant color for the cloud
     Color color;
 
-    PointCloudData() : pointData(0), numPoints(0), type(PCL_PointXYZ), color() {}
+    PointCloudData(PointCloudDataType dataType) :
+      pointData(0),
+      numPoints(0),
+      type(dataType),
+      color()
+    {}
 
-    PointCloudData(PointCloudDataType dataType) : pointData(0), numPoints(0), type(dataType), color() {}
+    PointCloudData(PointCloudDataType dataType, Color color) :
+      pointData(0),
+      numPoints(0),
+      type(dataType),
+      color(color) {}
 
-    PointCloudData(PointCloudDataType dataType, Color color) : pointData(0), numPoints(0), type(dataType), color(color) {}
-
-    PointCloudData(const void* data, unsigned long count, PointCloudDataType dataType) : color()
+    PointCloudData(const void* data, unsigned long count, PointCloudDataType dataType) :
+      type(dataType),
+      color()
     {
       pointData = data;
       numPoints = count;
-      type = dataType;
     }
 
-    PointCloudData(const void* data, unsigned long count, PointCloudDataType dataType, Color color) : color(color)
+    PointCloudData(const void* data, unsigned long count, PointCloudDataType dataType, Color color) :
+      type(dataType),
+      color(color)
     {
       pointData = data;
       numPoints = count;
-      type = dataType;
     }
-
   };
 
 } // namespace ar

@@ -23,16 +23,20 @@ public:
   virtual void RenderGUI() override;
 
 
-  void AddPointCloud(UniquePtr<PointCloud<VertexP4>> pointCloud, Color color);
+  void AddPointCloud(UniquePtr<BasePointCloud> pointCloud, bool colored, Color color);
+  // NOTE: swaps out points vector!
   void UpdatePointCloud(unsigned int handle, Vector<VertexP4>& points, Color color);
+  // NOTE: swaps out points vector!
+  void UpdatePointCloud(unsigned int handle, Vector<Vertex_PCL_PointXYZRGBA>& points);
   void SetPointCloudTransform(unsigned int handle, const glm::mat4& transform, bool absolute);
   void RemovePointCloud(unsigned int handle);
   void RemoveAllPointClouds();
 
 private:
 
-  Vector<UniquePtr<PointCloud<VertexP4>>> _pointClouds;
+  Vector<UniquePtr<BasePointCloud>> _pointClouds;
   ShaderProgram _pointCloudShader;
+  ShaderProgram _pointCloudColorShader;
 
   std::unordered_map<unsigned int, size_t> _handleIndexMap;
 };
