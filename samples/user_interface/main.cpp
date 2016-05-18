@@ -60,6 +60,10 @@ int main(void)
   const char* comboBoxItems[3] = { "Item 1", "Item 2", "Item 3" };
   ar::ui_element_handle comboBox = testWindow->AddComboBox("ComboBox", comboBoxItems, 3, 1);
 
+  float color[4] { 0.1f, 0.2f, 0.3f, 0.4f };
+  ar::ui_element_handle colorEdit3 = testWindow->AddColorEdit3("ColorEdit3", color);
+  ar::ui_element_handle colorEdit4 = testWindow->AddColorEdit4("ColorEdit4", color);
+
   // Add text elements to another window to show the values of the elements in the first window
 
   ar::ui_element_handle sliderFloat1_Text = valuesWindow->AddText("");
@@ -97,6 +101,8 @@ int main(void)
   ar::ui_element_handle sliderAngle_Text = valuesWindow->AddText("");
   ar::ui_element_handle floatRange_Text = valuesWindow->AddText("");
   ar::ui_element_handle comboBox_Text = valuesWindow->AddText("");
+  ar::ui_element_handle colorEdit3_Text = valuesWindow->AddText("");
+  ar::ui_element_handle colorEdit4_Text = valuesWindow->AddText("");
 
   // Stats window
   ar::ui_element_handle plotSliderFloat1 = statsWindow->AddPlot("SliderFloat1", 0.0f, 10.0f, 100, 60.0f);
@@ -171,6 +177,11 @@ int main(void)
 
     const int selectedItem = testWindow->GetSelectedComboBoxItem(comboBox);
     valuesWindow->UpdateText(comboBox_Text, "%d", selectedItem);
+
+    testWindow->GetColorValues3(colorEdit3, color);
+    valuesWindow->UpdateText(colorEdit3_Text, "%.2f %.2f %.2f", color[0], color[1], color[2]);
+    testWindow->GetColorValues4(colorEdit4, color);
+    valuesWindow->UpdateText(colorEdit4_Text, "%.2f %.2f %.2f %.2f", color[0], color[1], color[2], color[3]);
   }
 
   std::cout << "Shutting down..." << std::endl;

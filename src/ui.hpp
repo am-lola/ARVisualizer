@@ -35,6 +35,8 @@ public:
   virtual ui_element_handle AddComboBox(const char* label, const char** items, int itemsCount, int selectedItem = 0) = 0;
   virtual ui_element_handle AddInputText(const char* label, const char* text = nullptr) = 0;
   virtual ui_element_handle AddText(const char* fmt, ...) = 0;
+  virtual ui_element_handle AddColorEdit3(const char* label, float color[3]) = 0;
+  virtual ui_element_handle AddColorEdit4(const char* label, float color[4]) = 0;
 
   virtual ui_element_handle AddPlot(const char* label, float rangeMin, float rangeMax, int bufferSize = 128, float height = 0.0f) = 0;
   virtual void PushPlotValue(ui_element_handle handle, float value) = 0;
@@ -51,6 +53,8 @@ public:
   virtual void GetFloatRangeValues(ui_element_handle handle, float& lower, float& upper) const = 0;
   virtual int GetSelectedComboBoxItem(ui_element_handle handle) const = 0;
   virtual std::string GetInputTextValue(ui_element_handle handle) const = 0;
+  virtual void GetColorValues3(ui_element_handle handle, float color[3]) const = 0;
+  virtual void GetColorValues4(ui_element_handle handle, float color[4]) const = 0;
 
   virtual void UpdateText(ui_element_handle handle, const char* fmt, ...) = 0;
 

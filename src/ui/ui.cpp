@@ -148,6 +148,17 @@ public:
   Vector<float> _buffer;
 };
 
+class UIColor : public UIBaseElement
+{
+public:
+
+  virtual void draw() override;
+
+  std::string _label;
+  float _color[4];
+  bool _withAlpha;
+};
+
 struct UIElement
 {
   UIElement(UIBaseElement* element) : _element(element) { }
@@ -187,6 +198,8 @@ public:
   virtual ui_element_handle AddComboBox(const char* label, const char** items, int itemsCount, int selectedItem = 0) override;
   virtual ui_element_handle AddInputText(const char* label, const char* text = nullptr) override;
   virtual ui_element_handle AddText(const char* fmt, ...) override;
+  virtual ui_element_handle AddColorEdit3(const char* label, float color[3]) override;
+  virtual ui_element_handle AddColorEdit4(const char* label, float color[4]) override;
 
   virtual ui_element_handle AddPlot(const char* label, float rangeMin, float rangeMax, int bufferSize = 128, float height = 0.0f) override;
   virtual void PushPlotValue(ui_element_handle handle, float value) override;
@@ -203,6 +216,8 @@ public:
   virtual void GetFloatRangeValues(ui_element_handle handle, float& lower, float& upper) const override;
   virtual int GetSelectedComboBoxItem(ui_element_handle handle) const override;
   virtual std::string GetInputTextValue(ui_element_handle handle) const override;
+  virtual void GetColorValues3(ui_element_handle handle, float color[3]) const override;
+  virtual void GetColorValues4(ui_element_handle handle, float color[4]) const override;
 
   virtual void UpdateText(ui_element_handle handle, const char* fmt, ...) override;
 
@@ -414,6 +429,11 @@ void UIAuxiliaryElement::draw()
 void UIPlot::draw()
 {
   ImGui::PlotLines(_label.c_str(), _buffer.data(), static_cast<int>(_buffer.size()), _offset, nullptr, _rangeMin, _rangeMax, ImVec2(0, _height));
+}
+
+void UIColor::draw()
+{
+  ImGui::ColorEdit4(_label.c_str(), _color, _withAlpha);
 }
 
 
@@ -703,6 +723,34 @@ ui_element_handle UIWindow::AddPlot(const char* label, float rangeMin, float ran
   return getLastElementHandle();
 }
 
+ui_element_handle UIWindow::AddColorEdit3(const char* label, float color[3])
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIColor* col = new UIColor();
+  col->_label = label;
+  col->_withAlpha = false;
+  for (int i = 0; i < 3; i++)
+    col->_color[i] = color[i];
+
+  _elements.emplace_back(col);
+  return getLastElementHandle();
+}
+
+ui_element_handle UIWindow::AddColorEdit4(const char* label, float color[4])
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIColor* col = new UIColor();
+  col->_label = label;
+  col->_withAlpha = true;
+  for (int i = 0; i < 4; i++)
+    col->_color[i] = color[i];
+
+  _elements.emplace_back(col);
+  return getLastElementHandle();
+}
+
 void UIWindow::PushPlotValue(ui_element_handle handle, float value)
 {
   MutexLockGuard lockGuard(_mutex);
@@ -820,6 +868,24 @@ std::string UIWindow::GetInputTextValue(ui_element_handle handle) const
 
   UIInputText* inputText = dynamic_cast<UIInputText*>(_elements[handle]._element.get());
   return inputText->_text;
+}
+
+void UIWindow::GetColorValues3(ui_element_handle handle, float color[3]) const
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIColor* col = dynamic_cast<UIColor*>(_elements[handle]._element.get());
+  for (int i = 0; i < 3; i++)
+    color[i] = col->_color[i];
+}
+
+void UIWindow::GetColorValues4(ui_element_handle handle, float color[4]) const
+{
+  MutexLockGuard lockGuard(_mutex);
+
+  UIColor* col = dynamic_cast<UIColor*>(_elements[handle]._element.get());
+  for (int i = 0; i < 4; i++)
+    color[i] = col->_color[i];
 }
 
 } // namespace ar

@@ -7,6 +7,7 @@ pkg_search_module(GLFW REQUIRED glfw3)
 
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/extern/stb")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui")
 
 option(ARVIS_BUILD_LIBRARY "Build AR Visualization library" TRUE)

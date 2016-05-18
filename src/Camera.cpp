@@ -131,6 +131,10 @@ void Camera::RenderGUI()
 
 void Camera::Reset()
 {
+  // Don't move the camera if an imgui item is active (e.g. for text input)
+  if (ImGui::IsAnyItemActive())
+    return;
+
   _position = _basePosition;
   _forward  = _baseForward;
   _up       = _baseUp;

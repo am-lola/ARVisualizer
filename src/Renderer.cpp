@@ -2,6 +2,9 @@
 #include "rendering/SceneInfo.hpp"
 #include "mesh/MeshFactory.hpp"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 namespace ar
 {
 
@@ -354,6 +357,8 @@ Renderer::Renderer(GLFWwindow* window)
   // set a default projection matrix
   _camera.SetAspectRatio((float)_windowWidth / (float)_windowHeight);
   _camera.UpdateProjection();
+
+  strcpy(_screenshotPrefix, "img");
 }
 
 Renderer::~Renderer()
@@ -657,10 +662,67 @@ void Renderer::Render()
 
     glfwSwapBuffers(_window);
     glfwPollEvents();
+
+    HandleScreenshot();
   }
 
   // if we've stopped rendering, cleanup
   Shutdown();
+}
+
+std::string Renderer::MakeScreenshotFileName() const
+{
+  char fileName[128];
+  MakeScreenshotFileName(fileName, sizeof(fileName));
+  return std::string(fileName);
+}
+
+void Renderer::MakeScreenshotFileName(char* fileName, size_t len) const
+{
+  snprintf(fileName, len, "%s_%d.%s", _screenshotPrefix, _screenshotNr,
+           _screenshotFileExt[static_cast<int>(_screenshotFormat)]);
+}
+
+void Renderer::HandleScreenshot()
+{
+  if (_doScreenshot && (!_screenshotHideGUI || !_guiIsVisible))
+  {
+    int vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    const int width = vp[2];
+    const int height = vp[3];
+
+    const int size = width*height;
+    uint32_t* buffer = new uint32_t[size];
+    uint32_t* mirrored = new uint32_t[size];
+
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+    for (int y = 0; y < height; y++)
+      for (int x = 0; x < width; x++)
+        mirrored[y * width + x] = buffer[(height - y - 1) * width + x] | 0xFF000000;
+
+    const std::string fileName = MakeScreenshotFileName();
+
+    switch (_screenshotFormat)
+    {
+      case PNG:
+        stbi_write_png(fileName.c_str(), width, height, 4, mirrored, width * 4);
+        break;
+      case BMP:
+        stbi_write_bmp(fileName.c_str(), width, height, 4, mirrored);
+        break;
+      case TGA:
+        stbi_write_tga(fileName.c_str(), width, height, 4, mirrored);
+        break;
+    }
+
+    _doScreenshot = false;
+    _hideGUI = false;
+    _screenshotNr++;
+    delete[] mirrored;
+    delete[] buffer;
+  }
 }
 
 void Renderer::Update()
@@ -736,8 +798,16 @@ void Renderer::RenderOneFrame()
   glBindTexture(GL_TEXTURE_2D, 0);
   glUseProgram(0);
 
-  // Render GUI last
-  RenderGUI();
+  if (!_hideGUI)
+  {
+    // Render GUI last
+    RenderGUI();
+    _guiIsVisible = true;
+  }
+  else
+  {
+    _guiIsVisible = false;
+  }
 }
 
 void Renderer::RenderGUI()
@@ -760,7 +830,8 @@ void Renderer::RenderGUI()
   _voxelRenderer.RenderGUI();
   _lineRenderer.RenderGUI();
 
-  RenderStatsGUI();
+  static bool showScreenshotWindow = false;
+  static bool showRendererStats = false;
 
   if (ImGui::Begin("Camera"))
   {
@@ -788,19 +859,60 @@ void Renderer::RenderGUI()
     ImGui::Checkbox("Enable depth", &enableDepth);
     ImGui::Checkbox("Light alpha", &_lightAlpha);
 
+    ImGui::Separator();
+    ImGui::Text("Windows:");
+
     if (enableDepth)
       _meshRenderPassParams |= EnableDepth;
+
+    ImGui::Checkbox("Screenshot", &showScreenshotWindow);
+    ImGui::Checkbox("Renderer Stats", &showRendererStats);
   }
 
   ImGui::End();
 
+  if (showScreenshotWindow)
+  {
+    if (ImGui::Begin("Screenshot", &showScreenshotWindow, ImVec2(250, 130)))
+    {
+      ImGui::Columns(2);
+      ImGui::PushItemWidth(-40);
+      ImGui::InputText("Prefix", _screenshotPrefix, sizeof(_screenshotPrefix));
+      int format = static_cast<int>(_screenshotFormat);
+      ImGui::Combo("", &format, "png\0bmp\0tga\0");
+      _screenshotFormat = static_cast<ScreenshotFormat>(format);
+      if (ImGui::Button("Screenshot"))
+      {
+        _doScreenshot = true;
+        if (_screenshotHideGUI)
+          _hideGUI = true;
+      }
+      ImGui::Checkbox("Hide GUI", &_screenshotHideGUI);
+      ImGui::NextColumn();
+      ImGui::PushItemWidth(-40);
+      ImGui::DragInt("Nr", &_screenshotNr, 0.5f, 0, std::numeric_limits<int>::max());
+      ImGui::SameLine();
+      ImGui::TextDisabled("(?)");
+      if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Auto increments after a screenshot is taken.");
+
+      char fileName[128];
+      MakeScreenshotFileName(fileName, sizeof(fileName));
+      ImGui::Text("%s", "Filename:");
+      ImGui::Text("%s", fileName);
+    }
+
+    ImGui::End();
+  }
+
+  RenderStatsGUI(showRendererStats);
   _renderGUIDelegate();
 
   ImGui::Render();
   _imguiRenderer.RenderDrawLists(ImGui::GetDrawData());
 }
 
-void Renderer::RenderStatsGUI()
+void Renderer::RenderStatsGUI(bool& opened)
 {
   static constexpr int bufferSize = 128;
   static float values[bufferSize] = { 0.0f };
@@ -811,8 +923,6 @@ void Renderer::RenderStatsGUI()
   lastTime = ImGui::GetTime();
   values[offset] = timeDiff;
   offset = (offset + 1) % bufferSize;
-
-  static bool opened = true;
 
   if (opened)
   {

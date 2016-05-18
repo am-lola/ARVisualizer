@@ -261,6 +261,26 @@ private:
   // temporary: light should affect alpha
   bool _lightAlpha;
 
+
+  // Screenshot
+  enum ScreenshotFormat
+  {
+    PNG = 0,
+    BMP = 1,
+    TGA = 2
+  };
+
+
+  char _screenshotPrefix[128];// = "img";
+  const char _screenshotFileExt[3][4] = { "png", "bmp", "tga" };
+  int _screenshotNr = 0;
+  bool _doScreenshot = false;
+  bool _screenshotHideGUI = true;
+  ScreenshotFormat _screenshotFormat = PNG;
+  bool _hideGUI = false;
+  bool _guiIsVisible = true;
+
+
   // Generates a unique ID used to reference meshes from external components
   unsigned int GenerateMeshHandle();
 
@@ -304,11 +324,15 @@ private:
 
   // ! Call from _renderThread only
   // renders the GUI for stats
-  void RenderStatsGUI();
+  void RenderStatsGUI(bool& opened);
 
   // ! Call from _renderThread only
   // Final cleanup which needs to be done (from the render thread) when we stop rendering
   void Shutdown();
+
+  void HandleScreenshot();
+  std::string MakeScreenshotFileName() const;
+  void MakeScreenshotFileName(char* fileName, size_t len) const;
 
 };
 
