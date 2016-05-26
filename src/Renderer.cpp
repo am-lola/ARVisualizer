@@ -698,9 +698,11 @@ void Renderer::HandleScreenshot()
 
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
+    const uint32_t alpha = _screenshotTransparentBG ? 0 : 0xFF000000;
+
     for (int y = 0; y < height; y++)
       for (int x = 0; x < width; x++)
-        mirrored[y * width + x] = buffer[(height - y - 1) * width + x] | 0xFF000000;
+        mirrored[y * width + x] = buffer[(height - y - 1) * width + x] | alpha;
 
     const std::string fileName = MakeScreenshotFileName();
 
@@ -873,7 +875,7 @@ void Renderer::RenderGUI()
 
   if (showScreenshotWindow)
   {
-    if (ImGui::Begin("Screenshot", &showScreenshotWindow, ImVec2(250, 130)))
+    if (ImGui::Begin("Screenshot", &showScreenshotWindow, ImVec2(280, 150)))
     {
       ImGui::Columns(2);
       ImGui::PushItemWidth(-40);
@@ -888,6 +890,7 @@ void Renderer::RenderGUI()
           _hideGUI = true;
       }
       ImGui::Checkbox("Hide GUI", &_screenshotHideGUI);
+      ImGui::Checkbox("Transparent BG", &_screenshotTransparentBG);
       ImGui::NextColumn();
       ImGui::PushItemWidth(-40);
       ImGui::DragInt("Nr", &_screenshotNr, 0.5f, 0, std::numeric_limits<int>::max());

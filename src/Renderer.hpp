@@ -276,6 +276,7 @@ private:
   int _screenshotNr = 0;
   bool _doScreenshot = false;
   bool _screenshotHideGUI = true;
+  bool _screenshotTransparentBG = false;
   ScreenshotFormat _screenshotFormat = PNG;
   bool _hideGUI = false;
   bool _guiIsVisible = true;
