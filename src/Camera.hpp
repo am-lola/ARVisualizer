@@ -98,8 +98,8 @@ private:
 
   // default (untransformed) camera pose parameters
   glm::vec3 _basePosition = {0.0f, 0.0f, 0.0f};
-  glm::vec3 _baseForward  = {0.0f, 0.0f, 1.0f};
-  glm::vec3 _baseUp       = {0.0f, 1.0f, 0.0f};
+  glm::vec3 _baseForward  = {1.0f, 0.0f, 0.0f};
+  glm::vec3 _baseUp       = {0.0f, 0.0f, 1.0f};
   float     _baseZoom     = 1.0f;
 
   double _prevMouseX = 0;
