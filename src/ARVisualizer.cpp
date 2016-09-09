@@ -99,8 +99,8 @@ void ARVisualizer::SetCameraPose(double position[3], double orientation[3][3])
 {
   if (!IsRunning()) { return; }
   glm::vec3 vPos = glm::vec3( position[0], position[1], position[2] );
-  glm::vec3 vFor = glm::vec3( 1.0, 0.0, 0.0 );
-  glm::vec3 vUp  = glm::vec3( 0.0, 0.0, 1.0 );
+  glm::vec3 vFor = glm::vec3( 0.0, 0.0, 1.0 );
+  glm::vec3 vUp  = glm::vec3( 0.0, -1.0, 0.0 );
 
   // fill rotation matrix from given orientation
   glm::mat3 r(1.0);
