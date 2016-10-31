@@ -88,7 +88,7 @@ echo       ===========${END}
 mkdir glfw.bin
 cd glfw.bin
 
-cmake ../glfw-3.1.2
+cmake ../glfw-3.2.1
 
 if [ $? -eq 0 ]; then
     echo ${GRN}'\t'OK'\n'${END}
