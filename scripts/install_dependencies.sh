@@ -65,7 +65,7 @@ temp_dir=`mktemp -d` && cd $temp_dir
 
 echo ${BLU}Downloading GLFW source...
 echo       ==========================${END}
-wget https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.zip
+wget https://github.com/glfw/glfw/releases/download/3.1.2/glfw-3.1.2.zip
 
 if [ $? -eq 0 ]; then
     echo ${GRN}'\t'OK'\n'${END}
@@ -75,7 +75,7 @@ fi
 
 echo ${BLU}Unzipping...
 echo       ============${END}
-unzip glfw-3.2.1.zip
+unzip glfw-3.1.2.zip
 
 if [ $? -eq 0 ]; then
     echo ${GRN}'\t'OK'\n'${END}
@@ -88,7 +88,7 @@ echo       ===========${END}
 mkdir glfw.bin
 cd glfw.bin
 
-cmake ../glfw-3.2.1
+cmake ../glfw-3.1.2
 
 if [ $? -eq 0 ]; then
     echo ${GRN}'\t'OK'\n'${END}
