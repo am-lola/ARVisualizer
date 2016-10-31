@@ -22,7 +22,7 @@
 ################################################################
 
 MIN_DEPS='libglm-dev python unzip cmake'
-ALL_DEPS='libglm-dev python unzip cmake python-pip libopencv-dev libpcl-1.7-all libpcl-1.7-all-dev libclang-dev'
+ALL_DEPS='libglm-dev python unzip cmake python-pip libopencv-dev libclang-dev'
 
 GRN='\033[0;32m'
 RED='\033[0;31m'
@@ -65,7 +65,7 @@ temp_dir=`mktemp -d` && cd $temp_dir
 
 echo ${BLU}Downloading GLFW source...
 echo       ==========================${END}
-wget https://github.com/glfw/glfw/releases/download/3.1.2/glfw-3.1.2.zip
+wget https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.zip
 
 if [ $? -eq 0 ]; then
     echo ${GRN}'\t'OK'\n'${END}
@@ -75,7 +75,7 @@ fi
 
 echo ${BLU}Unzipping...
 echo       ============${END}
-unzip glfw-3.1.2.zip
+unzip glfw-3.2.1.zip
 
 if [ $? -eq 0 ]; then
     echo ${GRN}'\t'OK'\n'${END}
