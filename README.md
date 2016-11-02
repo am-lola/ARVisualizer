@@ -68,6 +68,7 @@ The visualizer supports some mouse and keyboard shortcuts which can be applied t
           Left Mouse : Rotate camera around its current position
          Right Mouse : Pan camera (movement relative to image plane)
     Left+Right Mouse : Rotate camera around a point in space (set with Orbit Radius in camera GUI)
+        Middle Mouse : Move camera forward and backward (movement relative to image plane)
          Mouse Wheel : Camera Zoom in and out
            'W/S/A/D' : Move camera horizontally
                'Q/E' : Move camera vertically
