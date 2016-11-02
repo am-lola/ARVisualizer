@@ -201,7 +201,10 @@ void Camera::OnMouseMove(double xpos, double ypos)
   {
     Pan(deltaX, deltaY);
   }
-
+  else if (_middleMousePressed)
+  {
+    Advance(deltaY);
+  }
 }
 
 void Camera::OnMouseButton(int button, int action, int mods)
@@ -219,6 +222,10 @@ void Camera::OnMouseButton(int button, int action, int mods)
     {
       _rightMousePressed = true;
     }
+    else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+    {
+      _middleMousePressed = true;
+    }
   }
   else if (action == GLFW_RELEASE)
   {
@@ -229,6 +236,10 @@ void Camera::OnMouseButton(int button, int action, int mods)
     else if (button == GLFW_MOUSE_BUTTON_RIGHT)
     {
       _rightMousePressed = false;
+    }
+    else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+    {
+      _middleMousePressed = false;
     }
   }
 }
@@ -346,6 +357,13 @@ void Camera::Pan(double dx, double dy)
   // 'up' vector w.r.t. camera
   glm::vec3 cameraUp = glm::cross(_forward, _right);
   glm::vec3 translation = _movementSpeed * 0.001f * ((float)dx * _right + (float)dy * cameraUp);
+  _position += translation;
+}
+
+void Camera::Advance(double dy)
+{
+  // 'forward' vector w.r.t. camera
+  glm::vec3 translation = _movementSpeed * 0.005f * (-1) * (float)dy * _forward;
   _position += translation;
 }
 

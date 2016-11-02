@@ -71,6 +71,10 @@ private:
   // @dy Y-distance mouse has moved since previous frame
   void Pan(double dx, double dy);
 
+  // Computes new camera location from mouse movement
+  // @dy Y-distance mouse has moved since previous frame
+  void Advance(double dy);
+
   // Rotates the camera around the forward axis
   // @dt Amount (in radians) to rotate from current orientation
   void Roll(double dt);
@@ -106,6 +110,7 @@ private:
   double _prevMouseY = 0;
   bool _leftMousePressed  = false;
   bool _rightMousePressed = false;
+  bool _middleMousePressed = false;
 
   float _orbitRadius = 2.0f;
   int _movementForward = 0;
