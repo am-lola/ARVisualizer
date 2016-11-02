@@ -112,13 +112,13 @@ private:
   bool _rightMousePressed = false;
   bool _middleMousePressed = false;
 
-  float _orbitRadius = 2.0f;
+  float _orbitRadius = 25.0f;
   int _movementForward = 0;
   int _movementSide = 0;
   int _movementUp = 0;
   int _rolling = 0;
   float _movementSpeed = 10.0f;
-  float _sensitivity = 1.0f;
+  float _sensitivity = 0.5f;
 
   ScrollWheelFunction _scrollWheelFunction = ScrollWheelFunction::ChangeFOV;
 };

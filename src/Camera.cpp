@@ -369,7 +369,7 @@ void Camera::Advance(double dy)
 
 void Camera::Roll(double dt)
 {
-  float rot = dt * _sensitivity *  0.01f;
+  float rot = dt * _sensitivity *  0.05f;
 
   // rotate
   _up = glm::rotate(_up, rot, _forward);
