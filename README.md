@@ -24,7 +24,7 @@ To build the documentation, ensure you have the necessary [dependencies](#depend
 
 The generated documentation will be in `<build-directory>/docs`
 
-Similarly, if you wish NOT to build the samples (which are enabled by default), you can set `ARVIS_BUILD_SAMPLES` to False.
+Similarly, if you wish NOT to build the samples (which are enabled by default), you can set `ARVIS_BUILD_SAMPLES` to False (do this if you don't have PCL installed, e.g. the control pc).
 
 # Usage
 
