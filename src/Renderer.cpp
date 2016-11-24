@@ -181,11 +181,17 @@ public:
     _pixels = UniquePtr<unsigned char[]>(new unsigned char[width * largefactor * height * 3]);
 
     // TODO: Memcpy
-    for (size_t i = 0; i < width * height * 3; i++)
+    for (size_t i = 0; i < width * height * 3 * _largefactor / 4; i++)
     {
-      _pixels[i] = pixels[i];
+      _pixels[i] = 50;
     }
-    for (size_t i = width * height * 3; i < width * largefactor * height * 3; i++)
+    size_t start = width * height * 3 * _largefactor / 4;
+    for (size_t i = start; i < start + width * height * 3; i++)
+    {
+      _pixels[i] = pixels[i-start];
+    }
+    start = start + width * height * 3;
+    for (size_t i = start; i < start + width * height * 3 * _largefactor / 4; i++)
     {
       _pixels[i] = 50;
     }
