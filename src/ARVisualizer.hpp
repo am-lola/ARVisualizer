@@ -77,6 +77,13 @@ public:
   // @pixels image data
   void NotifyNewVideoFrame(int width, int height, unsigned char* pixels);
 
+  // Updates video texture with (RGB24) data in pixels, but starts a larger screen    // TODO: determine if any other pixel formats need to be supported
+  // @width  width, in pixels, of the image
+  // @height height, in pixles, of the image
+  // @pixels image data
+  // @largefactor how much bigger should the width be
+  void NotifyNewVideoFrame(int width, int height, unsigned char* pixels, int largefactor);
+
   // Updates the camera parameters used for rendering.
   // @position Position of the camera in world-coordinates
   // @forward  Vector pointing in the direction the camera is facing

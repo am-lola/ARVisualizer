@@ -175,14 +175,31 @@ public:
     }
   }
 
+  RenderCommandNotifyNewVideoFrame(Renderer* renderer, unsigned int width, unsigned int height, unsigned char* pixels, int largefactor)
+    : _renderer(renderer), _width(width), _height(height), _largefactor(largefactor)
+  {
+    _pixels = UniquePtr<unsigned char[]>(new unsigned char[width * largefactor * height * 3]);
+
+    // TODO: Memcpy
+    for (size_t i = 0; i < width * height * 3; i++)
+    {
+      _pixels[i] = pixels[i];
+    }
+    for (size_t i = width * height * 3; i < width * largefactor * height * 3; i++)
+    {
+      _pixels[i] = 50;
+    }
+  }
+
   virtual void execute() override
   {
-    _renderer->_videoRenderer.SetNewFrame(_width, _height, _pixels.get());
+    _renderer->_videoRenderer.SetNewFrame(_width, _largefactor * _height, _pixels.get());
   }
 
   Renderer* _renderer;
   unsigned int _width;
   unsigned int _height;
+  int _largefactor = 1;
 
   UniquePtr<unsigned char[]> _pixels;
 };
@@ -404,6 +421,12 @@ bool Renderer::IsRunning()
 void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels)
 {
   RenderCommandNotifyNewVideoFrame* command = new RenderCommandNotifyNewVideoFrame(this, width, height, pixels);
+  EnqueueRenderCommand(command);
+}
+
+void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels, int largefactor)
+{
+  RenderCommandNotifyNewVideoFrame* command = new RenderCommandNotifyNewVideoFrame(this, width, height, pixels, largefactor);
   EnqueueRenderCommand(command);
 }
 

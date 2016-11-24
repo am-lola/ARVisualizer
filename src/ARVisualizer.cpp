@@ -85,6 +85,12 @@ void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pix
   _renderer->NotifyNewVideoFrame(width, height, pixels);
 }
 
+void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels, int largefactor)
+{
+  if (!IsRunning()) { return; }
+  _renderer->NotifyNewVideoFrame(width, height, pixels, largefactor);
+}
+
 void ARVisualizer::SetCameraPose(double position[3], double forward[3], double up[3])
 {
   if (!IsRunning()) { return; }
