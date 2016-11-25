@@ -126,7 +126,7 @@ public:
   // @height height, in pixles, of the image
   // @pixels image data
   // @largefactor how much bigger should the width be
-  void NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels, int largefactor); // TODO: determine if any other pixel formats need to be supported
+  void NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels, float largefactor); // TODO: determine if any other pixel formats need to be supported
 
   // Updates camera parameters with the given values
   // @position New camera position

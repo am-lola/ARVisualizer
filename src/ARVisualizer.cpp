@@ -85,7 +85,7 @@ void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pix
   _renderer->NotifyNewVideoFrame(width, height, pixels);
 }
 
-void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels, int largefactor)
+void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels, float largefactor)
 {
   if (!IsRunning()) { return; }
   _renderer->NotifyNewVideoFrame(width, height, pixels, largefactor);

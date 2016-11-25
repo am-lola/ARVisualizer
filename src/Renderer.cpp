@@ -175,23 +175,23 @@ public:
     }
   }
 
-  RenderCommandNotifyNewVideoFrame(Renderer* renderer, unsigned int width, unsigned int height, unsigned char* pixels, int largefactor)
+  RenderCommandNotifyNewVideoFrame(Renderer* renderer, unsigned int width, unsigned int height, unsigned char* pixels, float largefactor)
     : _renderer(renderer), _width(width), _height(height), _largefactor(largefactor)
   {
-    _pixels = UniquePtr<unsigned char[]>(new unsigned char[width * largefactor * height * 3]);
+    _pixels = UniquePtr<unsigned char[]>(new unsigned char[static_cast<unsigned int>(width * largefactor * height * 3)]);
 
     // TODO: Memcpy
-    for (size_t i = 0; i < width * height * 3 * (_largefactor - 1) / 2; i++)
+    for (size_t i = 0; i < static_cast<size_t>(width * height * 3 * (_largefactor - 1) / 2); i++)
     {
       _pixels[i] = 50;
     }
-    size_t start = width * height * 3 * (_largefactor - 1) / 2;
+    size_t start = static_cast<size_t>(width * height * 3 * (_largefactor - 1) / 2);
     for (size_t i = start; i < start + width * height * 3; i++)
     {
       _pixels[i] = pixels[i-start];
     }
     start = start + width * height * 3;
-    for (size_t i = start; i < start + width * height * 3 * (_largefactor - 1) / 2; i++)
+    for (size_t i = start; i < static_cast<size_t>(start + width * height * 3 * (_largefactor - 1) / 2); i++)
     {
       _pixels[i] = 50;
     }
@@ -199,13 +199,13 @@ public:
 
   virtual void execute() override
   {
-    _renderer->_videoRenderer.SetNewFrame(_width, _largefactor * _height, _pixels.get());
+    _renderer->_videoRenderer.SetNewFrame(_width, static_cast<unsigned int>(_largefactor * _height), _pixels.get());
   }
 
   Renderer* _renderer;
   unsigned int _width;
   unsigned int _height;
-  int _largefactor = 1;
+  float _largefactor = 1;
 
   UniquePtr<unsigned char[]> _pixels;
 };
@@ -430,7 +430,7 @@ void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsi
   EnqueueRenderCommand(command);
 }
 
-void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels, int largefactor)
+void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels, float largefactor)
 {
   RenderCommandNotifyNewVideoFrame* command = new RenderCommandNotifyNewVideoFrame(this, width, height, pixels, largefactor);
   EnqueueRenderCommand(command);

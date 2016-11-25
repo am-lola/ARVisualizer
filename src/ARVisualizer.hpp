@@ -82,7 +82,7 @@ public:
   // @height height, in pixles, of the image
   // @pixels image data
   // @largefactor how much bigger should the width be
-  void NotifyNewVideoFrame(int width, int height, unsigned char* pixels, int largefactor);
+  void NotifyNewVideoFrame(int width, int height, unsigned char* pixels, float largefactor);
 
   // Updates the camera parameters used for rendering.
   // @position Position of the camera in world-coordinates
