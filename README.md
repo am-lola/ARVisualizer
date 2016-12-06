@@ -83,6 +83,9 @@ To [compile the library](#build-instructions), you need Python, [GLM](http://glm
 
 To compile the samples, you will also need [PCL](http://pointclouds.org/) and [OpenCV](http://opencv.org/)
 
+If you want to directly compile PCL for C++11 (needed for lepp and am2b-ar), follow the instructions on lepp's wiki:
+https://gitlab.lrz.de/AMCode/lepp3/wikis/Installation%20Instructions
+
 To build the documentation you will also need [cldoc](https://jessevdk.github.io/cldoc/)
 
 A script is provided in `/scripts/install_dependencies.sh` which can be used to automatically fetch and install the necessary dependencies on Ubuntu-based platforms:
