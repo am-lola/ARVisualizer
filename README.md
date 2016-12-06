@@ -81,9 +81,9 @@ The visualizer supports some mouse and keyboard shortcuts which can be applied t
 
 To [compile the library](#build-instructions), you need Python, [GLM](http://glm.g-truc.net/) (which you can apt-get install), and [GLFW3](http://www.glfw.org/) (which you might need to build from source depending on your platform).
 
-To compile the samples, you will also need [PCL](http://pointclouds.org/) and [OpenCV](http://opencv.org/)
-
+To compile the samples, you will also need [PCL](http://pointclouds.org/) and [OpenCV](http://opencv.org/).
 If you want to directly compile PCL for C++11 (needed for lepp and am2b-ar), follow the instructions on lepp's wiki:
+
 https://gitlab.lrz.de/AMCode/lepp3/wikis/Installation%20Instructions
 
 To build the documentation you will also need [cldoc](https://jessevdk.github.io/cldoc/)
