@@ -112,7 +112,7 @@ private:
   bool _rightMousePressed = false;
   bool _middleMousePressed = false;
 
-  float _orbitRadius = 25.0f;
+  float _orbitRadius = 5.0f;
   int _movementForward = 0;
   int _movementSide = 0;
   int _movementUp = 0;
