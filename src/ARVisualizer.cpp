@@ -79,13 +79,13 @@ bool ARVisualizer::IsRunning() const
   return _renderer != nullptr;
 }
 
-void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels)
+void ARVisualizer::NotifyNewVideoFrame(int width, int height, const unsigned char* pixels)
 {
   if (!IsRunning()) { return; }
   _renderer->NotifyNewVideoFrame(width, height, pixels);
 }
 
-void ARVisualizer::NotifyNewVideoFrame(int width, int height, unsigned char* pixels, float largefactor)
+void ARVisualizer::NotifyNewVideoFrame(int width, int height, const unsigned char* pixels, float largefactor)
 {
   if (!IsRunning()) { return; }
   _renderer->NotifyNewVideoFrame(width, height, pixels, largefactor);

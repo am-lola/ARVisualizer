@@ -163,7 +163,7 @@ class Renderer::RenderCommandNotifyNewVideoFrame : public RenderCommand
 {
 public:
 
-  RenderCommandNotifyNewVideoFrame(Renderer* renderer, unsigned int width, unsigned int height, unsigned char* pixels)
+  RenderCommandNotifyNewVideoFrame(Renderer* renderer, unsigned int width, unsigned int height, const unsigned char* pixels)
     : _renderer(renderer), _width(width), _height(height)
   {
     _pixels = UniquePtr<unsigned char[]>(new unsigned char[width * height * 3]);
@@ -175,7 +175,7 @@ public:
     }
   }
 
-  RenderCommandNotifyNewVideoFrame(Renderer* renderer, unsigned int width, unsigned int height, unsigned char* pixels, float largefactor)
+  RenderCommandNotifyNewVideoFrame(Renderer* renderer, unsigned int width, unsigned int height, const unsigned char* pixels, float largefactor)
     : _renderer(renderer), _width(width), _height(height), _largefactor(largefactor)
   {
     _pixels = UniquePtr<unsigned char[]>(new unsigned char[static_cast<unsigned int>(width * largefactor * height * 3)]);
@@ -424,13 +424,13 @@ bool Renderer::IsRunning()
   return _running;
 }
 
-void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels)
+void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, const unsigned char* pixels)
 {
   RenderCommandNotifyNewVideoFrame* command = new RenderCommandNotifyNewVideoFrame(this, width, height, pixels);
   EnqueueRenderCommand(command);
 }
 
-void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels, float largefactor)
+void Renderer::NotifyNewVideoFrame(unsigned int width, unsigned int height, const unsigned char* pixels, float largefactor)
 {
   RenderCommandNotifyNewVideoFrame* command = new RenderCommandNotifyNewVideoFrame(this, width, height, pixels, largefactor);
   EnqueueRenderCommand(command);

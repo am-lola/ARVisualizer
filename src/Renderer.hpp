@@ -119,14 +119,14 @@ public:
   // @width  Width, in pixels, of the image
   // @height Height, in pixels, of the image
   // @pixels Image data, ordered [r,g,b,r,g,b,...]
-  void NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels); // TODO: determine if any other pixel formats need to be supported
+  void NotifyNewVideoFrame(unsigned int width, unsigned int height, const unsigned char* pixels); // TODO: determine if any other pixel formats need to be supported
 
   // Updates video texture with (RGB24) data in pixels, but starts a larger screen
   // @width  width, in pixels, of the image
   // @height height, in pixles, of the image
   // @pixels image data
   // @largefactor how much bigger should the width be
-  void NotifyNewVideoFrame(unsigned int width, unsigned int height, unsigned char* pixels, float largefactor); // TODO: determine if any other pixel formats need to be supported
+  void NotifyNewVideoFrame(unsigned int width, unsigned int height, const unsigned char* pixels, float largefactor); // TODO: determine if any other pixel formats need to be supported
 
   // Updates camera parameters with the given values
   // @position New camera position
