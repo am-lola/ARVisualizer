@@ -52,7 +52,7 @@ public:
   virtual void RenderGUI() = 0;
 
   float _fadeDepth = 5.0f;
-  float _pointSize = 3.5f;
+  float _pointSize = 1.0f;
 
 protected:
 
