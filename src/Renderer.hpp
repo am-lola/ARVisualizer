@@ -268,6 +268,15 @@ private:
   // temporary: light should affect alpha
   bool _lightAlpha;
 
+  unsigned int _backgroundcolor;
+  enum BackgroundColor
+  {
+    GREY = 0,
+    BLACK = 1,
+    WHITE = 2,
+    SKYBLUE = 3
+  };
+
 
   // Screenshot
   enum ScreenshotFormat

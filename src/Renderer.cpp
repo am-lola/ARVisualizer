@@ -868,6 +868,7 @@ void Renderer::RenderGUI()
   {
     ImGui::Separator();
     static int currentItem;
+    static int currentColor;
     ImGui::Combo("Blend mode", &currentItem, "Add\0Mul\0Alpha\0None\0");
 
     switch(currentItem)
@@ -896,6 +897,22 @@ void Renderer::RenderGUI()
     if (enableDepth)
       _meshRenderPassParams |= EnableDepth;
 
+    ImGui::Combo("Background", &currentColor, "Grey\0Black\0White\0Skyblue\0");
+    switch(currentColor)
+    {
+      case 0:
+        _backgroundcolor = GREY;
+        break;
+      case 1:
+        _backgroundcolor = BLACK;
+        break;
+      case 2:
+        _backgroundcolor = WHITE;
+        break;
+      case 3:
+        _backgroundcolor = SKYBLUE;
+        break;
+    }
     ImGui::Checkbox("Screenshot", &showScreenshotWindow);
     ImGui::Checkbox("Renderer Stats", &showRendererStats);
   }
