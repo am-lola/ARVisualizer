@@ -15,6 +15,7 @@ public:
 
   VideoRenderer();
 
+  void SetBackgroundColor(unsigned int);
   virtual void Init() override;
   virtual void Release() override;
   virtual void Update() override;
@@ -36,6 +37,14 @@ private:
   GenericVertexBuffer<VertexP2T2> _vertexBuffer;
   GenericIndexBuffer _indexBuffer;
   TexturedMesh<VertexP2T2> _quadMesh;
+  unsigned int _background = 0;
+  enum BackgroundColor //TODO: unify with enum in Renderer.hpp
+  {
+    GREY = 0,
+    BLACK = 1,
+    WHITE = 2,
+    SKYBLUE = 3
+  };
 };
 
 }

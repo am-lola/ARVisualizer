@@ -2,12 +2,13 @@
 #include "ShaderSources.g.hpp"
 #include "mesh/MeshFactory.hpp"
 
-namespace ar
-{
+namespace ar {
 
-VideoRenderer::VideoRenderer()
-{
-}
+  VideoRenderer::VideoRenderer() {
+  }
+
+void VideoRenderer::SetBackgroundColor(unsigned int color)
+{_background=color;}
 
 void VideoRenderer::Init()
 {
@@ -17,10 +18,28 @@ void VideoRenderer::Init()
 
   _videoWidth = 64; _videoHeight = 64;
   _currentVideoFrame = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]);
-  for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++)
-  {
-    _currentVideoFrame[i] = 50;
+
+  if(_background == GREY) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _currentVideoFrame[i] = 50;
+    }
   }
+  if(_background == BLACK) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _currentVideoFrame[i] = 0;
+    }
+  }
+  if(_background == WHITE) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _currentVideoFrame[i] = 255;
+    }
+  }
+  if(_background == SKYBLUE) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _currentVideoFrame[i] = 135 * (0 == (i % 3)) + 206 * (1 == (i % 3)) + 250 * (2 == (i % 3));
+    }
+  }
+
 
   TexturedMesh<VertexP2T2> videoPane = MeshFactory::MakeQuad<TexturedMesh<VertexP2T2>>(glm::vec2(0, 0), 2.0, 2.0); // vertices range from -1..1
   videoPane.SetShader(&_shader);

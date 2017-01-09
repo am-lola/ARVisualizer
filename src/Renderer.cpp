@@ -544,6 +544,7 @@ void Renderer::Init()
 
   _meshRenderer.Init();
   _meshRenderer.SetDefaultShader(&_defaultShader);
+  _videoRenderer.SetBackgroundColor(_backgroundcolor);
   _videoRenderer.Init();
   _pointCloudRenderer.Init();
   _voxelRenderer.Init();
@@ -774,6 +775,7 @@ void Renderer::Update()
     delete command;
   }
 
+  _videoRenderer.SetBackgroundColor(_backgroundcolor);
   _videoRenderer.Update();
   _pointCloudRenderer.Update();
   _meshRenderer.Update();

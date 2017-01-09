@@ -268,7 +268,7 @@ private:
   // temporary: light should affect alpha
   bool _lightAlpha;
 
-  unsigned int _backgroundcolor;
+  unsigned int _backgroundcolor=0;
   enum BackgroundColor
   {
     GREY = 0,
