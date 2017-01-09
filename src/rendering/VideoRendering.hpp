@@ -32,12 +32,14 @@ private:
   UniquePtr<unsigned char[]> _currentVideoFrame;
   unsigned int _videoWidth, _videoHeight;
   bool _newVideoFrame = false;
+  bool _newColor = true;
 
 
   GenericVertexBuffer<VertexP2T2> _vertexBuffer;
   GenericIndexBuffer _indexBuffer;
   TexturedMesh<VertexP2T2> _quadMesh;
   unsigned int _background = 0;
+  UniquePtr<unsigned char[]> _backgroundpixels;
   enum BackgroundColor //TODO: unify with enum in Renderer.hpp
   {
     GREY = 0,

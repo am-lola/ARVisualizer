@@ -269,6 +269,7 @@ private:
   bool _lightAlpha;
 
   unsigned int _backgroundcolor=0;
+  bool _newBackgroundColor = false;
   enum BackgroundColor
   {
     GREY = 0,

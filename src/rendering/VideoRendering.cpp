@@ -1,3 +1,4 @@
+#include <vtkDataSetToDataObjectFilter.h>
 #include "VideoRendering.hpp"
 #include "ShaderSources.g.hpp"
 #include "mesh/MeshFactory.hpp"
@@ -8,7 +9,36 @@ namespace ar {
   }
 
 void VideoRenderer::SetBackgroundColor(unsigned int color)
-{_background=color;}
+{
+  if(_background == color)
+    return;
+
+  _newColor = true;
+  _background = color;
+  _backgroundpixels = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]);
+
+  if(_background == GREY) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _backgroundpixels[i] = 50;
+    }
+  }
+  if(_background == BLACK) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _backgroundpixels[i] = 0;
+    }
+  }
+  if(_background == WHITE) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _backgroundpixels[i] = 255;
+    }
+  }
+  if(_background == SKYBLUE) {
+    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
+      _backgroundpixels[i] = 135 * (0 == (i % 3)) + 206 * (1 == (i % 3)) + 250 * (2 == (i % 3));
+    }
+  }
+
+}
 
 void VideoRenderer::Init()
 {
@@ -70,6 +100,11 @@ void VideoRenderer::Update()
   {
     BufferTexture(_videoWidth, _videoHeight, _quadMesh.GetTexture(), _currentVideoFrame.get());
     _newVideoFrame = false;
+  }
+  else if (_newColor)
+  {
+    BufferTexture(_videoWidth, _videoHeight, _quadMesh.GetTexture(), _backgroundpixels.get());
+    _newColor = false;
   }
 
   if (_quadMesh.Dirty())

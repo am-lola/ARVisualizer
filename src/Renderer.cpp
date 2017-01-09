@@ -775,7 +775,11 @@ void Renderer::Update()
     delete command;
   }
 
-  _videoRenderer.SetBackgroundColor(_backgroundcolor);
+  if (_newBackgroundColor)
+  {
+    _videoRenderer.SetBackgroundColor(_backgroundcolor);
+    _newBackgroundColor = false;
+  }
   _videoRenderer.Update();
   _pointCloudRenderer.Update();
   _meshRenderer.Update();
@@ -903,16 +907,32 @@ void Renderer::RenderGUI()
     switch(currentColor)
     {
       case 0:
-        _backgroundcolor = GREY;
+        if(_backgroundcolor!=GREY)
+        {
+          _backgroundcolor = GREY;
+          _newBackgroundColor = true;
+        }
         break;
       case 1:
-        _backgroundcolor = BLACK;
+        if(_backgroundcolor!=BLACK)
+        {
+          _backgroundcolor = BLACK;
+          _newBackgroundColor = true;
+        }
         break;
       case 2:
-        _backgroundcolor = WHITE;
+        if(_backgroundcolor!=WHITE)
+        {
+          _backgroundcolor = WHITE;
+          _newBackgroundColor = true;
+        }
         break;
       case 3:
-        _backgroundcolor = SKYBLUE;
+        if(_backgroundcolor!=SKYBLUE)
+        {
+          _backgroundcolor = SKYBLUE;
+          _newBackgroundColor = true;
+        }
         break;
     }
     ImGui::Checkbox("Screenshot", &showScreenshotWindow);
