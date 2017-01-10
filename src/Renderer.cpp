@@ -544,7 +544,6 @@ void Renderer::Init()
 
   _meshRenderer.Init();
   _meshRenderer.SetDefaultShader(&_defaultShader);
-  _videoRenderer.SetBackgroundColor(_backgroundr, _backgroundg, _backgroundb);
   _videoRenderer.Init();
   _pointCloudRenderer.Init();
   _voxelRenderer.Init();

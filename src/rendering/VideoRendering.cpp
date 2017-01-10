@@ -17,7 +17,6 @@ void VideoRenderer::SetBackgroundColor(unsigned char r, unsigned char g, unsigne
   _background[0] = r;
   _background[1] = g;
   _background[2] = b;
-  _backgroundpixels = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]);
 
   for (size_t i = 0; i < _videoWidth * _videoHeight; i++) {
     _backgroundpixels[3*i] = _background[0];
@@ -35,11 +34,16 @@ void VideoRenderer::Init()
 
   _videoWidth = 64; _videoHeight = 64;
   _currentVideoFrame = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]);
+  _backgroundpixels = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]);
+
 
   for (size_t i = 0; i < _videoWidth * _videoHeight; i++) {
     _currentVideoFrame[3*i] = _background[0];
     _currentVideoFrame[3*i+1] = _background[1];
     _currentVideoFrame[3*i+2] = _background[2];
+    _backgroundpixels[3*i] = _background[0];
+    _backgroundpixels[3*i+1] = _background[1];
+    _backgroundpixels[3*i+2] = _background[2];
   }
 
 
