@@ -544,7 +544,7 @@ void Renderer::Init()
 
   _meshRenderer.Init();
   _meshRenderer.SetDefaultShader(&_defaultShader);
-  _videoRenderer.SetBackgroundColor(_backgroundcolor);
+  _videoRenderer.SetBackgroundColor(_backgroundr, _backgroundg, _backgroundb);
   _videoRenderer.Init();
   _pointCloudRenderer.Init();
   _voxelRenderer.Init();
@@ -777,7 +777,10 @@ void Renderer::Update()
 
   if (_newBackgroundColor)
   {
-    _videoRenderer.SetBackgroundColor(_backgroundcolor);
+    _backgroundr = (unsigned char)(_backgroundfloat[0]*255);
+    _backgroundg = (unsigned char)(_backgroundfloat[1]*255);
+    _backgroundb = (unsigned char)(_backgroundfloat[2]*255);
+    _videoRenderer.SetBackgroundColor(_backgroundr, _backgroundg, _backgroundb);
     _newBackgroundColor = false;
   }
   _videoRenderer.Update();
@@ -903,38 +906,40 @@ void Renderer::RenderGUI()
     if (enableDepth)
       _meshRenderPassParams |= EnableDepth;
 
-    ImGui::Combo("Background", &currentColor, "Grey\0Black\0White\0Skyblue\0");
-    switch(currentColor)
+    if ( ImGui::ColorEdit3("Background RGB", _backgroundfloat) )
     {
-      case 0:
-        if(_backgroundcolor!=GREY)
-        {
-          _backgroundcolor = GREY;
-          _newBackgroundColor = true;
-        }
-        break;
-      case 1:
-        if(_backgroundcolor!=BLACK)
-        {
-          _backgroundcolor = BLACK;
-          _newBackgroundColor = true;
-        }
-        break;
-      case 2:
-        if(_backgroundcolor!=WHITE)
-        {
-          _backgroundcolor = WHITE;
-          _newBackgroundColor = true;
-        }
-        break;
-      case 3:
-        if(_backgroundcolor!=SKYBLUE)
-        {
-          _backgroundcolor = SKYBLUE;
-          _newBackgroundColor = true;
-        }
-        break;
+      _newBackgroundColor = true;
     }
+    ImGui::Combo("Background", &currentColor, "Grey\0Black\0White\0Skyblue\0");
+    if (currentColor != _backgroundcolor)
+    {
+      _backgroundcolor = currentColor;
+      _newBackgroundColor = true;
+      switch(_backgroundcolor)
+      {
+        case GREY:
+          _backgroundfloat[0] = 0.197;
+          _backgroundfloat[1] = 0.197;
+          _backgroundfloat[2] = 0.197;
+          break;
+        case BLACK:
+          _backgroundfloat[0] = 0.0;
+          _backgroundfloat[1] = 0.0;
+          _backgroundfloat[2] = 0.0;
+          break;
+        case WHITE:
+          _backgroundfloat[0] = 1.0;
+          _backgroundfloat[1] = 1.0;
+          _backgroundfloat[2] = 1.0;
+          break;
+        case SKYBLUE:
+          _backgroundfloat[0] = 0.529;
+          _backgroundfloat[1] = 0.808;
+          _backgroundfloat[2] = 0.980;
+          break;
+      }
+    }
+
     ImGui::Checkbox("Screenshot", &showScreenshotWindow);
     ImGui::Checkbox("Renderer Stats", &showRendererStats);
   }

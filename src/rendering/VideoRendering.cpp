@@ -8,34 +8,21 @@ namespace ar {
   VideoRenderer::VideoRenderer() {
   }
 
-void VideoRenderer::SetBackgroundColor(unsigned int color)
+void VideoRenderer::SetBackgroundColor(unsigned char r, unsigned char g, unsigned char b)
 {
-  if(_background == color)
+  if((_background[0] == r) && (_background[1] == g) && (_background[2] == b))
     return;
 
   _newColor = true;
-  _background = color;
+  _background[0] = r;
+  _background[1] = g;
+  _background[2] = b;
   _backgroundpixels = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]);
 
-  if(_background == GREY) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _backgroundpixels[i] = 50;
-    }
-  }
-  if(_background == BLACK) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _backgroundpixels[i] = 0;
-    }
-  }
-  if(_background == WHITE) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _backgroundpixels[i] = 255;
-    }
-  }
-  if(_background == SKYBLUE) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _backgroundpixels[i] = 135 * (0 == (i % 3)) + 206 * (1 == (i % 3)) + 250 * (2 == (i % 3));
-    }
+  for (size_t i = 0; i < _videoWidth * _videoHeight; i++) {
+    _backgroundpixels[3*i] = _background[0];
+    _backgroundpixels[3*i+1] = _background[1];
+    _backgroundpixels[3*i+2] = _background[2];
   }
 
 }
@@ -49,25 +36,10 @@ void VideoRenderer::Init()
   _videoWidth = 64; _videoHeight = 64;
   _currentVideoFrame = UniquePtr<unsigned char[]>(new unsigned char[_videoWidth * _videoHeight * 3]);
 
-  if(_background == GREY) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _currentVideoFrame[i] = 50;
-    }
-  }
-  if(_background == BLACK) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _currentVideoFrame[i] = 0;
-    }
-  }
-  if(_background == WHITE) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _currentVideoFrame[i] = 255;
-    }
-  }
-  if(_background == SKYBLUE) {
-    for (size_t i = 0; i < _videoWidth * _videoHeight * 3; i++) {
-      _currentVideoFrame[i] = 135 * (0 == (i % 3)) + 206 * (1 == (i % 3)) + 250 * (2 == (i % 3));
-    }
+  for (size_t i = 0; i < _videoWidth * _videoHeight; i++) {
+    _currentVideoFrame[3*i] = _background[0];
+    _currentVideoFrame[3*i+1] = _background[1];
+    _currentVideoFrame[3*i+2] = _background[2];
   }
 
 

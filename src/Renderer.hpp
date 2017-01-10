@@ -268,7 +268,11 @@ private:
   // temporary: light should affect alpha
   bool _lightAlpha;
 
-  unsigned int _backgroundcolor=0;
+  int _backgroundcolor=0;
+  unsigned char _backgroundr = 50;
+  unsigned char _backgroundg = 50;
+  unsigned char _backgroundb = 50;
+  float _backgroundfloat[3] = {0.197,0.197,0.197};
   bool _newBackgroundColor = false;
   enum BackgroundColor
   {
