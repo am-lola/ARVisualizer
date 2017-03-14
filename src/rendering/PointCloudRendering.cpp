@@ -89,8 +89,7 @@ void PointCloudRenderer::UpdatePointCloud(unsigned int handle, Vector<VertexP4>&
   if (pc == nullptr)
     throw std::runtime_error("The point cloud for given handle has wrong type. Don't update a point cloud with a different type!");
 
-  // TODO: Set color
-  //pc->GetMaterial()->
+  pc->SetMaterial(std::make_shared<FlatColorMaterial>(color));
   std::swap(pc->_points, points);
   pc->_dirty = true;
 }
