@@ -21,8 +21,6 @@ option(GLFW_STATIC_LINKAGE "Link GLFW3 statically" TRUE)
 # Build everything with C++11
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-find_package(VTK REQUIRED)
-include(${VTK_USE_FILE})
 
 # Figure out whether we should be linking against the static or shared version of GLFW3
 if (GLFW_STATIC_LINKAGE)
@@ -69,7 +67,7 @@ if (ARVIS_BUILD_LIBRARY)
     add_library(arvisualizer SHARED ${libarvis_src})
     add_dependencies(arvisualizer shader_gen)
     set_target_properties(arvisualizer PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
-    target_link_libraries(arvisualizer ${AR_GLFW_LIBS} ${OPENGL_LIBRARIES} ${VTK_LIBRARIES})
+    target_link_libraries(arvisualizer ${AR_GLFW_LIBS} ${OPENGL_LIBRARIES} )
 
     # install target for the visualization library
     set(config_install_dir "lib/cmake/${PROJECT_NAME}")
