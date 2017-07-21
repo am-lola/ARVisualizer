@@ -40,7 +40,8 @@ private:
   TexturedMesh<VertexP2T2> _quadMesh;
   unsigned char _background[3] = {50,50,50};
   UniquePtr<unsigned char[]> _backgroundpixels;
-  unsigned int _bgWidth, _bgHeight = 64;
+  unsigned int _bgWidth = 64;
+  unsigned int _bgHeight = 64;
 };
 
 }
