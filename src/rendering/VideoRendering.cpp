@@ -18,7 +18,7 @@ void VideoRenderer::SetBackgroundColor(unsigned char r, unsigned char g, unsigne
   _background[1] = g;
   _background[2] = b;
 
-  for (size_t i = 0; i < _videoWidth * _videoHeight; i++) {
+  for (size_t i = 0; i < _bgWidth * _bgHeight; i++) {
     _backgroundpixels[3*i] = _background[0];
     _backgroundpixels[3*i+1] = _background[1];
     _backgroundpixels[3*i+2] = _background[2];
@@ -79,7 +79,7 @@ void VideoRenderer::Update()
   }
   else if (_newColor)
   {
-    BufferTexture(_videoWidth, _videoHeight, _quadMesh.GetTexture(), _backgroundpixels.get());
+    BufferTexture(_bgWidth, _bgHeight, _quadMesh.GetTexture(), _backgroundpixels.get());
     _newColor = false;
   }
 
