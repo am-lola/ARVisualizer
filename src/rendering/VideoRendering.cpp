@@ -95,6 +95,9 @@ void VideoRenderer::Update()
 }
 void VideoRenderer::RenderPass(const SceneInfo& sceneInfo)
 {
+  if (!sceneInfo.onlyOpaque) // only render on opaque passes
+    return;
+
   const auto& shader = _quadMesh.GetShader();
   shader->enable();
 

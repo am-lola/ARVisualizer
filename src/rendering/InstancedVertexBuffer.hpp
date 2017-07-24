@@ -98,6 +98,6 @@ public:
   Vector<InstanceT> _instances;
 };
 
-}
+} // namespace ar
 
 #endif // _INSTANCEDVERTEXBUFFER_H

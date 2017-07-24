@@ -17,6 +17,6 @@ public:
   virtual void RenderGUI() { }
 };
 
-}
+} // namespace ar
 
 #endif // _ARRENDERCOMPONENT_HPP

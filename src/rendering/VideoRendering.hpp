@@ -44,6 +44,6 @@ private:
   unsigned int _bgHeight = 64;
 };
 
-}
+} // namespace ar
 
 #endif // _ARVIDEO_RENDERING_HPP

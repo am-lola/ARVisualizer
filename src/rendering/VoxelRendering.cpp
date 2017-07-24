@@ -36,6 +36,9 @@ void VoxelRenderer::Update()
 
 void VoxelRenderer::RenderPass(const SceneInfo& sceneInfo)
 {
+  if (sceneInfo.onlyOpaque) // only render in transparent passes
+    return;
+
   if (_instancedVertexBuffer.InstanceCount() > 0)
   {
     ShaderProgram& shader = _shader;

@@ -801,10 +801,43 @@ void Renderer::RenderOneFrame()
   sceneInfo.aspect = _camera._aspect;
   sceneInfo.visibilityMap = &_visibilityMap;
   sceneInfo.lightAlpha = _lightAlpha;
+  sceneInfo.onlyOpaque = true;
 
   glViewport(0, 0, _windowWidth, _windowHeight);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  // --- OPAQUE-Only Pass
+
+  /*************
+  * First pass:
+  *   render all 2D textured shapes
+  *************/
+  EnableRenderPass(Blend_None);
+  _videoRenderer.RenderPass(sceneInfo);
+
+  /*************
+  * Second pass:
+  *   render point cloud
+  *************/
+  EnableRenderPass(Blend_None | EnableDepth);
+  _pointCloudRenderer.RenderPass(sceneInfo);
+
+  // Render voxels
+  EnableRenderPass(Blend_None | EnableDepth);
+  _voxelRenderer.RenderPass(sceneInfo);
+
+  /*************
+  * Third pass:
+  *   render all 3D objects on top of the previous 2D shapes
+  *************/
+  EnableRenderPass(_meshRenderPassParams);
+  _meshRenderer.RenderPass(sceneInfo);
+
+  EnableRenderPass(Blend_None | EnableDepth);
+  _lineRenderer.RenderPass(sceneInfo);
+
+  // --- TRANSPARENT Pass
+  sceneInfo.onlyOpaque = false;
   /*************
   * First pass:
   *   render all 2D textured shapes

@@ -63,6 +63,6 @@ protected:
   bool _initialized = false;
 };
 
-}
+} // namespace ar
 
 #endif // _ARRENDER_RESOURCE_HPP

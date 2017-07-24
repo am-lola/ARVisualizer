@@ -30,7 +30,7 @@ private:
   GenericIndexBuffer _indexBuffer;
 };
 
-}
+} // namespace ar
 
 
 #endif // _ARVOXEL_RENDERING_HPP

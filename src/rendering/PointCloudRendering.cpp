@@ -36,28 +36,30 @@ void PointCloudRenderer::RenderPass(const SceneInfo& sceneInfo)
 {
   for (auto& cloud : _pointClouds)
   {
-    if (cloud->ShouldDraw())
-    {
-      const auto& shader = cloud->GetShader();
-      shader->enable();
-      cloud->GetMaterial()->Apply();
+    if (!cloud->ShouldDraw())
+      continue;
+    else if (cloud->GetMaterial()->GetOpaque() != sceneInfo.onlyOpaque)
+      continue;
 
-      glm::mat4 mvp = sceneInfo.projectionMatrix * sceneInfo.viewMatrix * cloud->GetTransform();
-      glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
-      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &cloud->GetTransform()[0][0]);
-      glUniform1f(shader->getUniform("fadeDepth"), cloud->_fadeDepth);
+    const auto& shader = cloud->GetShader();
+    shader->enable();
+    cloud->GetMaterial()->Apply();
+
+    glm::mat4 mvp = sceneInfo.projectionMatrix * sceneInfo.viewMatrix * cloud->GetTransform();
+    glUniformMatrix4fv(shader->getUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, &cloud->GetTransform()[0][0]);
+    glUniform1f(shader->getUniform("fadeDepth"), cloud->_fadeDepth);
 
 
-      GLfloat storedPointSize;
-      glGetFloatv(GL_POINT_SIZE, &storedPointSize);
-      glPointSize(cloud->_pointSize);
+    GLfloat storedPointSize;
+    glGetFloatv(GL_POINT_SIZE, &storedPointSize);
+    glPointSize(cloud->_pointSize);
 
-      glBindVertexArray(cloud->GetVAO());
-      glDrawArrays(GL_POINTS, 0, cloud->NumPoints());
-      glBindVertexArray(0);
+    glBindVertexArray(cloud->GetVAO());
+    glDrawArrays(GL_POINTS, 0, cloud->NumPoints());
+    glBindVertexArray(0);
 
-      glPointSize(storedPointSize);
-    }
+    glPointSize(storedPointSize);
   }
 }
 

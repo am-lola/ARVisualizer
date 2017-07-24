@@ -23,6 +23,6 @@ private:
   ShaderProgram _shader;
 };
 
-}
+} // namespace ar
 
 #endif // _ARLINE_RENDERING_HPP

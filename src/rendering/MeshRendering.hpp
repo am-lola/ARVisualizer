@@ -32,7 +32,6 @@ public:
   void RemoveAllMeshes();
   void UpdateMesh(unsigned int handle, Mesh<VertexT>* mesh);
 
-
   void SetMeshTransform(unsigned int handle, const glm::mat4& transform, bool absolute);
 
   inline void SetDefaultShader(ShaderProgram* shader) { _defaultShader = shader; }
@@ -51,6 +50,6 @@ protected:
   bool _removedMesh = false;
 };
 
-}
+} // namespace ar
 
 #endif // _ARMESH_RENDERING_H

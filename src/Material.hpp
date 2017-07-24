@@ -22,7 +22,10 @@ namespace ar
       Validate();
     }
 
+    bool GetOpaque() { return _opaque; }
+
   protected:
+    bool _opaque;
     ShaderProgram* _shader;
     Vector<std::string> _uniformNames; // used to ensure shader can support this material
 
@@ -52,6 +55,11 @@ namespace ar
     FlatColorMaterial (Color color) {
       _color = color;
       _uniformNames = {"color"};
+
+      if (_color.a < 1.0)
+        _opaque = false;
+      else
+        _opaque = true;
     }
 
     virtual void Apply() {

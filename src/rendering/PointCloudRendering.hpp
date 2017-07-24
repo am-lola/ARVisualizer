@@ -41,6 +41,6 @@ private:
   std::unordered_map<unsigned int, size_t> _handleIndexMap;
 };
 
-}
+} // namespace ar
 
 #endif // _ARPPOINTCLOUD_RENDERING_HPP

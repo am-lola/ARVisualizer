@@ -20,6 +20,6 @@ static GLenum GetGLUsage(BufferUsage usage)
   return usage == BufferUsage::Stream ? GL_STREAM_DRAW : (usage == BufferUsage::Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 }
 
-}
+} // namespace ar
 
 #endif // _ARRENDER_DEFINITIONS_HPP

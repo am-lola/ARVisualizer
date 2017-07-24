@@ -28,6 +28,8 @@ void LineRenderer::RenderPass(const SceneInfo& sceneInfo)
   {
     if (!sceneInfo.shouldDraw(m->ID()))
       continue;
+    else if (m->GetMaterial()->GetOpaque() != sceneInfo.onlyOpaque)
+      continue;
 
     const LineMesh* mesh = static_cast<LineMesh*>(m.get());
 

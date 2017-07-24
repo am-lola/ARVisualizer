@@ -18,6 +18,7 @@ struct SceneInfo
   float aspect;
   std::unordered_map<unsigned int, bool>* visibilityMap;
   bool lightAlpha;
+  bool onlyOpaque;
 
   bool shouldDraw(unsigned handle) const
   {
@@ -25,6 +26,6 @@ struct SceneInfo
   }
 };
 
-}
+} // namespace ar
 
 #endif // _ARSCENEINFO_H
