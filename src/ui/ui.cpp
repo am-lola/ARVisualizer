@@ -757,6 +757,9 @@ void UIWindow::PushPlotValue(ui_element_handle handle, float value)
 
   UIPlot* plot = dynamic_cast<UIPlot*>(_elements[handle]._element.get());
 
+  if (plot == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIPlot.");
+
   plot->_buffer[plot->_offset] = value;
   plot->_offset = (plot->_offset + 1) % plot->size();
 }
@@ -766,6 +769,9 @@ void UIWindow::UpdateText(ui_element_handle handle, const char* fmt, ...)
   MutexLockGuard lockGuard(_mutex);
 
   UIText* uiText = dynamic_cast<UIText*>(_elements[handle]._element.get());
+
+  if (uiText == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIText.");
 
   va_list args;
   va_start(args, fmt);
@@ -795,6 +801,10 @@ bool UIWindow::GetButtonState(ui_element_handle handle)
   MutexLockGuard lockGuard(_mutex);
 
   UIButton* button = dynamic_cast<UIButton*>(_elements[handle]._element.get());
+
+  if (button == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIButton.");
+
   const bool pressed = button->_pressed;
   button->_pressed = false;
   return pressed;
@@ -805,8 +815,9 @@ float UIWindow::GetSliderFloatValue(ui_element_handle handle) const
   MutexLockGuard lockGuard(_mutex);
 
   UISlider<float>* slider = dynamic_cast<UISlider<float>*>(_elements[handle]._element.get());
+
   if (slider == nullptr)
-    throw new std::exception;
+    throw std::runtime_error("Invalid element handle. Element is not UISlider<float>.");
 
   return slider->_values[0];
 }
@@ -816,6 +827,10 @@ void UIWindow::GetSliderFloatValues(ui_element_handle handle, float* values) con
   MutexLockGuard lockGuard(_mutex);
 
   UISlider<float>* slider = dynamic_cast<UISlider<float>*>(_elements[handle]._element.get());
+
+  if (slider == nullptr)
+    throw std::runtime_error("Invalid element handle. Element is not UISlider<float>.");
+
   for (int i = 0; i < slider->_numValues; i++)
     values[i] = slider->_values[i];
 }
@@ -825,6 +840,10 @@ int UIWindow::GetSliderIntValue(ui_element_handle handle) const
   MutexLockGuard lockGuard(_mutex);
 
   UISlider<int>* slider = dynamic_cast<UISlider<int>*>(_elements[handle]._element.get());
+
+  if (slider == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UISlider<int>");
+
   return slider->_values[0];
 }
 
@@ -833,6 +852,10 @@ void UIWindow::GetSliderIntValues(ui_element_handle handle, int* values) const
   MutexLockGuard lockGuard(_mutex);
 
   UISlider<int>* slider = dynamic_cast<UISlider<int>*>(_elements[handle]._element.get());
+
+  if (slider == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UISlider<int>");
+
   for (int i = 0; i < slider->_numValues; i++)
     values[i] = slider->_values[i];
 }
@@ -842,6 +865,10 @@ bool UIWindow::GetCheckBoxState(ui_element_handle handle) const
   MutexLockGuard lockGuard(_mutex);
 
   UICheckBox* checkBox = dynamic_cast<UICheckBox*>(_elements[handle]._element.get());
+
+  if (checkBox == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UICheckBox");
+
   return checkBox->_checked;
 }
 
@@ -850,6 +877,10 @@ void UIWindow::GetFloatRangeValues(ui_element_handle handle, float& lower, float
   MutexLockGuard lockGuard(_mutex);
 
   UIFloatRange* floatRange = dynamic_cast<UIFloatRange*>(_elements[handle]._element.get());
+
+  if (floatRange == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIFloatRange.");
+
   lower = floatRange->_lowerValue;
   upper = floatRange->_upperValue;
 }
@@ -859,6 +890,10 @@ int UIWindow::GetSelectedComboBoxItem(ui_element_handle handle) const
   MutexLockGuard lockGuard(_mutex);
 
   UIComboBox* comboBox = dynamic_cast<UIComboBox*>(_elements[handle]._element.get());
+
+  if (comboBox == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIComboBox.");
+
   return comboBox->_currentItem;
 }
 
@@ -867,6 +902,10 @@ std::string UIWindow::GetInputTextValue(ui_element_handle handle) const
   MutexLockGuard lockGuard(_mutex);
 
   UIInputText* inputText = dynamic_cast<UIInputText*>(_elements[handle]._element.get());
+
+  if (inputText == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIInputText");
+
   return inputText->_text;
 }
 
@@ -875,6 +914,10 @@ void UIWindow::GetColorValues3(ui_element_handle handle, float color[3]) const
   MutexLockGuard lockGuard(_mutex);
 
   UIColor* col = dynamic_cast<UIColor*>(_elements[handle]._element.get());
+
+  if (col == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIColor.");
+
   for (int i = 0; i < 3; i++)
     color[i] = col->_color[i];
 }
@@ -884,6 +927,10 @@ void UIWindow::GetColorValues4(ui_element_handle handle, float color[4]) const
   MutexLockGuard lockGuard(_mutex);
 
   UIColor* col = dynamic_cast<UIColor*>(_elements[handle]._element.get());
+
+  if (col == nullptr)
+      throw std::runtime_error("Invalid element handle. Element is not UIColor.");
+
   for (int i = 0; i < 4; i++)
     color[i] = col->_color[i];
 }
