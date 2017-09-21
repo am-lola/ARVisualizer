@@ -1,6 +1,25 @@
 # Awesome Robot Visualizer
 
-A small visualization library
+A small 3D visualization library with minimal overhead.
+
+# Dependencies
+
+To [compile the library](#build-instructions), you need Python, [GLM](http://glm.g-truc.net/) (which you can apt-get install), and [GLFW3](http://www.glfw.org/) (which you might need to build from source depending on your platform).
+
+To compile the samples, you will also need [PCL](http://pointclouds.org/) and [OpenCV](http://opencv.org/).
+If you want to directly compile PCL for C++11 (needed for lepp and am2b-ar), follow the instructions on lepp's wiki:
+
+https://gitlab.lrz.de/AMCode/lepp3/wikis/Installation%20Instructions
+
+To build the documentation you will also need [cldoc](https://jessevdk.github.io/cldoc/)
+
+A script is provided in `/scripts/install_dependencies.sh` which can be used to automatically fetch and install the necessary dependencies on Ubuntu-based platforms:
+
+    install_dependencies.sh
+        Installs the minimum dependencies necessary to build the library
+
+    install_dependencies.sh all
+        Installs all dependencies necessary to build the library, the samples, and the documentation
 
 # Build Instructions
 
@@ -77,21 +96,3 @@ The visualizer supports some mouse and keyboard shortcuts which can be applied t
                  '2' : Render meshes as wireframes
                  '3' : Render meshes as points (one point per vertex)
 
-# Dependencies
-
-To [compile the library](#build-instructions), you need Python, [GLM](http://glm.g-truc.net/) (which you can apt-get install), and [GLFW3](http://www.glfw.org/) (which you might need to build from source depending on your platform).
-
-To compile the samples, you will also need [PCL](http://pointclouds.org/) and [OpenCV](http://opencv.org/).
-If you want to directly compile PCL for C++11 (needed for lepp and am2b-ar), follow the instructions on lepp's wiki:
-
-https://gitlab.lrz.de/AMCode/lepp3/wikis/Installation%20Instructions
-
-To build the documentation you will also need [cldoc](https://jessevdk.github.io/cldoc/)
-
-A script is provided in `/scripts/install_dependencies.sh` which can be used to automatically fetch and install the necessary dependencies on Ubuntu-based platforms:
-
-    install_dependencies.sh
-        Installs the minimum dependencies necessary to build the library
-
-    install_dependencies.sh all
-        Installs all dependencies necessary to build the library, the samples, and the documentation
