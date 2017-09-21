@@ -19,7 +19,9 @@ A script is provided in `/scripts/install_dependencies.sh` which can be used to 
         Installs the minimum dependencies necessary to build the library
 
     install_dependencies.sh all
-        Installs all dependencies necessary to build the library, the samples, and the documentation
+        Installs all dependencies necessary to build the library, the samples, and the documentation EXCEPT for PCL,
+        which should be compiled according to the instructions above
+        
 
 # Build Instructions
 
