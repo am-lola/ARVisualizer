@@ -1,4 +1,3 @@
-#include <vtkDataSetToDataObjectFilter.h>
 #include "VideoRendering.hpp"
 #include "ShaderSources.g.hpp"
 #include "mesh/MeshFactory.hpp"
