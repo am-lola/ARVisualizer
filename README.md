@@ -2,6 +2,17 @@
 
 A small 3D visualization library with minimal overhead.
 
+# Publications
+
+The ideas behind this code are published under:
+
+[Wahrmann, Daniel; Hildebrandt, Arne-Christoph; Bates, Tamas; Wittmann, Robert; Sygulla, Felix; Seiwald, Philipp; Rixen, Daniel: Vision-Based 3D Modeling of Unknown Dynamic Environments for Real-Time Humanoid Navigation. International Journal of Humanoid Robotics Vol. 16 No. 01, 2019](http://mediatum.ub.tum.de/node?id=1435457)
+
+# Videos
+
+The results of these algorithms can be seen on:
+[Vision System of Humanoid Robot LOLA](https://youtu.be/VceqNJucPiw)
+
 # Dependencies
 
 To [compile the library](#build-instructions), you need Python, [GLM](http://glm.g-truc.net/) (which you can apt-get install), and [GLFW3](http://www.glfw.org/) (which you might need to build from source depending on your platform).
